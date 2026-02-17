@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">The Herd</string>
+    <!-- Toolbar -->
+    <string name="logo_desc">Logo</string>
+    <string name="settings_desc">Settings</string>
+    <string name="home_desc">Home</string>
+    <string name="toolbar_title">The Herd</string>
+
+    <!-- Sign Up Page -->
+    <string name="sign_up_title">Sign - Up</string>
+    <string name="app_logo_desc">App Logo</string>
+
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="fsc_email">FSC Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+
+    <string name="create_account">Create an Account</string>
+    <string name="login">Login</string>
+
+    <!-- Footer -->
+    <string name="footer_text">© 2026 The Herd. All rights reserved.</string>
 </resources>
