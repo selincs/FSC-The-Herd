@@ -35,9 +35,12 @@ public class Friendship {
         status = FriendshipStatus.REJECTED;
     }
 
+    public void block(){ status = FriendshipStatus.BLOCKED;}
+
     public enum FriendshipStatus {
         PENDING,
         ACCEPTED,
-        REJECTED
+        REJECTED,
+        BLOCKED
     }
 }
