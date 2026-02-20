@@ -19,6 +19,10 @@
     <string name="create_account">Create an Account</string>
     <string name="login">Login</string>
 
+    <!-- Log In Page -->
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">We missed you!</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
     <!-- Footer -->
     <string name="footer_text">© 2026 The Herd. All rights reserved.</string>
 </resources>

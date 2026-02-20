@@ -73,6 +73,117 @@
 
     </androidx.appcompat.widget.Toolbar>
 
+    <!-- login form -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/topToolbar"
+        app:layout_constraintBottom_toTopOf="@id/footerLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:padding="24dp"
+            android:paddingBottom="60dp">
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/loginTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/login_title"
+                android:textSize="32sp"
+                android:fontFamily="@font/fugaz_one"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                android:textColor="#2F442F"/>
+
+            <!-- Subtitle -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/login_subtitle"
+                android:textSize="16sp"
+                android:textColor="#6B6B6B"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Logo -->
+            <ImageView
+                android:id="@+id/loginLogo"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@mipmap/ic_launcher"
+                android:contentDescription="@string/app_logo_desc"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Email -->
+            <EditText
+                android:id="@+id/emailField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:paddingVertical="12dp"
+                android:hint="@string/fsc_email"
+                android:inputType="textEmailAddress"
+                android:autofillHints="emailAddress"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Password -->
+            <EditText
+                android:id="@+id/passwordField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:paddingVertical="12dp"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:autofillHints="password"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Validation -->
+            <TextView
+                android:id="@+id/validationMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF0000"
+                android:text=""
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Login Button -->
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/login"
+                android:textColor="#FCF5FD"
+                android:backgroundTint="#2F442F"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Don't have account -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dont_have_account"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Sign Up Button -->
+            <Button
+                android:id="@+id/signUpButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_up_title"
+                android:textColor="#FCF5FD"
+                android:backgroundTint="#2F442F"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+
     <!-- Footer -->
     <LinearLayout
         android:id="@+id/footerLayout"

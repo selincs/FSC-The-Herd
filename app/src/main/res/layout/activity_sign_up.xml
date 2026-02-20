@@ -189,6 +189,13 @@
                 android:text="@string/create_account"
                 android:backgroundTint="#2F442F"/>
 
+            <!-- Already have account -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Already have an account?"
+                android:layout_marginBottom="8dp"/>
+
             <!-- Login btn -->
             <Button
                 android:id="@+id/loginButton"
