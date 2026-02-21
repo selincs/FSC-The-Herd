@@ -1,5 +1,8 @@
 package Model;
 
+//Should the friends list be its own class? How do we show online/offline users in the friends list?
+
+//Friend request class? We gotta develop this idea a bit more :)
 public class Friendship {
 
     private int requesterId;

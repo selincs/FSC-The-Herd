@@ -1,5 +1,6 @@
 package Model;
 
+//We don't need this class, it should be combined with Hobby. Let's find a better name though. Topic? BoardTopic?
 public class Interest {
 
     private String interestName;

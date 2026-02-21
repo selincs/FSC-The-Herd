@@ -6,25 +6,41 @@ import java.util.ArrayList;
 
 //Social Content class for the User, behaviors etc.
 public class Profile {
-    private User user;
-    private List<Hobby> hobbies;
+    //private User user;
+    private String userID; //No need to store the whole User class here, just userID to find them
+    private List<Hobby> hobbies; //We don't need both Hobby + Interest. Let's combine into 1 + rename -> Topic?
     private List<Interest> interests;
-    private List<Integer> friends;
-    //profile picture
+    //private List<Integer> friends;
+    private List<String> friendIDs;
+    private onlineStatus status;
+    //profile picture, how do we store an image? revisit after deciding
+    private String profilePictureURL;
+    //online status
     //bio
-    //related community boards?
+    //related community boards? board participation information, like posts/comments
 
     public Profile(User user ) {
-
-        this.user = user;
+        //this.user = user;
+        this.userID = user.getUserID();
 
         hobbies = new ArrayList<Hobby>();
 
         interests = new ArrayList<Interest>();
+        this.status = status; //How does this part work in the grand scheme of things...
+//        friends = new ArrayList<Integer>();
+        this.friendIDs = new ArrayList<String>();
 
-        friends = new ArrayList<Integer>();
+        //profilePictureURL is empty at start, do we declare it as null?
+    }
 
-
+    //Can later associate colors with online status (maybe in text color) Online=Green, Offline=Grey, Away=Yellow
+    //Invisible=Grey, Do Not Disturb = Red
+    public enum onlineStatus {
+        ONLINE, //User is online & visible to those with permission to see this status (Friends only? Everyone? Personal pref?)
+        OFFLINE, //User is offline and signed out
+        AWAY, //User is logged in but inactive (AFK) - Mobile app might have no use for this
+        INVISIBLE, //User appears offline, but can still chat & send messages
+        DO_NOT_DISTURB //Disable all notifications
     }
 
     public void addHobbies(Hobby hobby){
@@ -39,14 +55,34 @@ public class Profile {
         }
     }
 
-    public void addFriends(int friend){
-        if ( !friends.contains(friend)){
-            friends.add(friend);
+//    public void addFriends(int friend){
+//        if ( !friends.contains(friend)){
+//            friends.add(friend);
+//        }
+//    }
+    public void addFriends(String friendID){
+        if ( !friendIDs.contains(friendID)){
+            friendIDs.add(friendID);
         }
     }
 
-    public User getUser() {
-        return user;
+//    public User getUser() { return user; }
+
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public onlineStatus getStatus() {
+        return status;
+    }
+
+    public String getProfilePictureURL() {
+        return profilePictureURL;
+    }
+
+    public List<String> getFriendIDs() {
+        return friendIDs;
     }
 
     public List<Hobby> getHobbies() {
@@ -57,7 +93,5 @@ public class Profile {
         return interests;
     }
 
-    public List<Integer> getFriends() {
-        return friends;
-    }
+//    public List<Integer> getFriends() {    return friends;    }
 }
