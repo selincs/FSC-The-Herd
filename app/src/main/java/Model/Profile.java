@@ -4,12 +4,15 @@ package Model;
 import java.util.List;
 import java.util.ArrayList;
 
-
+//Social Content class for the User, behaviors etc.
 public class Profile {
     private User user;
     private List<Hobby> hobbies;
     private List<Interest> interests;
     private List<Integer> friends;
+    //profile picture
+    //bio
+    //related community boards?
 
     public Profile(User user ) {
 
