@@ -1,6 +1,7 @@
 package Model;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -8,80 +9,109 @@ import java.util.ArrayList;
 public class Profile {
     //private User user;
     private String userID; //No need to store the whole User class here, just userID to find them
-    private List<Topic> topics; //We don't need both Topic + Interest. Let's combine into 1 + rename -> Topic?
 
-    //private List<Integer> friends;
-    private List<String> friendIDs;
-    private onlineStatus status;    //online status, for displaying to other users
-    //profile picture, how do we store an image? revisit after deciding
+    private String firstName;   //Received from GUI Sign Up, used for display purposes
+    private String lastName;
+
+    private OnlineStatus status;    //online status, for displaying to other users
+    private MentorRole role;    //Enum to denote User's optional role in mentorship feature
+
+    private String currentStatusUpdate;     //Status a user posts on their page for real time updates (not online status)
+    private List<String> friendIDs; //Connect users by userID
+    private List<String> topicIds; //All topics User is interested in
+    private List<String> askMeAboutTopicIds; // Selected by User for display on Profile to spark convo/interest b/w users
+
     private String profilePictureURL;
-    private String currentStatusUpdate;
-    //Enum to denote User's optional role in mentorship feature -> Move this to Profile I think
-    private MentorRole role;
+    private String profileBio;    //User bio may be redundant with askMeAbtTIDs.. keep for now
 
-    private String profileBio;    //User bio -- Ask me about XYZ -> Spark convo + interest b/w ppl
-    //askMeAbout (Topics go Here) -> List of their selected topics sent to GUI
-    private List<Topic> askMeAbout; //Is this just a string of topicNames?
+
     //sharedContext (Shared Topics liked between two users, classes, etc) (Do we ask ppl to input their actual classes?)
-    private List<String> sharedContext; //topic name
+    //private List<String> sharedContext; //Needs to be dynamic, not permanently decided here. Don't store.
+    //Compare this.profile.topicIds with otherProfile.topicIds
     //related community boards? board participation information, like posts/comments
 
-    public Profile(User user ) {
-        //this.user = user;
-        this.userID = user.getUserID();
+    public Profile(String userID, String firstName, String lastName) {
+        this.userID = userID;
+        this.firstName = firstName;
+        this.lastName = lastName;
 
-        topics = new ArrayList<Topic>();
-
-        this.status = status; //How does this part work in the grand scheme of things...
-//        friends = new ArrayList<Integer>();
-        this.friendIDs = new ArrayList<String>();
+        this.status = OnlineStatus.OFFLINE; //How does this part work in the grand scheme of things...
         this.role = MentorRole.NONE; //On default user creation set NONE, updates later if user enrolls in feature
-        //profilePictureURL is empty at start, do we declare it as null?
+
+        this.topicIds = new ArrayList<String>();
+        this.askMeAboutTopicIds = new ArrayList<String>();
+        this.friendIDs = new ArrayList<String>();
     }
 
-    //Can later associate colors with online status (maybe in text color) Online=Green, Offline=Grey, Away=Yellow
-    //Invisible=Grey, Do Not Disturb = Red
-    public enum onlineStatus {
+    //Can later associate colors with online status (bubble/text color) Online=Green, Invisible=Grey, Do Not Disturb = Red
+    public enum OnlineStatus {
         ONLINE, //User is online & visible to those with permission to see this status (Friends only? Everyone? Personal pref?)
         OFFLINE, //User is offline and signed out
-        AWAY, //User is logged in but inactive (AFK) - Mobile app might have no use for this
         INVISIBLE, //User appears offline, but can still chat & send messages
         DO_NOT_DISTURB //Disable all notifications
     }
-
-    public void addTopic(Topic addedTopic){
-        if ((addedTopic != null ) && !topics.contains(addedTopic)){
-            topics.add(addedTopic);
-        }
-    }
-
     public enum MentorRole {
         NONE, //default user has no mentorship enrollment
         MENTOR, //user is a mentor to another user(s)
         MENTEE //user is a mentee, and has a mentor user
     }
+
     public MentorRole getRole() {
         return role;
     }
-//    public void addFriends(int friend){
-//        if ( !friends.contains(friend)){
-//            friends.add(friend);
-//        }
-//    }
-    public void addFriends(String friendID){
-        if ( !friendIDs.contains(friendID)){
+
+    public void addFriend(String friendID){
+        if (friendID != null && !friendIDs.contains(friendID)){
             friendIDs.add(friendID);
         }
     }
 
-//    public User getUser() { return user; }
+    public void removeFriend(String friendID) {
+        if (friendID != null && friendIDs.contains(friendID)){
+            friendIDs.remove(friendID);
+            System.out.println("Friend removed"); //Debug print to make sure this works, removable after
+        }
+    }
 
+    public void addTopic(String topicID) {
+        if (topicID != null && !topicIds.contains(topicID)) {
+            topicIds.add(topicID);
+        }
+    }
+    public void removeTopic(String topicID) {
+        if (topicID != null && topicIds.contains(topicID)) {
+            topicIds.remove(topicID);
+            System.out.println("Topic removed"); //Removable after confirmation it works
+        }
+    }
+
+    public void addAskMeAboutTopic(String topicID) {
+        if (topicID != null && !askMeAboutTopicIds.contains(topicID)) {
+            askMeAboutTopicIds.add(topicID);
+        }
+    }
+
+    public void removeAskMeAboutTopic(String topicID) {
+        if (topicID != null && askMeAboutTopicIds.contains(topicID)) {
+            askMeAboutTopicIds.remove(topicID);
+        }
+    }
 
     public String getUserID() {
         return userID;
     }
 
-    public onlineStatus getStatus() {
+    public List<String> getFriendIDs() {
+//        return friendIDs;
+        return Collections.unmodifiableList(friendIDs);
+    }
+
+    public List<String> getTopicIds() {
+//        return topicIds;
+        return Collections.unmodifiableList(topicIds);
+    }
+
+    public OnlineStatus getStatus() {
         return status;
     }
 
@@ -89,15 +119,33 @@ public class Profile {
         return profilePictureURL;
     }
 
-    public List<String> getFriendIDs() {
-        return friendIDs;
+    public void setProfilePictureURL(String profilePictureURL) {
+        if (profilePictureURL != null && !profilePictureURL.isEmpty()) {
+            this.profilePictureURL = profilePictureURL;
+        }
     }
 
-    public List<Topic> getTopics() {
-        return topics;
+    public void setStatus(OnlineStatus status) {
+        if (status != null) {
+            this.status = status;
+        }
     }
 
+    public void setProfileBio(String bio) {
+        if (bio != null) {
+            this.profileBio = bio;
+        }
+    }
 
+    public String getFirstName() {
+        return firstName;
+    }
 
-//    public List<Integer> getFriends() {    return friends;    }
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getProfileBio() {
+        return profileBio;
+    }
 }
