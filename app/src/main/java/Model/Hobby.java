@@ -10,7 +10,13 @@ import java.util.List;
     -Has posts in the community board -> Posts have likes and comments. Other things? Post class, member of Community Board?
     -Has members (memberIDs)
     TODO: Is a Topic *DIFFERENT* than a CommunityBoard? What is different? Do we need both classes?
+    -Relevant CommBoard topics
+    -Events
+    -Guides
+    -Clubs (Groups?)
+    -Videos? -> How to vet videos... (pre approved? maybe videos should be reserved for guides)
 */
+
 public class Hobby {
     private String hobbyID;
     private String hobbyName;

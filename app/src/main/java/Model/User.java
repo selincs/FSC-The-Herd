@@ -8,8 +8,9 @@ public class User {
     private String fscEmail;
     //the user's unique student ramID, which identifier should we use? we probably don't want to expose email addys to randos
     private String ramID;
-
+    //First + Last Name - Display Purposes
     //the user's password, do we need to hash this later? how to do security...
+
     //What database are we using? Firebase? Or SQL? How do we store passwords? For now, here
     private String password;
 

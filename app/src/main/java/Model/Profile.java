@@ -12,11 +12,14 @@ public class Profile {
     private List<Interest> interests;
     //private List<Integer> friends;
     private List<String> friendIDs;
-    private onlineStatus status;
+    private onlineStatus status;    //online status
     //profile picture, how do we store an image? revisit after deciding
     private String profilePictureURL;
-    //online status
-    //bio
+
+
+    private String profileBio;    //User bio -- Ask me about XYZ -> Spark convo + interest b/w ppl
+    //askMeAbout (Topics go Here) -> List of their selected topics sent to GUI
+    //sharedContext (Shared Topics liked between two users, classes, etc) (Do we ask ppl to input their actual classes?)
     //related community boards? board participation information, like posts/comments
 
     public Profile(User user ) {
