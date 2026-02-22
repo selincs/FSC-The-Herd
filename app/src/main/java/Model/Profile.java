@@ -12,11 +12,12 @@ public class Profile {
 
     //private List<Integer> friends;
     private List<String> friendIDs;
-    private onlineStatus status;    //online status
+    private onlineStatus status;    //online status, for displaying to other users
     //profile picture, how do we store an image? revisit after deciding
     private String profilePictureURL;
     private String currentStatusUpdate;
-
+    //Enum to denote User's optional role in mentorship feature -> Move this to Profile I think
+    private MentorRole role;
 
     private String profileBio;    //User bio -- Ask me about XYZ -> Spark convo + interest b/w ppl
     //askMeAbout (Topics go Here) -> List of their selected topics sent to GUI
@@ -34,7 +35,7 @@ public class Profile {
         this.status = status; //How does this part work in the grand scheme of things...
 //        friends = new ArrayList<Integer>();
         this.friendIDs = new ArrayList<String>();
-
+        this.role = MentorRole.NONE; //On default user creation set NONE, updates later if user enrolls in feature
         //profilePictureURL is empty at start, do we declare it as null?
     }
 
@@ -54,8 +55,14 @@ public class Profile {
         }
     }
 
-
-
+    public enum MentorRole {
+        NONE, //default user has no mentorship enrollment
+        MENTOR, //user is a mentor to another user(s)
+        MENTEE //user is a mentee, and has a mentor user
+    }
+    public MentorRole getRole() {
+        return role;
+    }
 //    public void addFriends(int friend){
 //        if ( !friends.contains(friend)){
 //            friends.add(friend);

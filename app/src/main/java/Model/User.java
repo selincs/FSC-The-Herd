@@ -1,40 +1,37 @@
 package Model;
 
+import java.util.UUID;
+
 //Verification, Authentication + Identity class
 public class User {
     //unique userID, do we use this or ram ID for software ID needs. Firebase UUID = String, maybe strings over int data type
-    private String userID;
+    private final String userID; //Links Profile-> User, internal primary key. Plus ID usage areas:
+    // friendIDs, Post.authorID, comment.authorID, Message.senderID, event.CreatorID,Mentor/Mentee ID rels.
     //to record the user's unique FSC email address required for sign up
-    private String fscEmail;
+    private String fscEmail;  //there are rare instances where fscEmail could change...
     //the user's unique student ramID, which identifier should we use? we probably don't want to expose email addys to randos
-    private String ramID;
+    //private final String ramID; //Not sure if we need this. If real app, probably necessary for student identity for college
     private String firstName; //Received from GUI Sign Up, used for display purposes
     private String lastName;  //Received from GUI Sign Up, used for display purposes
 
-    //the user's password, do we need to hash this later? how to do security...
     //What database are we using? Firebase? Or SQL? How do we store passwords? For now, here
-    private String password;
-
-    //Enum to denote User's optional role in mentorship feature -> Move this to Profile I think
-    private MentorRole role;
-
-    public enum MentorRole {
-        NONE, //default user has no mentorship enrollment
-        MENTOR, //user is a mentor to another user(s)
-        MENTEE //user is a mentee, and has a mentor user
-    }
+    private String password; //the user's password, do we need to hash this later? how to do security...
 
 
-    public User(String userID, String fscEmail, String password, MentorRole role) {
-        this.userID = userID;
+    public User(String fscEmail, String password) {
+        this.userID = createUserID();
         this.fscEmail = fscEmail;
         this.password = password;
-        this.role = role; //Change this to NONE on default creation, user updates later if they enroll in feature
     }
 
-//    public int getUserID(){
-//        return userID;
-//    }
+    //generate userID if no firebase
+    public String createUserID(){
+        //If Firebase : FirebaseAuth.getInstance().getCurrentUser().getUid()
+        //Assuming no Firebase for now.
+        return UUID.randomUUID().toString();
+    }
+
+
     public String getUserID(){
         return userID;
     }
@@ -43,11 +40,9 @@ public class User {
         return fscEmail;
     }
 
+    //Should be removed when time comes
     public String getPassword(){
         return password;
     }
 
-    public MentorRole getRole() {
-        return role;
-    }
 }
