@@ -15,9 +15,9 @@
         android:layout_height="wrap_content"
         android:background="#2F442F"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         <!-- Logo image on left -->
@@ -25,21 +25,21 @@
             android:id="@+id/logoImage"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@mipmap/ic_launcher"
-            android:contentDescription="@string/logo_desc"
+            android:layout_gravity="start|center_vertical"
             android:layout_marginStart="8dp"
-            android:layout_gravity="start|center_vertical" />
+            android:contentDescription="@string/logo_desc"
+            android:src="@mipmap/ic_launcher" />
 
         <!-- Title the herd next to logo -->
         <TextView
             android:id="@+id/appTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="8dp"
             android:text="@string/toolbar_title"
             android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:layout_marginStart="8dp"
-            android:layout_gravity="start|center_vertical" />
+            android:textSize="20sp" />
 
         <!-- Spacer -->
         <View
@@ -52,39 +52,166 @@
             android:id="@+id/settingsButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_settings"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/settings_desc"
-            app:tint="@android:color/white"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"/>
+            android:src="@drawable/ic_settings"
+            app:tint="@android:color/white" />
 
         <!-- Home button -->
         <ImageButton
             android:id="@+id/homeButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_home"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/home_desc"
-            app:tint="@android:color/white"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"/>
+            android:src="@drawable/ic_home"
+            app:tint="@android:color/white" />
 
     </androidx.appcompat.widget.Toolbar>
+
+
+    <!-- Body -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_page_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginTop="96dp"
+        android:background="#2F442F"
+        android:backgroundTint="#2F442F"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/events_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+        android:backgroundTint="@android:color/transparent"
+        android:text="@string/events_button"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="1dp" />
+
+    <Button
+        android:id="@+id/motivation_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="24dp"
+        android:backgroundTint="@android:color/transparent"
+        android:text="@string/motivation_button"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="1dp" />
+
+    <Button
+        android:id="@+id/friends_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="64dp"
+        android:backgroundTint="@android:color/transparent"
+        android:text="@string/friends_button"
+        app:layout_constraintStart_toEndOf="@+id/profile_button"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="1dp" />
+
+    <Button
+        android:id="@+id/interests_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@android:color/transparent"
+        android:text="@string/interests_button"
+        app:layout_constraintStart_toEndOf="@+id/profile_button"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="1dp" />
+
+    <Button
+        android:id="@+id/community_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="@android:color/transparent"
+        android:text="@string/community_button"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="1dp" />
+
+    <Button
+        android:id="@+id/profile_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@android:color/transparent"
+        android:text="@string/profile_button"
+        app:layout_constraintStart_toStartOf="@id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@id/main_page_toolbar"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="1dp" />
+
+    <TextView
+        android:id="@+id/WelcomeText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:elevation="20dp"
+        android:fontFamily="@font/irish_grover"
+        android:text="@string/welcome_to2"
+        android:textAlignment="center"
+        android:textColor="#05472A"
+        android:textSize="50sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topToolbar" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="342dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="27dp"
+        android:layout_marginBottom="13dp"
+        android:contentDescription="@string/marquee_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.853"
+        app:srcCompat="@drawable/marquee_logo" />
 
     <!-- Footer -->
     <LinearLayout
         android:id="@+id/footerLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="12dp"
         android:background="#2F442F"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:id="@+id/footerText"
@@ -92,6 +219,7 @@
             android:layout_height="wrap_content"
             android:text="@string/footer_text"
             android:textColor="#FCF5FD"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
