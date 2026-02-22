@@ -9,7 +9,7 @@ public class Profile {
     //private User user;
     private String userID; //No need to store the whole User class here, just userID to find them
     private List<Hobby> hobbies; //We don't need both Hobby + Interest. Let's combine into 1 + rename -> Topic?
-    private List<Interest> interests;
+
     //private List<Integer> friends;
     private List<String> friendIDs;
     private onlineStatus status;    //online status
@@ -28,7 +28,6 @@ public class Profile {
 
         hobbies = new ArrayList<Hobby>();
 
-        interests = new ArrayList<Interest>();
         this.status = status; //How does this part work in the grand scheme of things...
 //        friends = new ArrayList<Integer>();
         this.friendIDs = new ArrayList<String>();
@@ -52,11 +51,7 @@ public class Profile {
         }
     }
 
-    public void addInterests(Interest interest){
-        if ((interest != null ) && !interests.contains(interest)){
-            interests.add(interest);
-        }
-    }
+
 
 //    public void addFriends(int friend){
 //        if ( !friends.contains(friend)){
@@ -92,9 +87,7 @@ public class Profile {
         return hobbies;
     }
 
-    public List<Interest> getInterests() {
-        return interests;
-    }
+
 
 //    public List<Integer> getFriends() {    return friends;    }
 }
