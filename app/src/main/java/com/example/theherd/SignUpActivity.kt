@@ -20,18 +20,18 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         // text fields
-        val firstNameField: EditText = findViewById<EditText>(R.id.firstNameField)
-        val lastNameField: EditText = findViewById<EditText>(R.id.lastNameField)
-        val emailField: EditText  = findViewById<EditText>(R.id.emailField)
-        val passwordField: EditText  = findViewById<EditText>(R.id.passwordField)
-        val confirmedPasswordField: EditText  = findViewById<EditText>(R.id.confirmPasswordField)
+        val firstNameField = findViewById<EditText>(R.id.firstNameField)
+        val lastNameField = findViewById<EditText>(R.id.lastNameField)
+        val emailField = findViewById<EditText>(R.id.emailField)
+        val passwordField = findViewById<EditText>(R.id.passwordField)
+        val confirmedPasswordField = findViewById<EditText>(R.id.confirmPasswordField)
 
         // buttons
-        val createAccountButton: Button = findViewById<Button>(R.id.createAccountButton)
-        val loginButton: Button = findViewById<Button>(R.id.loginButton)
+        val createAccountButton = findViewById<Button>(R.id.createAccountButton)
+        val loginButton = findViewById<Button>(R.id.loginButton)
 
         // validation message
-        val validationMessage: TextView = findViewById<TextView>(R.id.validationMessage)
+        val validationMessage: TextView = findViewById(R.id.validationMessage)
 
         // create account button onclick listener
         createAccountButton.setOnClickListener {
