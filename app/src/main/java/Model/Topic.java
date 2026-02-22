@@ -2,7 +2,6 @@ package Model;
 
 import java.util.List;
 
-//Rename to Topic? BoardTopic?
 /*  TODO: This class is :
     -Searchable
     -Has a community board
@@ -17,21 +16,22 @@ import java.util.List;
     -Videos? -> How to vet videos... (pre approved? maybe videos should be reserved for guides)
 */
 
-public class Hobby {
-    private String hobbyID;
-    private String hobbyName;
-    private String hobbyDesc;   //hobby description
+public class Topic {
+    private String topicID;
+    private final String topicName;
+    private String topicDesc;   //topic description
     private String creatorID;   //The user who created the Topic
     private int memberCount;
     private List<String> memberIDs; //IDs of all participating members
+    //communityBoard - What is a community board? Just a list of Posts?
 
-    public Hobby(String hobbyName) {
-        this.hobbyName = hobbyName;
+    public Topic(String topicName) {
+        this.topicName = topicName;
         this.memberCount = 0;
     }
 
-    public String getHobbyName() {
-        return hobbyName;
+    public String getTopicName() {
+        return topicName;
     }
 
     public int getMemberCount() {

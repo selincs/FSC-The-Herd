@@ -8,25 +8,28 @@ import java.util.ArrayList;
 public class Profile {
     //private User user;
     private String userID; //No need to store the whole User class here, just userID to find them
-    private List<Hobby> hobbies; //We don't need both Hobby + Interest. Let's combine into 1 + rename -> Topic?
+    private List<Topic> topics; //We don't need both Topic + Interest. Let's combine into 1 + rename -> Topic?
 
     //private List<Integer> friends;
     private List<String> friendIDs;
     private onlineStatus status;    //online status
     //profile picture, how do we store an image? revisit after deciding
     private String profilePictureURL;
+    private String currentStatusUpdate;
 
 
     private String profileBio;    //User bio -- Ask me about XYZ -> Spark convo + interest b/w ppl
     //askMeAbout (Topics go Here) -> List of their selected topics sent to GUI
+    private List<Topic> askMeAbout; //Is this just a string of topicNames?
     //sharedContext (Shared Topics liked between two users, classes, etc) (Do we ask ppl to input their actual classes?)
+    private List<String> sharedContext; //topic name
     //related community boards? board participation information, like posts/comments
 
     public Profile(User user ) {
         //this.user = user;
         this.userID = user.getUserID();
 
-        hobbies = new ArrayList<Hobby>();
+        topics = new ArrayList<Topic>();
 
         this.status = status; //How does this part work in the grand scheme of things...
 //        friends = new ArrayList<Integer>();
@@ -45,9 +48,9 @@ public class Profile {
         DO_NOT_DISTURB //Disable all notifications
     }
 
-    public void addHobbies(Hobby hobby){
-        if ((hobby != null ) && !hobbies.contains(hobby)){
-            hobbies.add(hobby);
+    public void addTopic(Topic addedTopic){
+        if ((addedTopic != null ) && !topics.contains(addedTopic)){
+            topics.add(addedTopic);
         }
     }
 
@@ -83,8 +86,8 @@ public class Profile {
         return friendIDs;
     }
 
-    public List<Hobby> getHobbies() {
-        return hobbies;
+    public List<Topic> getTopics() {
+        return topics;
     }
 
 
