@@ -25,8 +25,8 @@ class MainActivity : AppCompatActivity() {
         }, 3000) // logo stay on for 3 seconds
 
         enableEdgeToEdge()
-        setContentView(R.layout.activity_sign_up)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.signUpLayout)) { v, insets ->
+        setContentView(R.layout.activity_profile)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.profileLayout)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
