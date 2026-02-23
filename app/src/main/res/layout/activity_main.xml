@@ -75,11 +75,12 @@
 
 
     <!-- Body -->
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_page_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_marginTop="96dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="56dp"
         android:background="#2F442F"
         android:backgroundTint="#2F442F"
         android:minHeight="?attr/actionBarSize"
@@ -94,7 +95,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="68dp"
         android:backgroundTint="@android:color/transparent"
         android:text="@string/events_button"
         app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
@@ -106,8 +107,8 @@
         android:id="@+id/motivation_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginTop="68dp"
+        android:layout_marginEnd="20dp"
         android:backgroundTint="@android:color/transparent"
         android:text="@string/motivation_button"
         app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
@@ -120,7 +121,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="68dp"
         android:backgroundTint="@android:color/transparent"
         android:text="@string/friends_button"
         app:layout_constraintStart_toEndOf="@+id/profile_button"
@@ -133,7 +134,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:backgroundTint="@android:color/transparent"
         android:text="@string/interests_button"
         app:layout_constraintStart_toEndOf="@+id/profile_button"
@@ -145,8 +146,8 @@
         android:id="@+id/community_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
         android:backgroundTint="@android:color/transparent"
         android:text="@string/community_button"
         app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
@@ -159,7 +160,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:backgroundTint="@android:color/transparent"
         android:text="@string/profile_button"
         app:layout_constraintStart_toStartOf="@id/main_page_toolbar"
@@ -167,11 +168,26 @@
         app:strokeColor="@android:color/white"
         app:strokeWidth="1dp" />
 
+    <Button
+        android:id="@+id/guide_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="124dp"
+        android:backgroundTint="@android:color/transparent"
+        android:text="@string/guide_button"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="1dp" />
+
+    <!-- Footer -->
+
     <TextView
         android:id="@+id/WelcomeText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="236dp"
         android:elevation="20dp"
         android:fontFamily="@font/irish_grover"
         android:text="@string/welcome_to2"
@@ -179,7 +195,7 @@
         android:textColor="#05472A"
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topToolbar" />
 
@@ -197,10 +213,9 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.853"
+        app:layout_constraintVertical_bias="0.925"
         app:srcCompat="@drawable/marquee_logo" />
 
-    <!-- Footer -->
     <LinearLayout
         android:id="@+id/footerLayout"
         android:layout_width="0dp"

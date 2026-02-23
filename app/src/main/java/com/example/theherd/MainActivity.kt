@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         val eventsButton: Button = findViewById(R.id.events_button)
 
         eventsButton.setOnClickListener {
-            // Create the Intent (From this page, To SecondActivity)
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
@@ -47,7 +46,6 @@ class MainActivity : AppCompatActivity() {
         val motivationButton: Button = findViewById(R.id.motivation_button)
 
         motivationButton.setOnClickListener {
-            // Create the Intent (From this page, To SecondActivity)
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
@@ -55,7 +53,6 @@ class MainActivity : AppCompatActivity() {
         val friendsButton: Button = findViewById(R.id.friends_button)
 
         friendsButton.setOnClickListener {
-            // Create the Intent (From this page, To SecondActivity)
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
@@ -63,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         val interestsButton: Button = findViewById(R.id.interests_button)
 
         interestsButton.setOnClickListener {
-            // Create the Intent (From this page, To SecondActivity)
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
@@ -71,7 +67,6 @@ class MainActivity : AppCompatActivity() {
         val communityButton: Button = findViewById(R.id.community_button)
 
         communityButton.setOnClickListener {
-            // Create the Intent (From this page, To SecondActivity)
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
@@ -79,7 +74,6 @@ class MainActivity : AppCompatActivity() {
         val profileButton: Button = findViewById(R.id.profile_button)
 
         profileButton.setOnClickListener {
-            // Create the Intent (From this page, To SecondActivity)
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
