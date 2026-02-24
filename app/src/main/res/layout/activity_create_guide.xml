@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EAF1EA"
+    tools:context=".GuidesActivity">
+
+    <!-- Top bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/topToolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#2F442F"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <!-- Logo image on left -->
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/logo_desc"
+            android:src="@mipmap/ic_launcher" />
+
+        <!-- Title the herd next to logo -->
+        <TextView
+            android:id="@+id/appTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="8dp"
+            android:text="@string/toolbar_title"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+
+        <!-- Spacer -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Settings button -->
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/settings_desc"
+            android:src="@drawable/ic_settings"
+            app:tint="@android:color/white" />
+
+        <!-- Home button -->
+        <ImageButton
+            android:id="@+id/homeButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/home_desc"
+            android:src="@drawable/ic_home"
+            app:tint="@android:color/white" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <TextView
+        android:id="@+id/create_guide_title"
+        android:layout_width="339dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="124dp"
+        android:fontFamily="@font/irish_grover"
+        android:text="@string/create_your_own_guide"
+        android:textAlignment="center"
+        android:textColor="#05472A"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/enter_guide_title"
+        android:hint="@string/enter_guide_title"
+        android:layout_width="339dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/create_guide_title" />
+
+    <Spinner
+        android:id="@+id/guide_categories"
+        android:layout_width="339dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="24dp"
+        android:background="#D3D3D3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/enter_guide_title" />
+
+    <EditText
+        android:id="@+id/guide_content_field"
+        android:layout_width="339dp"
+        android:layout_height="239dp"
+        android:layout_marginTop="52dp"
+        android:background="@color/white"
+        android:hint="@string/guide_text_field"
+        android:ems="10"
+        android:gravity="top"
+        android:inputType="textImeMultiLine"
+        android:minLines="10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guide_categories" />
+
+    <Button
+        android:id="@+id/submit_request_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="#2F442F"
+        android:text="@string/submit_guide_request"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guide_content_field" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

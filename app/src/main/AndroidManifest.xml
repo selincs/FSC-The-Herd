@@ -20,9 +20,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SignUpActivity"
+        <activity
+            android:name=".SignUpActivity"
             android:exported="false"/>
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".GuidesActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".CreateGuideActivity"
             android:exported="false"/>
     </application>
 
