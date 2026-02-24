@@ -41,7 +41,9 @@ class LoginActivity : AppCompatActivity() {
                 else -> {
                     validationField.text = ""
                     Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+                    println("before creating intent:")
                     val intent = Intent(this, MainActivity::class.java)
+                    println("before startActivity:")
                     startActivity(intent)
                 }
             }
