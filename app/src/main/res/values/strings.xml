@@ -25,4 +25,15 @@
     <string name="dont_have_account">Don\'t have an account?</string>
     <!-- Footer -->
     <string name="footer_text">© 2026 The Herd. All rights reserved.</string>
+    <string name="welcome_to">Welcome to</string>
+    <string name="marquee_logo" />
+    <string name="welcome_to2">WELCOME TO</string>
+    <string name="signup">Signup</string>
+    <string name="events_button">Events</string>
+    <string name="friends_button">Friends</string>
+    <string name="motivation_button">Motivation</string>
+    <string name="interests_button">Interests</string>
+    <string name="community_button">Community</string>
+    <string name="profile_button">Profile</string>
+    <string name="guide_button">Guide</string>
 </resources>
