@@ -23,6 +23,56 @@
     <string name="login_title">Welcome Back</string>
     <string name="login_subtitle">We missed you!</string>
     <string name="dont_have_account">Don\'t have an account?</string>
+
+    <!-- Navigation Buttons -->
+    <string name="events_button">Events</string>
+    <string name="motivation_button">Motivation</string>
+    <string name="friends_button">Friends</string>
+    <string name="interests_button">Interests</string>
+    <string name="community_button">Community</string>
+    <string name="profile_button">Profile</string>
+
+    <!-- Profile page -->
+    <string name="profile_image_desc">Profile Picture</string>
+    <string name="profile_name">Insert Name</string>
+    <string name="profile_username">Username</string>
+    <string name="profile_major">Major</string>
+    <string name="profile_grad_year">Graduation Year</string>
+    <string name="welcome_to2">Welcome!</string>
+    <string name="marquee_logo">...</string>
+
+    <!-- buttons -->
+    <string name="edit_profile">Edit Profile</string>
+    <string name="view_communities">View Communities</string>
+    <string name="guide_button">Guides</string>
+
+    <string name="interests_section">Interests</string>
+    <string name="interest_fitness">Fitness</string>
+    <string name="interest_coding">Coding</string>
+    <string name="interest_music">Music</string>
+    <string name="interest_gaming">Gaming</string>
+    <string name="interest_art">Art</string>
+    <string name="interest_other">Other (write here)</string>
+
+    <string name="bio_section">Bio</string>
+    <string name="bio_hint">Write something about yourself...</string>
+
+    <string name="status_posts_section">Status Posts</string>
+    <string name="no_posts_yet">No posts yet.</string>
     <!-- Footer -->
     <string name="footer_text">© 2026 The Herd. All rights reserved.</string>
+    <string name="submit_guide_request">Submit Guide Request</string>
+    <string name="create_your_own_guide">Create Your Own Guide</string>
+    <string name="enter_guide_title">Enter Guide Title:</string>
+    <string name="guide_text_field">Write your guide idea here...</string>
+    <string name="guide_categories">Guide Categories</string>
+    <string name="create_a_guide">Create a Guide</string>
+    <string name="navigation">Navigation</string>
+    <string name="travel">Travel</string>
+    <string name="academic">Academic</string>
+    <string name="financial_aid">Financial Aid</string>
+    <string name="housing">Housing</string>
+    <string name="clubs">Clubs</string>
+    <string name="miscellaneous">Miscellaneous</string>
+    <string name="health_and_wellness">Health and Wellness</string>
 </resources>
