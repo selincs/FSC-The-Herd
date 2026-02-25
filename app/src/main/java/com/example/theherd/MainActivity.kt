@@ -36,46 +36,51 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        // buttons
         val eventsButton: Button = findViewById(R.id.events_button)
+        val motivationButton: Button = findViewById(R.id.motivation_button)
+        val friendsButton: Button = findViewById(R.id.friends_button)
+        val interestsButton: Button = findViewById(R.id.interests_button)
+        val communityButton: Button = findViewById(R.id.community_button)
+        val profileButton: Button = findViewById(R.id.profile_button)
+        val guideButton: Button = findViewById(R.id.guide_button)
 
-        eventsButton.setOnClickListener {
+
+        // event listeners
+        /* eventsButton.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
-
-        val motivationButton: Button = findViewById(R.id.motivation_button)
 
         motivationButton.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
 
-        val friendsButton: Button = findViewById(R.id.friends_button)
-
         friendsButton.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
-
-        val interestsButton: Button = findViewById(R.id.interests_button)
 
         interestsButton.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
 
-        val communityButton: Button = findViewById(R.id.community_button)
-
         communityButton.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
-        }
-
-        val profileButton: Button = findViewById(R.id.profile_button)
+        } */
 
         profileButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
+
+        guideButton.setOnClickListener {
+            val intent = Intent(this, GuidesActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 }
