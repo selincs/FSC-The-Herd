@@ -22,6 +22,16 @@ class MainActivity : AppCompatActivity() {
         splashScreen.setKeepOnScreenCondition { keepSplash }
 
         super.onCreate(savedInstanceState)
+        //TODO:Might need to move splash delay to after the Log In check? Verify.
+        //Start of Selin code - Singleton Session Manager existence check.
+        // Check if user is logged in after successful Log In activity - Not sign up
+        if (!SessionManager.isLoggedIn()) {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish() // Prevent returning to MainActivity
+            return
+        }
+        //End Selin entry
 
         Handler(Looper.getMainLooper()).postDelayed({
             keepSplash = false
