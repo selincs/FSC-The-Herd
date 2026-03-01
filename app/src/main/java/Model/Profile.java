@@ -148,4 +148,14 @@ public class Profile {
     public String getProfileBio() {
         return profileBio;
     }
+
+    @Override
+    public String toString() {
+        return "Profile{" +
+                "firstName='" + firstName + '\'' +
+                ", userID='" + userID + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

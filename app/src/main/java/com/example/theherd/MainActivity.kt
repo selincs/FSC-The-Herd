@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.Button
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -22,6 +23,16 @@ class MainActivity : AppCompatActivity() {
         splashScreen.setKeepOnScreenCondition { keepSplash }
 
         super.onCreate(savedInstanceState)
+        //TODO:Might need to move splash delay to after the Log In check? Verify.
+        //Start of Selin code - Singleton Session Manager existence check.
+        // Check if user is logged in after successful Log In activity - Not sign up
+        if (!SessionManager.isLoggedIn()) {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish() // Prevent returning to MainActivity
+            return
+        }
+        //End Selin entry
 
         Handler(Looper.getMainLooper()).postDelayed({
             keepSplash = false
@@ -34,6 +45,12 @@ class MainActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        //Set Welcome text to welcome user by first name
+        val welcomeText = findViewById<TextView>(R.id.WelcomeText)
+        SessionManager.getProfile()?.let { profile ->
+            welcomeText.text = "Welcome ${profile.firstName}!"
         }
 
         // buttons
