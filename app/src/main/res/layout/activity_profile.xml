@@ -77,7 +77,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_page_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="180dp"
         android:background="#2F442F"
         android:backgroundTint="#2F442F"
         android:minHeight="?attr/actionBarSize"
@@ -162,6 +162,19 @@
         android:text="@string/profile_button"
         app:layout_constraintStart_toStartOf="@id/main_page_toolbar"
         app:layout_constraintTop_toTopOf="@id/main_page_toolbar"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="1dp" />
+
+    <Button
+        android:id="@+id/guide_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="124dp"
+        android:backgroundTint="@android:color/transparent"
+        android:text="@string/guide_button"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar"
         app:strokeColor="@android:color/white"
         app:strokeWidth="1dp" />
 
