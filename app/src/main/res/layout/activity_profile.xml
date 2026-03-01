@@ -341,7 +341,7 @@
                         android:id="@+id/saveOtherInterestButton"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
-                        android:text="Save"
+                        android:text="@string/save_button"
                         android:layout_marginStart="8dp"
                         android:backgroundTint="#2F442F"
                         android:textColor="@android:color/white"/>
@@ -375,7 +375,7 @@
                         android:id="@+id/saveBioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
-                        android:text="Save"
+                        android:text="@string/save_button"
                         android:layout_gravity="bottom|end"
                         android:layout_marginStart="8dp"
                         android:backgroundTint="#2F442F"
