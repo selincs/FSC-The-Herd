@@ -86,7 +86,7 @@ class LoginActivity : AppCompatActivity() {
     fun validLogin(email: String, password: String): Boolean {
         // if (email.isEmpty() || )
 //        return true
-        return FakeUserDatabase.validateLogin(email, password) //Selin entry- temp
+        return FakeUserDatabase.validateLogin(email, password) //Selin entry- temp till Firestore integration
     }
 
 }
