@@ -43,4 +43,12 @@ public class User {
         return password;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "userID='" + userID + '\'' +
+                ", fscEmail='" + fscEmail + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
 }

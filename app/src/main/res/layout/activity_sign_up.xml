@@ -222,11 +222,11 @@
                 android:layout_marginBottom="8dp"/>
 
             <!-- Already have account -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Already have an account?"
-                android:layout_marginBottom="8dp"/>
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Already have an account?"-->
+<!--                android:layout_marginBottom="8dp"/>-->
 
             <!-- Login btn -->
             <androidx.appcompat.widget.AppCompatButton
