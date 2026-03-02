@@ -24,6 +24,7 @@ public class Profile {
     private String profilePictureURL;
     private String profileBio;    //User bio may be redundant with askMeAbtTIDs.. keep for now
 
+    //postHistory, likeHistory, commentHistory, recorded by ID
 
     //sharedContext (Shared Topics liked between two users, classes, etc) (Do we ask ppl to input their actual classes?)
     //private List<String> sharedContext; //Needs to be dynamic, not permanently decided here. Don't store.
