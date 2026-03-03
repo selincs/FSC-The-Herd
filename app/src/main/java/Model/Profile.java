@@ -13,7 +13,7 @@ public class Profile {
     private String firstName;   //Received from GUI Sign Up, used for display purposes
     private String lastName;
 
-    private OnlineStatus status;    //online status, for displaying to other users
+    private OnlineStatus onlineStatus;    //online status, for displaying to other users
     private MentorRole role;    //Enum to denote User's optional role in mentorship feature
 
     private String currentStatusUpdate;     //Status a user posts on their page for real time updates (not online status)
@@ -24,7 +24,7 @@ public class Profile {
     private String profilePictureURL;
     private String profileBio;    //User bio may be redundant with askMeAbtTIDs.. keep for now
 
-    //postHistory, likeHistory, commentHistory, recorded by ID
+    //postHistory, likeHistory, commentHistory, recorded by stringID -> If a user does one of these things, save it here to create a viewable history in recency order
 
     //sharedContext (Shared Topics liked between two users, classes, etc) (Do we ask ppl to input their actual classes?)
     //private List<String> sharedContext; //Needs to be dynamic, not permanently decided here. Don't store.
@@ -36,7 +36,7 @@ public class Profile {
         this.firstName = firstName;
         this.lastName = lastName;
 
-        this.status = OnlineStatus.OFFLINE; //How does this part work in the grand scheme of things...
+        this.onlineStatus = OnlineStatus.OFFLINE; //How does this part work in the grand scheme of things... Account created -> Offline, turns Online on log in
         this.role = MentorRole.NONE; //On default user creation set NONE, updates later if user enrolls in feature
 
         this.topicIds = new ArrayList<String>();
@@ -112,8 +112,14 @@ public class Profile {
         return Collections.unmodifiableList(topicIds);
     }
 
-    public OnlineStatus getStatus() {
-        return status;
+    public OnlineStatus getOnlineStatus() {
+        return onlineStatus;
+    }
+
+    public void setOnlineStatus(OnlineStatus onlineStatus) {
+        if (onlineStatus != null) {
+            this.onlineStatus = onlineStatus;
+        }
     }
 
     public String getProfilePictureURL() {
@@ -123,12 +129,6 @@ public class Profile {
     public void setProfilePictureURL(String profilePictureURL) {
         if (profilePictureURL != null && !profilePictureURL.isEmpty()) {
             this.profilePictureURL = profilePictureURL;
-        }
-    }
-
-    public void setStatus(OnlineStatus status) {
-        if (status != null) {
-            this.status = status;
         }
     }
 
@@ -156,7 +156,7 @@ public class Profile {
                 "firstName='" + firstName + '\'' +
                 ", userID='" + userID + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", status=" + status +
+                ", status=" + onlineStatus +
                 '}';
     }
 }

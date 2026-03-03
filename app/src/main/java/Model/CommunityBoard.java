@@ -1,17 +1,56 @@
 package Model;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class CommunityBoard {
-    //This does need to be its own class. A user does not own a CommBoard, it is its own entity where 2 users connect.
+    //TODO: Verify CommunityBoard hierarchy flows correctly
+    //TODO: Does a CommunityBoard need pictures or videos?
+    //A user does not own a CommBoard, it is its own entity where 2 users connect.
     //A topic HAS a community board among other things(guides, events, etc) -> Where does this list of Topics live?
-    private List<Post> boardPosts;  //A community board has : Posts (posts have likes & comments)
+    private List<Post> boardPosts;  //A Topic's community board has : Posts (Posts have likes & comments)
+    private String cbName;
+    private final String cbID;
+    //A Post contains its own comment chains in Post class
 
-    // -DateTimes on all above
-    //UserID of user who did the action
-    //If user wants a post/comment/like history (ListView of recent posts, etc.)
+    //Tracking UID of User who did the action should enable a post/comment/like history (ListView of recent posts, etc.) in Profile class
 
-    //Pictures? Videos? In Post class. Does a CommB need a picture?
-
+    private int memberCt; //Could additionally display online members who are a part of the Board?
+    private List<String> memberIDs; //UIDs of all Users who have joined this Community Board
     private List<String> moderatorIDs;    //Community moderators (Self managed?)
+    private String createdByUID; //The UID of the User who created the Community Board of a Topic. Might be needed for reporting feature?
+    //What does being a moderator do? How to implement these powers?
+
+
+    public CommunityBoard(String cbName, String createdByUID) {
+        this.cbName = cbName;
+        this.createdByUID = createdByUID;
+        this.memberCt = 1;
+        this.cbID = UUID.randomUUID().toString();
+
+        this.boardPosts = new ArrayList<>();
+        this.memberIDs = new ArrayList<>();
+        memberIDs.add(createdByUID);
+        this.moderatorIDs = new ArrayList<>();
+    }
+
+    //Join
+    public void joinCommunityBoard(String userID) {
+        this.memberIDs.add(userID);
+        this.memberCt++;
+    }
+
+    public int showOnlineMembers() {
+        int onlineCt = 0;
+
+        for (String memberID : memberIDs) {
+            //Need a way to search the User object by ID for this function to work
+//            if ( /*this member.getOnlineStatus == true */) {
+//                onlineCt++;
+//            }
+        }
+        System.out.println("Online status currently only returns 0, logic needed");
+        return onlineCt;
+    }
 }

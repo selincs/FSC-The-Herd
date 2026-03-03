@@ -17,7 +17,7 @@ object SessionManager {
         currentUser = user
         currentProfile = profile
         //Set user status to Online
-        currentProfile?.setStatus(OnlineStatus.ONLINE)
+        currentProfile?.getOnlineStatus(OnlineStatus.ONLINE)
         //Other on log in status change stuff can go here
 
     }
@@ -25,7 +25,7 @@ object SessionManager {
     //Log the current user out of a session, only via SessionManager
     fun logout() {
         //Set user status to offline
-        currentProfile?.setStatus(OnlineStatus.OFFLINE)
+        currentProfile?.getOnlineStatus(OnlineStatus.OFFLINE)
         //Other on log out status change stuff can go here
 
         currentUser = null
