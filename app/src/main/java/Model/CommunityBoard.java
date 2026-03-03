@@ -1,8 +1,13 @@
 package Model;
 
+import android.os.Build;
+
+import com.example.theherd.FakeUserDatabase;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class CommunityBoard {
     //TODO: Verify CommunityBoard hierarchy flows correctly
@@ -22,6 +27,8 @@ public class CommunityBoard {
     private String createdByUID; //The UID of the User who created the Community Board of a Topic. Might be needed for reporting feature?
     //What does being a moderator do? How to implement these powers?
 
+    //Can a User filter posts in a specific CommBoard post? By name or user most likely... Needs own search bar in CB GUI
+
 
     public CommunityBoard(String cbName, String createdByUID) {
         this.cbName = cbName;
@@ -35,7 +42,7 @@ public class CommunityBoard {
         this.moderatorIDs = new ArrayList<>();
     }
 
-    //Join
+    //Join a User to a Community Board
     public void joinCommunityBoard(String userID) {
         this.memberIDs.add(userID);
         this.memberCt++;
@@ -51,11 +58,36 @@ public class CommunityBoard {
 
         for (String memberID : memberIDs) {
             //Need a way to search the User object by ID for this function to work
-//            if ( /*this member.getOnlineStatus == true */) {
+//            if ( /*this member.getOnlineStatus of members in CommBoard == true */) {
 //                onlineCt++;
 //            }
         }
         System.out.println("Online status currently only returns 0, logic needed");
         return onlineCt;
     }
+
+    //Returns a Filtered List of the Posts that contain the keyword, case-insensitive (Post Title & Contents)
+    //Needs testing, unverified
+    public List<Post> searchPosts(String keyword) {
+        return boardPosts.stream()
+                .filter(post ->
+                        post.getPostTitle().toLowerCase().contains(keyword.toLowerCase()) ||
+                                post.getPostContents().toLowerCase().contains(keyword.toLowerCase())
+                )
+                .collect(Collectors.toList());
+    }
+
+    //Needs testing, unverified and uses fake user db, not sustainable..
+    /*
+    public List<Post> filterByAuthorName(String name) {
+        return boardPosts.stream()
+                .filter(post -> {
+                    Profile profile = FakeUserDatabase.getProfileByUserId(post.getPostedByUID());
+                    return profile != null &&
+                            profile.getFirstName().toLowerCase().contains(name.toLowerCase());
+                })
+                .collect(Collectors.toList());
+    }
+    */
+
 }

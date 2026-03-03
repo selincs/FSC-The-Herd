@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Comparator;
 
 public class Post {
     //TODO: Questions - Do posts ever expire? Do CommBoards expire? Do things time out? Stretch goal maybe. Reports & Deletes? Pics/Vids?
@@ -15,6 +16,8 @@ public class Post {
     private String postContents;    //Post contents (String)
     private int likeCt; //Total # of likes
     private List<Comment> commentChain; //Save comment chain by ID?
+
+    //Posts will be organized by date, with more active Posts showing at the top.
 
     //To create a Post, a User must provide a Post Title & Contents (Like their message), + their User ID is recorded
     public Post(String postedByUID, String postTitle, String postContents) {
@@ -30,8 +33,27 @@ public class Post {
 
     public void addComment(Comment comment) {
         //if !isReply? //Need to think about this some more
-        System.out.println("Comment added to a Post");
+        System.out.println("Comment added to a Post in Post class");
         this.commentChain.add(comment);
+    }
+
+    //Comparators for Filtering Posts
+    //Sort Posts by newest first
+    //Needs testing, unverified
+    public static Comparator<Post> sortByNewest =
+            Comparator.comparing(Post::getPostDateTime).reversed();
+    //Sort Posts by oldest first
+    public static final Comparator<Post> sortByOldest =
+            Comparator.comparing(Post::getPostDateTime);
+    //Sort by Most Likes
+    public static final Comparator<Post> sortByMostLikes =
+            Comparator.comparingInt(Post::getLikeCt).reversed();
+    //Sort by Most Comments
+    public static final Comparator<Post> sortByMostComments =
+            Comparator.comparingInt(Post::numberOfComments).reversed();
+
+    public String getPostTitle() {
+        return postTitle;
     }
 
     public String getPostedByUID() {
@@ -72,6 +94,10 @@ public class Post {
 
     public List<Comment> getCommentChain() {
         return commentChain;
+    }
+
+    public int numberOfComments() {
+        return this.commentChain.size();
     }
 
     public void setCommentChain(List<Comment> commentChain) {

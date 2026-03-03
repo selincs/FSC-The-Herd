@@ -2,8 +2,10 @@ package Model;
 
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 //Social Content class for the User, behaviors etc.
 public class Profile {
@@ -27,7 +29,9 @@ public class Profile {
     //postHistory, likeHistory, commentHistory, recorded by stringID -> If a user does one of these things, save it here to create a viewable history in recency order
 
     //sharedContext (Shared Topics liked between two users, classes, etc) (Do we ask ppl to input their actual classes?)
-    //private List<String> sharedContext; //Needs to be dynamic, not permanently decided here. Don't store.
+
+
+    //private List<String> sharedContext; //Needs to be dynamic, not permanently decided here. Don't store. Comparator?
     //Compare this.profile.topicIds with otherProfile.topicIds
     //related community boards? board participation information, like posts/comments
 
@@ -84,6 +88,23 @@ public class Profile {
             topicIds.remove(topicID);
             System.out.println("Topic removed"); //Removable after confirmation it works
         }
+    }
+
+    public List<String> getSharedTopicIds(Profile otherProfile) {
+        List<String> shared = new ArrayList<>();
+
+        if (otherProfile == null) return shared;
+
+        Set<String> otherTopics = new HashSet<>(otherProfile.getTopicIds());
+
+        for (String topicId : this.topicIds) {
+            if (otherTopics.contains(topicId)) {
+                shared.add(topicId); //This needs to store topic NAME here, not topic ID
+                System.out.println("Shared topic found.");
+            }
+        }
+
+        return shared;
     }
 
     public void addAskMeAboutTopic(String topicID) {

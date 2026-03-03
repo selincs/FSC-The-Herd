@@ -9,7 +9,7 @@ import java.util.UUID;
     -Can be created by a user if the Topic doesn't exist
     -Has posts in the community board -> Posts have likes and comments. Other things? Post class, member of Community Board?
     -Has members (memberIDs, memberCount for displaying these values)
-    TODO: Is a Topic *DIFFERENT* than a CommunityBoard? What is different? Do we need both classes?
+
     Searching Chess will display:
     -Relevant Community Board (Member count, active this week, new posts today)
     -Events (Next 0-3?)
