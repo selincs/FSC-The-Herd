@@ -41,6 +41,11 @@ public class CommunityBoard {
         this.memberCt++;
     }
 
+    public void leaveCommunityBoard(String userID) {
+        this.memberIDs.remove(userID);
+        this.memberCt--;
+    }
+
     public int showOnlineMembers() {
         int onlineCt = 0;
 

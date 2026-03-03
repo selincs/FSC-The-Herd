@@ -20,11 +20,13 @@ public class Comment {
     private List<Comment> replyChain; //Save reply chain of comments by ID?
     private boolean isReply; //if the comment is a reply to another COMMENT, this flag is set
 
-    public Comment(String commentedByUID, String commentID, String commContents, boolean isReply) {
-        this.commentedByUID = commentedByUID;
+    //To create a comment, a User must provide just the comment contents. User ID is recorded, boolean flag set based on if they
+    //are replying to another comment or not via GUI.
+    public Comment(String commentedByUID, String commContents, boolean isReply) {
+        this.commContents = commContents; // The user's message
+        this.commentedByUID = commentedByUID; //User ID always exists beforehand
         this.commentID = UUID.randomUUID().toString(); //Need to generate this randomly & consistently for all Posts/Comments
         this.commentDateTime = LocalDateTime.now();
-        this.commContents = commContents;
         this.replyChain = new ArrayList<>();
         this.likeCt = 0;
         this.isReply = isReply;

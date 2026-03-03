@@ -11,15 +11,19 @@ public class Post {
     private String postID;  //ID of the Post -> Used for post history of a User, building post/comment chains in CommBoard
 
     private final LocalDateTime postDateTime; //Date + Time of the Post
+    private final String postTitle;
     private String postContents;    //Post contents (String)
     private int likeCt; //Total # of likes
     private List<Comment> commentChain; //Save comment chain by ID?
 
-    public Post(String postedByUID, String postID, String postContents) {
-        this.postedByUID = postedByUID;
+    //To create a Post, a User must provide a Post Title & Contents (Like their message), + their User ID is recorded
+    public Post(String postedByUID, String postTitle, String postContents) {
+        this.postedByUID = postedByUID; //User ID always exists beforehand
         this.postID = UUID.randomUUID().toString(); //Need to generate this randomly & consistently for all Posts/Comments
-        this.postDateTime = LocalDateTime.now();
+        this.postTitle = postTitle;
         this.postContents = postContents;
+
+        this.postDateTime = LocalDateTime.now();
         this.commentChain = new ArrayList<>();
         this.likeCt = 0;
     }
