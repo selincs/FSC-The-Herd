@@ -6,6 +6,9 @@
     <string name="home_desc">Home</string>
     <string name="toolbar_title">The Herd</string>
 
+    <!-- Settings menu -->
+    <string name="logout_option">Logout</string>
+
     <!-- Sign Up Page -->
     <string name="sign_up_title">Sign - Up</string>
     <string name="app_logo_desc">App Logo</string>
@@ -40,6 +43,7 @@
     <string name="profile_grad_year">Graduation Year</string>
     <string name="welcome_to2">Welcome!</string>
     <string name="marquee_logo">...</string>
+    <string name="save_button">Save</string>
 
     <!-- buttons -->
     <string name="edit_profile">Edit Profile</string>
