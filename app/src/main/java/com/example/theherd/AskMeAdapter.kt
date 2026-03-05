@@ -11,6 +11,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
+//For the Ask me About section on the profile page
 class AskMeAdapter(
     private val context: Context,
     private val topics: MutableList<String>
