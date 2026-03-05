@@ -382,6 +382,52 @@
                         android:textColor="@android:color/white"/>
                 </LinearLayout>
 
+
+                <!-- Ask Me About Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ask Me About"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <EditText
+                        android:id="@+id/newTopicInput"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Add a topic"
+                        android:minHeight="48dp"
+                        android:padding="12dp"/>
+
+                    <Button
+                        android:id="@+id/addTopicButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="Add"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#2F442F"
+                        android:textColor="@android:color/white"/>
+                </LinearLayout>
+
+                <!-- RecyclerView for topics -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/askMeRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_marginBottom="24dp"
+                    tools:listitem="@layout/item_ask_me_topic"/>
+
+
+
                 <!-- Status Posts Horizontal Scroll -->
                 <TextView
                     android:layout_width="wrap_content"
