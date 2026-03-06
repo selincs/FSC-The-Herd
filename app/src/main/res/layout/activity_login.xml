@@ -155,7 +155,7 @@
                 android:layout_marginBottom="24dp"/>
 
             <!-- Login Button -->
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/loginButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -172,7 +172,7 @@
                 android:layout_marginBottom="8dp"/>
 
             <!-- Sign Up Button -->
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/signUpButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
