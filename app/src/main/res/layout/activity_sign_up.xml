@@ -170,6 +170,56 @@
                 android:autofillHints="emailAddress"
                 android:layout_marginBottom="12dp"/>
 
+            <!-- Graduation section with title -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_horizontal">
+
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/graduationTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Expected  Graduation  Date"
+                    android:textSize="16sp"
+                    android:textColor="#2F442F"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center"/>
+
+                <!-- Spinners side by side -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:gravity="center_vertical">
+
+                    <!-- Season Spinner -->
+                    <Spinner
+                        android:id="@+id/graduationSeasonSpinner"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:spinnerMode="dropdown"
+                        android:padding="8dp"
+                        android:layout_marginEnd="8dp"/>
+
+                    <!-- Year Spinner -->
+                    <Spinner
+                        android:id="@+id/graduationYearSpinner"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:spinnerMode="dropdown"
+                        android:padding="8dp"
+                        android:layout_marginStart="8dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
             <!-- Password -->
             <EditText
                 android:id="@+id/passwordField"
@@ -221,12 +271,6 @@
                 android:text="Already have an account?"
                 android:layout_marginBottom="8dp"/>
 
-            <!-- Already have account -->
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Already have an account?"-->
-<!--                android:layout_marginBottom="8dp"/>-->
 
             <!-- Login btn -->
             <androidx.appcompat.widget.AppCompatButton

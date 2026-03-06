@@ -10,7 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import Model.User
 import Model.Profile
-
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +29,24 @@ class SignUpActivity : AppCompatActivity() {
         val passwordField = findViewById<EditText>(R.id.passwordField)
         val confirmedPasswordField = findViewById<EditText>(R.id.confirmPasswordField)
 
+        // Graduation spinners
+        val graduationSeasonSpinner = findViewById<Spinner>(R.id.graduationSeasonSpinner)
+        val graduationYearSpinner = findViewById<Spinner>(R.id.graduationYearSpinner)
+
+        // Seasons with placeholder
+        val seasons = listOf("Season", "Fall", "Spring", "Summer", "Winter")
+        val seasonAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, seasons)
+        seasonAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        graduationSeasonSpinner.adapter = seasonAdapter
+        graduationSeasonSpinner.setSelection(0) // show placeholder by default
+
+        // Years with placeholder
+        val years = listOf("Year") + (2026..2030).map { it.toString() }
+        val yearAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, years)
+        yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        graduationYearSpinner.adapter = yearAdapter
+        graduationYearSpinner.setSelection(0) // show placeholder by default
+
         // buttons
         val createAccountButton = findViewById<Button>(R.id.createAccountButton)
         val loginButton = findViewById<Button>(R.id.loginButton)
@@ -43,6 +62,8 @@ class SignUpActivity : AppCompatActivity() {
             val email = emailField.text.toString()
             val password = passwordField.text.toString()
             val confirmPassword = confirmedPasswordField.text.toString()
+            val selectedSeason = graduationSeasonSpinner.selectedItem.toString()
+            val selectedYear = graduationYearSpinner.selectedItem.toString()
 
             when {
                 // if any fields are empty, notify user
@@ -55,6 +76,14 @@ class SignUpActivity : AppCompatActivity() {
                 // if password is not valid, notify user
                 !validPassword(password, confirmPassword) -> {
                     validationMessage.text = "Password is not valid."
+                }
+                //If season placeholder selected
+                selectedSeason == "Season" -> {
+                    validationMessage.text = "Please select your expected graduation season."
+                }
+                //If year placeholder selected
+                selectedYear == "Year" -> {
+                    validationMessage.text = "Please select your expected graduation year."
                 }
                 else -> {
                     validationMessage.text = ""
