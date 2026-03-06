@@ -3,19 +3,22 @@ package Model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Comparator;
 
 public class Post {
     //TODO: Questions - Do posts ever expire? Do CommBoards expire? Do things time out? Stretch goal maybe. Reports & Deletes? Pics/Vids?
-    private String postedByUID; //UID of User who made the Post
-    private String postID;  //ID of the Post -> Used for post history of a User, building post/comment chains in CommBoard
+    private final String postedByUID; //UID of User who made the Post
+    private final String postID;  //ID of the Post -> Used for post history of a User, building post/comment chains in CommBoard
 
     private final LocalDateTime postDateTime; //Date + Time of the Post
     private final String postTitle;
-    private String postContents;    //Post contents (String)
+    private String postContents;    //Post contents (String) - not final incase we allow "Edits" of posts
     private int likeCt; //Total # of likes
-    private List<Comment> commentChain; //Save comment chain by ID?
+    private Set<String> likedUserIds;     // Stores user IDs who liked the post (prevents duplicates, cant be final)
+
+    private List<Comment> commentChain; // List of comments under this post - Save comment chain by ID?
 
     //Posts will be organized by date, with more active Posts showing at the top.
 
@@ -33,6 +36,11 @@ public class Post {
 
     public void addComment(Comment comment) {
         //if !isReply? //Need to think about this some more
+
+        if (comment == null) { //Just added when merging Jadas classes, not tested but seems right.. Check comment fields tho
+            throw new IllegalArgumentException("Comment cannot be null");  // Prevent invalid comments
+        }
+
         System.out.println("Comment added to a Post in Post class");
         this.commentChain.add(comment);
     }
@@ -50,7 +58,7 @@ public class Post {
             Comparator.comparingInt(Post::getLikeCt).reversed();
     //Sort by Most Comments
     public static final Comparator<Post> sortByMostComments =
-            Comparator.comparingInt(Post::numberOfComments).reversed();
+            Comparator.comparingInt(Post::commentCount).reversed();
 
     public String getPostTitle() {
         return postTitle;
@@ -60,16 +68,8 @@ public class Post {
         return postedByUID;
     }
 
-    public void setPostedByUID(String postedByUID) {
-        this.postedByUID = postedByUID;
-    }
-
     public String getPostID() {
         return postID;
-    }
-
-    public void setPostID(String postID) {
-        this.postID = postID;
     }
 
     public LocalDateTime getPostDateTime() {
@@ -87,16 +87,23 @@ public class Post {
     public int getLikeCt() {
         return likeCt;
     }
+    //set likeCt unnecessary
 
-    public void setLikeCt(int likeCt) {
-        this.likeCt = likeCt;
+    public boolean like(String userId){ //Jada fnc, added likect incr/decr
+        this.likeCt++;
+        return likedUserIds.add(userId);        // Adds like (returns false if already liked)
+    }
+
+    public boolean unlike(String userId){ //Jada fnc, added likect incr/decr
+        this.likeCt--;
+        return likedUserIds.remove(userId);     // Removes like (returns false if not present)
     }
 
     public List<Comment> getCommentChain() {
         return commentChain;
     }
 
-    public int numberOfComments() {
+    public int commentCount() {
         return this.commentChain.size();
     }
 
@@ -115,4 +122,20 @@ public class Post {
                 ", numComments=" + commentChain.size() +
                 '}';
     }
+
+    //More Jada fncs -- Not verified or tested atm but look good
+    public String getContent() {
+        return postContents;                         // Returns post content
+    }
+
+    public void setContent(String content) {
+        this.postContents = content;                 // Allows editing post content
+    }
+
+    public Set<String> getLikedUserIds() {
+        return likedUserIds;                    // Returns users who liked the post
+    }
+
+
+
 }

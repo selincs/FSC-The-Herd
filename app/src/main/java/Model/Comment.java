@@ -41,26 +41,23 @@ public class Comment {
         return commentedByUID;
     }
 
-    public void setCommentedByUID(String commentedByUID) {
-        this.commentedByUID = commentedByUID;
-    }
-
     public String getCommentID() {
         return commentID;
-    }
-
-    public void setCommentID(String commentID) {
-        this.commentID = commentID;
     }
 
     public LocalDateTime getCommentDateTime() {
         return commentDateTime;
     }
 
+    //    public long getTimestamp() {
+    //        return timestamp;     // Returns creation time
+    //    }
+
     public String getCommContents() {
         return commContents;
     }
 
+    //Editing comments?
     public void setCommContents(String commContents) {
         this.commContents = commContents;
     }

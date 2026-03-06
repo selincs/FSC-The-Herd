@@ -17,6 +17,7 @@ public class CommunityBoard {
     private List<Post> boardPosts;  //A Topic's community board has : Posts (Posts have likes & comments)
     private String cbName;
     private final String cbID;
+    private final String topicId;// The Topic this board belongs to (used for backend lookup / Firestore path)
     //A Post contains its own comment chains in Post class
 
     //Tracking UID of User who did the action should enable a post/comment/like history (ListView of recent posts, etc.) in Profile class
@@ -30,11 +31,12 @@ public class CommunityBoard {
     //Can a User filter posts in a specific CommBoard post? By name or user most likely... Needs own search bar in CB GUI
 
 
-    public CommunityBoard(String cbName, String createdByUID) {
+    public CommunityBoard(String cbName, String createdByUID, String topicId) {
         this.cbName = cbName;
         this.createdByUID = createdByUID;
         this.memberCt = 1;
         this.cbID = UUID.randomUUID().toString();
+        this.topicId = topicId;
 
         this.boardPosts = new ArrayList<>();
         this.memberIDs = new ArrayList<>();
@@ -75,6 +77,38 @@ public class CommunityBoard {
                                 post.getPostContents().toLowerCase().contains(keyword.toLowerCase())
                 )
                 .collect(Collectors.toList());
+    }
+
+    //Merging with Jada CommBoard fncs below
+    // TODO: Later return an unmodifiable view for better encapsulation - Jada
+    public List<Post> getPosts() { // Returns all posts in this board
+        return boardPosts;
+    }
+
+    public String getTopicId() { // Returns the topic this board belongs to
+        return topicId;
+    }
+
+    // Creates and stores a new post in this board
+    // Validates input, generates a simulated ID, and returns the created Post
+    //Post(String postedByUID, String postTitle, String postContents)
+    public Post createPost(String postedByUID, String postTitle, String postContents) {
+//TODO: Merging Jada's fncs --We definitely need this but not necessarily this way. Check later, doesn't break anything rn.
+        // Validate required fields -- All of below doesn't break but is idk if it covers all Post build logic.
+        if (postTitle == null || postTitle.isBlank()) {
+            throw new IllegalArgumentException("Title of Post cannot be null or blank");
+        }
+
+        if (postContents == null || postContents.isBlank()) {
+            throw new IllegalArgumentException("Post contents cannot be null or blank");
+        }
+
+        // Create and store the new Post
+        //Post(String postedByUID, String postTitle, String postContents)
+        Post newPost = new Post(postedByUID, postTitle, postContents);
+        boardPosts.add(newPost);
+
+        return newPost;
     }
 
     //Needs testing, unverified and uses fake user db, not sustainable..
