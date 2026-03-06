@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.List;
+import java.util.UUID;
 
 /*  TODO: The Topic class is :
     -Searchable (by String topicName)
@@ -8,7 +9,7 @@ import java.util.List;
     -Can be created by a user if the Topic doesn't exist
     -Has posts in the community board -> Posts have likes and comments. Other things? Post class, member of Community Board?
     -Has members (memberIDs, memberCount for displaying these values)
-    TODO: Is a Topic *DIFFERENT* than a CommunityBoard? What is different? Do we need both classes?
+
     Searching Chess will display:
     -Relevant Community Board (Member count, active this week, new posts today)
     -Events (Next 0-3?)
@@ -21,7 +22,8 @@ import java.util.List;
 */
 
 public class Topic {
-    private String topicID;
+    private final String topicID;
+    private CommunityBoard communityBoard;
     private final String topicName;
     private String topicDesc;   //topic description
     private String creatorID;   //The user who created the Topic
@@ -29,8 +31,12 @@ public class Topic {
     private List<String> memberIDs; //IDs of all participating members
     //communityBoard - What is a community board? Just a list of Posts?
 
-    public Topic(String topicName) {
+    //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
+    public Topic(String topicName, String creatorID, String topicDesc) {
         this.topicName = topicName;
+        this.topicID = UUID.randomUUID().toString(); //Generate a random final ID for the new Topic
+        this.topicDesc = topicDesc;
+        this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
     }
 
@@ -50,5 +56,45 @@ public class Topic {
         if (memberCount > 0) {
             memberCount--;
         }
+    }
+
+    public String getTopicID() {
+        return topicID;
+    }
+
+    public String getTopicDesc() {
+        return topicDesc;
+    }
+
+    public void setTopicDesc(String topicDesc) {
+        this.topicDesc = topicDesc;
+    }
+
+    public String getCreatorID() {
+        return creatorID;
+    }
+
+    public void setCreatorID(String creatorID) {
+        this.creatorID = creatorID;
+    }
+
+    public CommunityBoard getCommunityBoard() {
+        return communityBoard;
+    }
+
+    public void setCommunityBoard(CommunityBoard communityBoard) {
+        this.communityBoard = communityBoard;
+    }
+
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
+    public List<String> getMemberIDs() {
+        return memberIDs;
+    }
+
+    public void setMemberIDs(List<String> memberIDs) {
+        this.memberIDs = memberIDs;
     }
 }
