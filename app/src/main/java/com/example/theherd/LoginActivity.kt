@@ -15,7 +15,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login) // connects XML
 
         // text fields
-        val emailField = findViewById<EditText>(R.id.emailField)
+        val emailUsernameField  = findViewById<EditText>(R.id.emailUsernameField)
         val passwordField = findViewById<EditText>(R.id.passwordField)
 
         // buttons
@@ -27,12 +27,15 @@ class LoginActivity : AppCompatActivity() {
 
         // login button onclick listener
         loginButton.setOnClickListener {
-            val email = emailField.text.toString()
+            val emailUsername = emailUsernameField.text.toString()
             val password = passwordField.text.toString()
+
+            // build full FSC email
+            val email = "$emailUsername@farmingdale.edu"
 
             println("in loginButton event listener")
             when {
-                email.isEmpty() || password.isEmpty() -> {
+                emailUsername.isEmpty() || password.isEmpty() -> {
                     validationField.text = "Error: Please enter a username and password"
                 }
                 !validLogin(email, password) -> {
