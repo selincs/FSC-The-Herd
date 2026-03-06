@@ -25,7 +25,7 @@ class SignUpActivity : AppCompatActivity() {
         // text fields
         val firstNameField = findViewById<EditText>(R.id.firstNameField)
         val lastNameField = findViewById<EditText>(R.id.lastNameField)
-        val emailField = findViewById<EditText>(R.id.emailField)
+        val emailUsernameField = findViewById<EditText>(R.id.emailUsernameField)
         val passwordField = findViewById<EditText>(R.id.passwordField)
         val confirmedPasswordField = findViewById<EditText>(R.id.confirmPasswordField)
 
@@ -59,19 +59,22 @@ class SignUpActivity : AppCompatActivity() {
             println("in create account button onclick listener")
             val firstName = firstNameField.text.toString()
             val lastName = lastNameField.text.toString()
-            val email = emailField.text.toString()
+            val emailUsername = emailUsernameField.text.toString().trim()
             val password = passwordField.text.toString()
             val confirmPassword = confirmedPasswordField.text.toString()
             val selectedSeason = graduationSeasonSpinner.selectedItem.toString()
             val selectedYear = graduationYearSpinner.selectedItem.toString()
 
+            // Combine username with fixed domain
+            val fullEmail = "$emailUsername@farmingdale.edu"
+
             when {
                 // if any fields are empty, notify user
-                firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
+                firstName.isEmpty() || lastName.isEmpty() ||  emailUsername.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
                     validationMessage.text = "Please fill out all fields."
                 }
-                !validEmail(email) -> {
-                    validationMessage.text = "Email is not valid. Please enter your Farmingdale email address."
+                !validEmail(fullEmail) -> {
+                    validationMessage.text = "Email is not valid. Please enter your Farmingdale email username."
                 }
                 // if password is not valid, notify user
                 !validPassword(password, confirmPassword) -> {
@@ -91,10 +94,11 @@ class SignUpActivity : AppCompatActivity() {
                     //User creation code goes here?
                     //This is where Firestore code must be input, Firestore will create the User
                     //Email & Pw in new User, userID auto genned
-                    val newUser = createUser(email, password)
+
+                    val newUser = createUser(fullEmail, password)
                     //Create profile of newUser, a new profile uses auto genned userID, fName, lName
                     val newProfile = Profile(newUser.userID, firstName, lastName)
-                    println("New User created with Email : " + email + "Password : " + password)
+                    println("New User created with Email : " + fullEmail + "Password : " + password)
                     println("User Profile : " + firstName + " " + lastName + ", " + newProfile.userID)
 
                     //Save User Data in Fake Repo - Temp solution till Firestore saves this data
