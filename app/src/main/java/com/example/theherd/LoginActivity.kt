@@ -41,6 +41,28 @@ class LoginActivity : AppCompatActivity() {
                 else -> {
                     validationField.text = ""
                     Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+
+                    //Selin Entry
+                    // > Get the user from FakeUserDatabase
+                    val user = FakeUserDatabase.findUserByEmail(email)
+                    println("User found in Login DB : " + user.toString())
+
+                    // > Get the user's profile using their userID
+                    val profile = user?.let {
+                        FakeUserDatabase.getProfileByUserId(it.getUserID())
+                    }
+                    println("Logging in to User profile : " + profile.toString())
+
+                    // > Only login if both profile and class exist, otherwise null issue somewhere
+                    if (user != null && profile != null) {
+                        SessionManager.login(user, profile)
+                        //Retrieving user info from Session Manager
+                        println("Logging in to : " + SessionManager.getUser().toString())
+                        println("Logged in User full name : " + SessionManager.getProfile().toString())
+                    }
+
+                    //End selin entry
+
                     println("before creating intent:")
                     val intent = Intent(this, MainActivity::class.java)
                     println("before startActivity:")
@@ -63,7 +85,8 @@ class LoginActivity : AppCompatActivity() {
      */
     fun validLogin(email: String, password: String): Boolean {
         // if (email.isEmpty() || )
-        return true
+//        return true
+        return FakeUserDatabase.validateLogin(email, password) //Selin entry- temp till Firestore integration
     }
 
 }

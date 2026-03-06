@@ -8,6 +8,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import Model.User
+import Model.Profile
 
 class SignUpActivity : AppCompatActivity() {
 
@@ -56,8 +58,25 @@ class SignUpActivity : AppCompatActivity() {
                 }
                 else -> {
                     validationMessage.text = ""
+
+                    //User creation code goes here?
+                    //This is where Firestore code must be input, Firestore will create the User
+                    //Email & Pw in new User, userID auto genned
+                    val newUser = createUser(email, password)
+                    //Create profile of newUser, a new profile uses auto genned userID, fName, lName
+                    val newProfile = Profile(newUser.userID, firstName, lastName)
+                    println("New User created with Email : " + email + "Password : " + password)
+                    println("User Profile : " + firstName + " " + lastName + ", " + newProfile.userID)
+
+                    //Save User Data in Fake Repo - Temp solution till Firestore saves this data
+                    FakeUserDatabase.addUser(newUser, newProfile)
+
+                    //Login -> should only happen on login, not here...
+                    //SessionManager.login(newUser, newProfile)
+
                     Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, MainActivity::class.java)
+
                     startActivity(intent)
                 }
             }
@@ -69,6 +88,14 @@ class SignUpActivity : AppCompatActivity() {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    /**
+     * Private func to create a User account - Temporary until Firestore integration
+     */
+    private fun createUser(email: String, password: String): User {
+        //Profile?
+        return User(email, password)
     }
 
     /**
