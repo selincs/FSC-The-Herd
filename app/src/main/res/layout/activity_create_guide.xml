@@ -8,76 +8,111 @@
     android:background="#EAF1EA"
     tools:context=".GuidesActivity">
 
-    <!-- Top bar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/topToolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#2F442F"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:navigationIcon="?attr/homeAsUpIndicator"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-        <!-- Logo image on left -->
         <ImageView
             android:id="@+id/logoImage"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_gravity="start|center_vertical"
-            android:layout_marginStart="8dp"
+            android:src="@mipmap/ic_launcher"
             android:contentDescription="@string/logo_desc"
-            android:src="@mipmap/ic_launcher" />
+            android:layout_marginStart="8dp"
+            android:layout_gravity="start|center_vertical" />
 
-        <!-- Title the herd next to logo -->
         <TextView
-            android:id="@+id/appTitle"
+            android:id="@+id/guides_main_page_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:layout_marginStart="8dp"
             android:text="@string/toolbar_title"
             android:textColor="@android:color/white"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:layout_marginStart="8dp"
+            android:layout_gravity="start|center_vertical" />
 
-        <!-- Spacer -->
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- Settings button -->
         <ImageButton
             android:id="@+id/settingsButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_settings"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/settings_desc"
-            android:src="@drawable/ic_settings"
-            app:tint="@android:color/white" />
+            app:tint="@android:color/white"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"/>
 
-        <!-- Home button -->
         <ImageButton
             android:id="@+id/homeButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_home"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/home_desc"
-            android:src="@drawable/ic_home"
-            app:tint="@android:color/white" />
-
+            app:tint="@android:color/white"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"/>
     </androidx.appcompat.widget.Toolbar>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_page_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="117dp"
+        android:background="#2F442F"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topToolbar" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_row1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:constraint_referenced_ids="profile_button,friends_button,events_button,guide_button"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalGap="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_row2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:constraint_referenced_ids="community_button,interests_button,motivation_button"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalGap="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toBottomOf="@id/flow_row1" />
+
+    <Button style="@style/PillButton" android:id="@+id/profile_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profile" />
+    <Button style="@style/PillButton" android:id="@+id/friends_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Friends" />
+    <Button style="@style/PillButton" android:id="@+id/events_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Events" />
+    <Button style="@style/PillButton" android:id="@+id/guide_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Guides" />
+    <Button style="@style/PillButton" android:id="@+id/community_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Community" />
+    <Button style="@style/PillButton" android:id="@+id/interests_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Interests" />
+    <Button style="@style/PillButton" android:id="@+id/motivation_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Motivation" />
 
     <TextView
         android:id="@+id/create_guide_title"
-        android:layout_width="339dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="124dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:fontFamily="@font/irish_grover"
         android:text="@string/create_your_own_guide"
         android:textAlignment="center"
@@ -85,15 +120,14 @@
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/main_page_toolbar" />
 
     <EditText
         android:id="@+id/enter_guide_title"
-        android:hint="@string/enter_guide_title"
         android:layout_width="339dp"
-        android:layout_height="40dp"
+        android:layout_height="48dp"
         android:layout_marginTop="16dp"
-        android:ems="10"
+        android:hint="@string/enter_guide_title"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -102,8 +136,8 @@
     <Spinner
         android:id="@+id/guide_categories"
         android:layout_width="339dp"
-        android:layout_height="42dp"
-        android:layout_marginTop="24dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
         android:background="#D3D3D3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -112,14 +146,13 @@
     <EditText
         android:id="@+id/guide_content_field"
         android:layout_width="339dp"
-        android:layout_height="239dp"
-        android:layout_marginTop="52dp"
-        android:background="@color/white"
-        android:hint="@string/guide_text_field"
-        android:ems="10"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/white"
         android:gravity="top"
-        android:inputType="textImeMultiLine"
-        android:minLines="10"
+        android:hint="@string/guide_text_field"
+        android:inputType="textMultiLine"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guide_categories" />
@@ -128,13 +161,11 @@
         android:id="@+id/submit_request_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:backgroundTint="#2F442F"
         android:text="@string/submit_guide_request"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guide_content_field" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
