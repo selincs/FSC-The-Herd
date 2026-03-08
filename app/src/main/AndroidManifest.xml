@@ -35,6 +35,9 @@
         <activity
             android:name=".CreateGuideActivity"
             android:exported="false"/>
+        <activity
+            android:name=".AccountSettingsActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>
