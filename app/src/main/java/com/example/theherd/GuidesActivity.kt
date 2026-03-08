@@ -36,6 +36,14 @@ class GuidesActivity : AppCompatActivity() {
             popupMenu.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
 
+                    R.id.menu_account_settings -> {
+
+                        val intent = Intent(this, AccountSettingsActivity::class.java)
+                        startActivity(intent)
+
+                        true
+                    }
+
                     R.id.menu_logout -> {
 
                         //When settings btn clicked add a way to logout the user
@@ -45,6 +53,7 @@ class GuidesActivity : AppCompatActivity() {
                         intent.flags =
                             Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
+
                         true
                     }
 
