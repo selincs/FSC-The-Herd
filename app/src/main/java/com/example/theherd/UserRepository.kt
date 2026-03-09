@@ -1,7 +1,8 @@
 package com.example.theherd
 
 object UserRepository {
-    private const val USE_FIRESTORE = true;
+    private const val USE_FIRESTORE = true
+
     fun register(
         firstName: String,
         lastName: String,
@@ -34,35 +35,47 @@ object UserRepository {
         FirestoreDatabase.users.document(userId)
             .set(userData)
             .addOnSuccessListener {
-                FirestoreDatabase.profiles.document(userId)
+                FirestoreDatabase.users
+                    .document(userId)
+                    .collection("profile")
+                    .document(userId)
                     .set(profileData)
                     .addOnSuccessListener { onDone(true) }
                     .addOnFailureListener { e ->
-                        println("Firestore profiles write FAILED: ${e.message}")
+                        println("Firestore profile write FAILED: ${e.message}")
                         onDone(false)
                     }
             }
             .addOnFailureListener { e ->
-                println("Firestore users write FAILED: ${e.message}")
+                println("Firestore user write FAILED: ${e.message}")
                 onDone(false)
             }
     }
+
     fun login(email: String, password: String, onDone: (Boolean) -> Unit) {
 
         if (!USE_FIRESTORE) {
-            // old fake login
             val ok = FakeUserDatabase.validateLogin(email, password)
-            if (!ok) { onDone(false); return }
+            if (!ok) {
+                onDone(false)
+                return
+            }
 
-            val user = FakeUserDatabase.findUserByEmail(email) ?: run { onDone(false); return }
-            val profile = FakeUserDatabase.getProfileByUserId(user.getUserID()) ?: run { onDone(false); return }
+            val user = FakeUserDatabase.findUserByEmail(email) ?: run {
+                onDone(false)
+                return
+            }
+
+            val profile = FakeUserDatabase.getProfileByUserId(user.getUserID()) ?: run {
+                onDone(false)
+                return
+            }
 
             SessionManager.login(user, profile)
             onDone(true)
             return
         }
 
-        // Firestore login
         FirestoreDatabase.users
             .whereEqualTo("email", email)
             .limit(1)
@@ -75,8 +88,16 @@ object UserRepository {
 
                 val doc = query.documents[0]
 
-                val userId = doc.getString("userId") ?: run { onDone(false); return@addOnSuccessListener }
-                val savedPassword = doc.getString("password") ?: run { onDone(false); return@addOnSuccessListener }
+                val userId = doc.getString("userId") ?: run {
+                    onDone(false)
+                    return@addOnSuccessListener
+                }
+
+                val savedPassword = doc.getString("password") ?: run {
+                    onDone(false)
+                    return@addOnSuccessListener
+                }
+
                 val savedEmail = doc.getString("email") ?: email
 
                 if (savedPassword != password) {
@@ -84,8 +105,10 @@ object UserRepository {
                     return@addOnSuccessListener
                 }
 
-                // Load profile
-                FirestoreDatabase.profiles.document(userId)
+                FirestoreDatabase.users
+                    .document(userId)
+                    .collection("profile")
+                    .document(userId)
                     .get()
                     .addOnSuccessListener { profileDoc ->
                         if (!profileDoc.exists()) {
@@ -96,17 +119,18 @@ object UserRepository {
                         val firstName = profileDoc.getString("firstName") ?: ""
                         val lastName = profileDoc.getString("lastName") ?: ""
 
-                        // Create your Java model objects for SessionManager
-                        val userObj = Model.User(savedEmail, savedPassword) // creates a NEW uuid...
-                        // We need the real userId in memory, so for now we will NOT rely on User.userID.
-                        // Instead, SessionManager mainly uses Profile.userID links, so we store correct userId there:
+                        val userObj = Model.User(savedEmail, savedPassword)
                         val profileObj = Model.Profile(userId, firstName, lastName)
 
                         SessionManager.login(userObj, profileObj)
                         onDone(true)
                     }
-                    .addOnFailureListener { onDone(false) }
+                    .addOnFailureListener {
+                        onDone(false)
+                    }
             }
-            .addOnFailureListener { onDone(false) }
+            .addOnFailureListener {
+                onDone(false)
+            }
     }
 }
