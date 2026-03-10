@@ -10,7 +10,7 @@
     <string name="logout_option">Logout</string>
 
     <!-- Sign Up Page -->
-    <string name="sign_up_title">Sign - Up</string>
+    <string name="sign_up_title">Sign Up</string>
     <string name="app_logo_desc">App Logo</string>
 
     <string name="first_name">First Name</string>

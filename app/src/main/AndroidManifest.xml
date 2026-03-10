@@ -35,6 +35,10 @@
         <activity
             android:name=".CreateGuideActivity"
             android:exported="false"/>
+
+        <activity
+            android:name=".CommunityBoardActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>

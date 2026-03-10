@@ -75,7 +75,7 @@ class SignUpActivity : AppCompatActivity() {
                     //SessionManager.login(newUser, newProfile)
 
                     Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, LoginActivity::class.java)
 
                     startActivity(intent)
                 }

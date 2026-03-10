@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#EAF1EA"
-    tools:context=".GuidesActivity">
+    tools:context=".CommunityBoardActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/topToolbar"
@@ -109,63 +109,67 @@
     <Button style="@style/PillButton" android:id="@+id/motivation_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Motivation" />
 
     <TextView
-        android:id="@+id/create_guide_title"
-        android:layout_width="0dp"
+        android:id="@+id/communityListTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:fontFamily="@font/irish_grover"
-        android:text="@string/create_your_own_guide"
-        android:textAlignment="center"
-        android:textColor="#05472A"
-        android:textSize="30sp"
+        android:layout_marginTop="16dp"
+        android:text="Community List"
+        android:textColor="#2F442F"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/main_page_toolbar" />
 
-    <EditText
-        android:id="@+id/enter_guide_title"
-        android:layout_width="339dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        android:hint="@string/enter_guide_title"
-        android:inputType="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/create_guide_title" />
-
-    <Spinner
-        android:id="@+id/guide_categories"
-        android:layout_width="339dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        android:background="#D3D3D3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/enter_guide_title" />
-
-    <EditText
-        android:id="@+id/guide_content_field"
-        android:layout_width="339dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="16dp"
-        android:background="@android:color/white"
-        android:gravity="top"
-        android:hint="@string/guide_text_field"
-        android:inputType="textMultiLine"
-        android:padding="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guide_categories" />
-
-    <Button
-        android:id="@+id/submit_request_button"
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/communitySearchView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:backgroundTint="#2F442F"
-        android:text="@string/submit_guide_request"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/white"
+        android:elevation="2dp"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search Communities..."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guide_content_field" />
+        app:layout_constraintTop_toBottomOf="@id/communityListTitle" />
+
+    <LinearLayout
+        android:id="@+id/filterRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/communitySearchView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sort by:"
+            android:textColor="#2F442F"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/sortDropdown"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:spinnerMode="dropdown" />
+
+        <Button
+            android:id="@+id/myListsButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My Lists"
+            android:textColor="#2F442F" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
