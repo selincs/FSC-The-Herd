@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 
@@ -12,6 +13,7 @@ class GuidesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guides) // connects XML
+        val homeButton: ImageButton = findViewById(R.id.homeButton)
 
         // toolbar buttons
         val eventsButton: Button = findViewById(R.id.events_button)
@@ -49,7 +51,7 @@ class GuidesActivity : AppCompatActivity() {
         }
 
         communityButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, CommunityBoardActivity::class.java)
             startActivity(intent)
         }
 
@@ -71,6 +73,12 @@ class GuidesActivity : AppCompatActivity() {
 
         toolbar.setNavigationOnClickListener {
             finish()
+        }
+
+        homeButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
         }
     }
 }

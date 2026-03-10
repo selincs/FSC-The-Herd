@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EAF1EA"
+    tools:context=".CommunityBoardActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/topToolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#2F442F"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@mipmap/ic_launcher"
+            android:contentDescription="@string/logo_desc"
+            android:layout_marginStart="8dp"
+            android:layout_gravity="start|center_vertical" />
+
+        <TextView
+            android:id="@+id/guides_main_page_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/toolbar_title"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:layout_marginStart="8dp"
+            android:layout_gravity="start|center_vertical" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_settings"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/settings_desc"
+            app:tint="@android:color/white"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"/>
+
+        <ImageButton
+            android:id="@+id/homeButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_home"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/home_desc"
+            app:tint="@android:color/white"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"/>
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_page_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="117dp"
+        android:background="#2F442F"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topToolbar" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_row1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:constraint_referenced_ids="profile_button,friends_button,events_button,guide_button"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalGap="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_row2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:constraint_referenced_ids="community_button,interests_button,motivation_button"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalGap="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toBottomOf="@id/flow_row1" />
+
+    <Button style="@style/PillButton" android:id="@+id/profile_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profile" />
+    <Button style="@style/PillButton" android:id="@+id/friends_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Friends" />
+    <Button style="@style/PillButton" android:id="@+id/events_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Events" />
+    <Button style="@style/PillButton" android:id="@+id/guide_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Guides" />
+    <Button style="@style/PillButton" android:id="@+id/community_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Community" />
+    <Button style="@style/PillButton" android:id="@+id/interests_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Interests" />
+    <Button style="@style/PillButton" android:id="@+id/motivation_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Motivation" />
+
+    <TextView
+        android:id="@+id/communityListTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Community List"
+        android:textColor="#2F442F"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_page_toolbar" />
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/communitySearchView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/white"
+        android:elevation="2dp"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search Communities..."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/communityListTitle" />
+
+    <LinearLayout
+        android:id="@+id/filterRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/communitySearchView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sort by:"
+            android:textColor="#2F442F"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/sortDropdown"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:spinnerMode="dropdown" />
+
+        <Button
+            android:id="@+id/myListsButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My Lists"
+            android:textColor="#2F442F" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

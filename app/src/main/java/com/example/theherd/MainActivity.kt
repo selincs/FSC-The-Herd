@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         //Set Welcome text to welcome user by first name
         val welcomeText = findViewById<TextView>(R.id.WelcomeText)
         SessionManager.getProfile()?.let { profile ->
-            welcomeText.text = "Welcome ${profile.firstName}!"
+            welcomeText.text = "Welcome, ${profile.firstName}!"
         }
 
         // buttons
@@ -84,7 +84,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         communityButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
+            println("In MainActivity: communityButton onclick listener")
+            val intent = Intent(this, CommunityBoardActivity::class.java)
             startActivity(intent)
         }
 

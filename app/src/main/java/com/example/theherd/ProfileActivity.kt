@@ -25,6 +25,7 @@ class ProfileActivity : AppCompatActivity() {
 
         // toolbar
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
+        val homeButton: ImageButton = findViewById(R.id.homeButton)
         setSupportActionBar(toolbar)
 
         // button event listeners
@@ -49,7 +50,7 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         communityButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, CommunityBoardActivity::class.java)
             startActivity(intent)
         }
 
@@ -90,6 +91,12 @@ class ProfileActivity : AppCompatActivity() {
 
         toolbar.setNavigationOnClickListener {
             finish()
+        }
+
+        homeButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
         }
     }
 }

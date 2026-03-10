@@ -2,27 +2,19 @@ package com.example.theherd
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.widget.ArrayAdapter
+import android.view.View
+import android.widget.AdapterView
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 
-class CreateGuideActivity : AppCompatActivity() {
+class CommunityBoardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        println("in Create Guide Activity")
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_guide)
-
-        // xml views
-        val guideTitle: EditText = findViewById(R.id.enter_guide_title)
-        val categories: Spinner = findViewById(R.id.guide_categories)
-        val guideContent: EditText = findViewById(R.id.guide_content_field)
-        val submitButton: Button = findViewById(R.id.submit_request_button)
+        setContentView(R.layout.activity_community_board)
 
         // buttons
         val eventsButton: Button = findViewById(R.id.events_button)
@@ -38,12 +30,38 @@ class CreateGuideActivity : AppCompatActivity() {
         val homeButton: ImageButton = findViewById(R.id.homeButton)
         setSupportActionBar(toolbar)
 
-        // display dropdown list of categories
-        val categoriesList = arrayOf( "Navigation", "Travel", "Academic", "Financial Aid", "Housing", "Clubs", "Health & Wellness", "Other (specify below)")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoriesList)
+        // dropdown window
+        val sortDropdown: Spinner = findViewById(R.id.sortDropdown)
+        val sortOptions = arrayOf("Relevant", "Popular", "Recent")
+        val adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_spinner_item, sortOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categories.adapter = adapter
+        sortDropdown.adapter = adapter
 
+        sortDropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val selected = sortOptions[position]
+                when (selected) {
+                    "Relevant" -> {
+
+                    }
+                    "Popular" -> {
+
+                    }
+                    "Recent" -> {
+
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                TODO("Not yet implemented")
+            }
+        }
         // button event listeners
         eventsButton.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
@@ -78,21 +96,6 @@ class CreateGuideActivity : AppCompatActivity() {
         guideButton.setOnClickListener {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
-        }
-
-        submitButton.setOnClickListener {
-            val title = guideTitle.text.toString()
-            val content = guideContent.text.toString()
-            when {
-                (title.isEmpty() || content.isEmpty()) -> {
-                    Toast.makeText(this, "Error: Please fill out all fields", Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    Toast.makeText(this, "Guide request submitted!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                }
-            }
         }
 
         toolbar.setNavigationOnClickListener {
