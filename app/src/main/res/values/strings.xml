@@ -8,6 +8,7 @@
 
     <!-- Settings menu -->
     <string name="logout_option">Logout</string>
+    <string name="account_settings">Account Settings</string>
 
     <!-- Sign Up Page -->
     <string name="sign_up_title">Sign Up</string>
