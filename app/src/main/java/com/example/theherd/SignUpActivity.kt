@@ -59,25 +59,25 @@ class SignUpActivity : AppCompatActivity() {
                 else -> {
                     validationMessage.text = ""
 
-                    //User creation code goes here?
-                    //This is where Firestore code must be input, Firestore will create the User
-                    //Email & Pw in new User, userID auto genned
-                    val newUser = createUser(email, password)
-                    //Create profile of newUser, a new profile uses auto genned userID, fName, lName
-                    val newProfile = Profile(newUser.userID, firstName, lastName)
-                    println("New User created with Email : " + email + "Password : " + password)
-                    println("User Profile : " + firstName + " " + lastName + ", " + newProfile.userID)
-
-                    //Save User Data in Fake Repo - Temp solution till Firestore saves this data
-                    FakeUserDatabase.addUser(newUser, newProfile)
+                    UserRepository.register(
+                        firstName = firstName,
+                        lastName = lastName,
+                        email = email,
+                        password = password
+                    ) { success ->
+                        if (success) {
+                            Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this, MainActivity::class.java))
+                        } else {
+                            validationMessage.text = "Failed to create account."
+                        }
+                    }
 
                     //Login -> should only happen on login, not here...
                     //SessionManager.login(newUser, newProfile)
 
-                    Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, LoginActivity::class.java)
 
-                    startActivity(intent)
+
                 }
             }
         }
