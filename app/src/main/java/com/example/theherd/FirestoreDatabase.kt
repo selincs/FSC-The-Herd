@@ -12,7 +12,6 @@ object FirestoreDatabase {
     //tables for
     val users = db.collection("users")
 
-    val guides = db.collection("guides")
-    val communityBoard = db.collection("Ccommunityboard")
+
 
 }

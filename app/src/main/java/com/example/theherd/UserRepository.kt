@@ -7,10 +7,9 @@ object UserRepository {
         firstName: String,
         lastName: String,
         email: String,
-        password: String,
         onDone: (Boolean) -> Unit
     ) {
-        val user = Model.User(email, password)
+        val user = Model.User(email, "")
         val userId = user.getUserID()
         val profile = Model.Profile(userId, firstName, lastName)
 
@@ -22,8 +21,7 @@ object UserRepository {
 
         val userData = hashMapOf(
             "userId" to userId,
-            "email" to email,
-            "password" to password
+            "fscEmail" to email
         )
 
         val profileData = hashMapOf(
@@ -77,7 +75,7 @@ object UserRepository {
         }
 
         FirestoreDatabase.users
-            .whereEqualTo("email", email)
+            .whereEqualTo("fscEmail", email)
             .limit(1)
             .get()
             .addOnSuccessListener { query ->
@@ -93,17 +91,10 @@ object UserRepository {
                     return@addOnSuccessListener
                 }
 
-                val savedPassword = doc.getString("password") ?: run {
-                    onDone(false)
-                    return@addOnSuccessListener
-                }
 
-                val savedEmail = doc.getString("email") ?: email
 
-                if (savedPassword != password) {
-                    onDone(false)
-                    return@addOnSuccessListener
-                }
+                val savedEmail = doc.getString("fscEmail") ?: email
+
 
                 FirestoreDatabase.users
                     .document(userId)
@@ -119,7 +110,7 @@ object UserRepository {
                         val firstName = profileDoc.getString("firstName") ?: ""
                         val lastName = profileDoc.getString("lastName") ?: ""
 
-                        val userObj = Model.User(savedEmail, savedPassword)
+                        val userObj = Model.User(savedEmail, "")
                         val profileObj = Model.Profile(userId, firstName, lastName)
 
                         SessionManager.login(userObj, profileObj)

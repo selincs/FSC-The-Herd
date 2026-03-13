@@ -107,7 +107,7 @@ class SignUpActivity : AppCompatActivity() {
                         firstName = firstName,
                         lastName = lastName,
                         email = fullEmail,
-                        password = password
+
                     ) { success ->
                         if (success) {
                             Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show()
