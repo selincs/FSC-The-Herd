@@ -1,51 +1,70 @@
 package com.example.theherd
-
+import com.google.firebase.auth.FirebaseAuth
 object UserRepository {
     private const val USE_FIRESTORE = true
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
 
     fun register(
         firstName: String,
         lastName: String,
         email: String,
+        password: String,
         onDone: (Boolean) -> Unit
     ) {
-        val user = Model.User(email, "")
-        val userId = user.getUserID()
-        val profile = Model.Profile(userId, firstName, lastName)
 
-        if (!USE_FIRESTORE) {
-            FakeUserDatabase.addUser(user, profile)
-            onDone(true)
-            return
-        }
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener { authResult ->
 
-        val userData = hashMapOf(
-            "userId" to userId,
-            "fscEmail" to email
-        )
+                val userId = authResult.user?.uid ?: run {
+                    onDone(false)
+                    return@addOnSuccessListener
+                }
 
-        val profileData = hashMapOf(
-            "userId" to userId,
-            "firstName" to firstName,
-            "lastName" to lastName
-        )
+                val profile = Model.Profile(userId, firstName, lastName)
 
-        FirestoreDatabase.users.document(userId)
-            .set(userData)
-            .addOnSuccessListener {
-                FirestoreDatabase.users
-                    .document(userId)
-                    .collection("profile")
-                    .document(userId)
-                    .set(profileData)
-                    .addOnSuccessListener { onDone(true) }
+                if (!USE_FIRESTORE) {
+                    onDone(true)
+                    return@addOnSuccessListener
+                }
+
+                val userData = hashMapOf(
+                    "userId" to userId,
+                    "fscEmail" to email
+                )
+
+                val profileData = hashMapOf(
+                    "userId" to userId,
+                    "firstName" to firstName,
+                    "lastName" to lastName
+                )
+
+                FirestoreDatabase.users.document(userId)
+                    .set(userData)
+                    .addOnSuccessListener {
+
+                        FirestoreDatabase.users
+                            .document(userId)
+                            .collection("profile")
+                            .document(userId)
+                            .set(profileData)
+                            .addOnSuccessListener {
+                                onDone(true)
+                            }
+                            .addOnFailureListener { e ->
+                                println("Firestore profile write FAILED: ${e.message}")
+                                onDone(false)
+                            }
+
+                    }
                     .addOnFailureListener { e ->
-                        println("Firestore profile write FAILED: ${e.message}")
+                        println("Firestore user write FAILED: ${e.message}")
                         onDone(false)
                     }
+
             }
             .addOnFailureListener { e ->
-                println("Firestore user write FAILED: ${e.message}")
+                println("Firebase Auth create user FAILED: ${e.message}")
                 onDone(false)
             }
     }
@@ -73,27 +92,14 @@ object UserRepository {
             onDone(true)
             return
         }
-
-        FirestoreDatabase.users
-            .whereEqualTo("fscEmail", email)
-            .limit(1)
-            .get()
-            .addOnSuccessListener { query ->
-                if (query.isEmpty) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener { authResult ->
+                val userId = authResult.user?.uid ?: run {
                     onDone(false)
                     return@addOnSuccessListener
                 }
 
-                val doc = query.documents[0]
-
-                val userId = doc.getString("userId") ?: run {
-                    onDone(false)
-                    return@addOnSuccessListener
-                }
-
-
-
-                val savedEmail = doc.getString("fscEmail") ?: email
+                val savedEmail = authResult.user?.email ?: email
 
 
                 FirestoreDatabase.users
