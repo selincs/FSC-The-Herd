@@ -120,10 +120,10 @@ class MainActivity : AppCompatActivity() {
 //            startActivity(intent)
 //        }
 //
-//        interestsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        interestsButton.setOnClickListener {
+            val intent = Intent(this, TopicsActivity::class.java)
+           startActivity(intent)
+        }
 
         communityButton.setOnClickListener {
             println("In MainActivity: communityButton onclick listener")
