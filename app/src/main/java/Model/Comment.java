@@ -11,14 +11,14 @@ public class Comment {
     //TODO: Does a comment need to track its parent Post/Comment?
     private String commentedByUID;  //UID of User who made the comment
     private String commentID;  //id of comment -> Used for comment history of a User, building post/comments in CB
-
-    private final LocalDateTime commentDateTime;  //Date & Time of comment
+    private String parentCommentID; //The parent of this comment, for implementing reply chains
+    private final LocalDateTime createdAt;  //Date & Time of comment
     private String commContents;    //Contents of the comment
     private int likeCt; //Total # of likes
 
     // This needs finesse if it's going to happen, or else it will double post from Post>commChain & here
-    private List<Comment> replyChain; //Save reply chain of comments by ID?
-    private boolean isReply; //if the comment is a reply to another COMMENT, this flag is set
+//    private List<Comment> replyChain; //Save reply chain of comments by ID?
+//    private boolean isReply; //if the comment is a reply to another COMMENT, this flag is set
 
     //To create a comment, a User must provide just the comment contents. User ID is recorded, boolean flag set based on if they
     //are replying to another comment or not via GUI.
@@ -26,16 +26,16 @@ public class Comment {
         this.commContents = commContents; // The user's message
         this.commentedByUID = commentedByUID; //User ID always exists beforehand
         this.commentID = UUID.randomUUID().toString(); //Need to generate this randomly & consistently for all Posts/Comments
-        this.commentDateTime = LocalDateTime.now();
-        this.replyChain = new ArrayList<>();
+        this.createdAt = LocalDateTime.now();
+//        this.replyChain = new ArrayList<>();
         this.likeCt = 0;
-        this.isReply = isReply;
+//        this.isReply = isReply;
     }
 
-    public void addReply(Comment comment) {
-        //if isReply
-        this.replyChain.add(comment);
-    }
+//    public void addReply(Comment comment) {
+//        //if isReply
+//        this.replyChain.add(comment);
+//    }
 
     public String getCommentedByUID() {
         return commentedByUID;
@@ -45,8 +45,8 @@ public class Comment {
         return commentID;
     }
 
-    public LocalDateTime getCommentDateTime() {
-        return commentDateTime;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     //    public long getTimestamp() {
@@ -70,16 +70,24 @@ public class Comment {
         this.likeCt = likeCt;
     }
 
-    public List<Comment> getReplyChain() {
-        return replyChain;
+//    public List<Comment> getReplyChain() {
+//        return replyChain;
+//    }
+//
+//    public boolean isReply() {
+//        return isReply;
+//    }
+//
+//    public void setReply(boolean reply) {
+//        isReply = reply;
+//    }
+
+    public String getParentCommentID() {
+        return parentCommentID;
     }
 
-    public boolean isReply() {
-        return isReply;
-    }
-
-    public void setReply(boolean reply) {
-        isReply = reply;
+    public void setParentCommentID(String parentCommentID) {
+        this.parentCommentID = parentCommentID;
     }
 
     @Override
@@ -87,11 +95,11 @@ public class Comment {
         return "Comment{" +
                 "commentedByUID='" + commentedByUID + '\'' +
                 ", commentID='" + commentID + '\'' +
-                ", commentDateTime=" + commentDateTime +
+                ", commentDateTime=" + createdAt +
                 ", commContents='" + commContents + '\'' +
                 ", likeCt=" + likeCt +
-                ", isReply=" + isReply +
-                ", replyCt=" + replyChain.size() +
+//                ", isReply=" + isReply +
+//                ", replyCt=" + replyChain.size() +
                 '}';
     }
 }

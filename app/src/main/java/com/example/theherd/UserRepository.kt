@@ -1,5 +1,6 @@
 package com.example.theherd
 import com.google.firebase.auth.FirebaseAuth
+
 object UserRepository {
     private const val USE_FIRESTORE = true
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
