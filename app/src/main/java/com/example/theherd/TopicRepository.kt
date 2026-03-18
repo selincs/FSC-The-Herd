@@ -40,7 +40,7 @@ object TopicRepository {
             .set(topicData)
             .addOnSuccessListener {
 
-                // Add creator as first member
+                // Add creator as first member and moderator of the Community Board
                 val memberData = hashMapOf(
                     "role" to "moderator",
                     "joinedAt" to FieldValue.serverTimestamp()
@@ -59,10 +59,150 @@ object TopicRepository {
                 onDone(false)
             }
     }
+    //TODO:Improve to preserve TopicID for further diving -> Might be needed for post ID and stuff
+    ///Used to show Topic name/description while searching. This function will populate Topic Lists.
+    fun getTopics(onResult: (List<Model.Topic>) -> Unit) {
+
+        FirestoreDatabase.topics
+            .get()
+            .addOnSuccessListener { result ->
+
+                val topics = mutableListOf<Model.Topic>()
+
+                for (doc in result) {
+
+                    val topicName = doc.getString("topicName") ?: ""
+                    val topicDesc = doc.getString("topicDesc") ?: ""
+                    val creatorID = doc.getString("creatorID") ?: ""
+
+                    val topic = Model.Topic(topicName, creatorID, topicDesc)
+
+                    topics.add(topic)
+                }
+
+                onResult(topics)
+            }
+    }
+
+    //To hopefully enable keyword searching
+    /* If searching by keyword Chess, will show
+        Chess
+        Chess Club
+        Chess Tournament
+     */
+    fun searchTopics(
+        keyword: String,
+        onResult: (List<Model.Topic>) -> Unit
+    ) {
+
+        FirestoreDatabase.topics
+            .whereGreaterThanOrEqualTo("topicName", keyword)
+            .whereLessThanOrEqualTo("topicName", keyword + "\uf8ff")
+            .get()
+            .addOnSuccessListener { result ->
+
+                val topics = mutableListOf<Model.Topic>()
+
+                for (doc in result) {
+
+                    val topicName = doc.getString("topicName") ?: ""
+                    val topicDesc = doc.getString("topicDesc") ?: ""
+                    val creatorID = doc.getString("creatorID") ?: ""
+
+                    topics.add(Model.Topic(topicName, creatorID, topicDesc))
+                }
+
+                onResult(topics)
+            }
+    }
+
+    // Allows a User to join a Topic as a member of the Community
+    fun joinTopic(
+        topicID: String,
+        onDone: (Boolean) -> Unit
+    ) {
+
+        val userID = auth.currentUser?.uid ?: run {
+            onDone(false)
+            return
+        }
+
+        val memberData = hashMapOf(
+            "role" to "member",
+            "joinedAt" to FieldValue.serverTimestamp()
+        )
+
+        FirestoreDatabase.topics
+            .document(topicID)
+            .collection("members")
+            .document(userID)
+            .set(memberData)
+            .addOnSuccessListener {
+
+                FirestoreDatabase.topics
+                    .document(topicID)
+                    .update("memberCount", FieldValue.increment(1))
+                    .addOnSuccessListener { onDone(true) }
+                    .addOnFailureListener { onDone(false) }
+
+            }
+            .addOnFailureListener {
+                onDone(false)
+            }
+    }
+
+    //Allows a User to leave a Topic/Community
+    fun leaveTopic(
+        topicID: String,
+        onDone: (Boolean) -> Unit
+    ) {
+
+        val userID = auth.currentUser?.uid ?: run {
+            onDone(false)
+            return
+        }
+
+        FirestoreDatabase.topics
+            .document(topicID)
+            .collection("members")
+            .document(userID)
+            .delete()
+            .addOnSuccessListener {
+
+                FirestoreDatabase.topics
+                    .document(topicID)
+                    .update("memberCount", FieldValue.increment(-1))
+                    .addOnSuccessListener { onDone(true) }
+                    .addOnFailureListener { onDone(false) }
+
+            }
+            .addOnFailureListener {
+                onDone(false)
+            }
+    }
+
+    //CommunityBoard functions
+    /*
+        createEvent()
+        getEvents()
+        rsvpToEvent()
+        unRSVPToEvent()
+        //View a User's profile...
+        //Send a friend request...
+
+     */
+
+    //Event functions
+    /*
+        createEvent()
+        getEvents()
+        rsvpToEvent()
+        filtering()? Less important
+     */
 
 /*
-Create a Topic
-Fetch Topics
+Create a Topic X
+Fetch Topics X
 Join/leave a Topic
 Load a Topic’s CommunityBoard
 Create Posts
@@ -73,13 +213,3 @@ Like/Comment on Posts
 
 
 }
-
-/*  Firestore architecture:
-    -----------------------
-User
-  └─ participates in Topics
-
-Topic
-  └─ contains CommunityBoard
-       └─ contains Posts
-            └─ contains Comments         */
