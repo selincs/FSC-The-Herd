@@ -23,7 +23,8 @@ object TopicRepository {
             println("Creator ID fauth failed")
             return
         }
-        //Create the Topic UUID... Come back to this... is it an issue that all UUIDs are the same function? Topic Vs User?
+        //Create the Topic UUID... Come back to this... is it an issue that all UUIDs are the same function?
+        // Topic Vs User UUID?
         val topicID = UUID.randomUUID().toString()
 
         val topicData = hashMapOf(
@@ -85,7 +86,7 @@ object TopicRepository {
     }
 
     //To hopefully enable keyword searching
-    /* If searching by keyword Chess, will show
+    /* If searching by keyword "Chess", will show
         Chess
         Chess Club
         Chess Tournament
@@ -127,24 +128,25 @@ object TopicRepository {
             return
         }
 
+        //Set the joining User to a member of Topic & save Timestamp of join date
         val memberData = hashMapOf(
             "role" to "member",
             "joinedAt" to FieldValue.serverTimestamp()
         )
 
+        //Open members subcollection and add new User who is joining
         FirestoreDatabase.topics
             .document(topicID)
             .collection("members")
             .document(userID)
             .set(memberData)
             .addOnSuccessListener {
-
+                //Increment member count of Topic
                 FirestoreDatabase.topics
                     .document(topicID)
                     .update("memberCount", FieldValue.increment(1))
                     .addOnSuccessListener { onDone(true) }
                     .addOnFailureListener { onDone(false) }
-
             }
             .addOnFailureListener {
                 onDone(false)
@@ -162,6 +164,7 @@ object TopicRepository {
             return
         }
 
+        //Open members subcollection and delete user by UserID in subcollection
         FirestoreDatabase.topics
             .document(topicID)
             .collection("members")
@@ -174,7 +177,6 @@ object TopicRepository {
                     .update("memberCount", FieldValue.increment(-1))
                     .addOnSuccessListener { onDone(true) }
                     .addOnFailureListener { onDone(false) }
-
             }
             .addOnFailureListener {
                 onDone(false)
