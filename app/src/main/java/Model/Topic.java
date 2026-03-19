@@ -1,5 +1,7 @@
 package Model;
 
+import com.example.theherd.R;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +41,27 @@ public class Topic {
         this.topicDesc = topicDesc;
         this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
+        this.imageResId = imageResId;
+    }
+
+    //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
+    //Imageless constructor, currently sets to herd logo
+    public Topic(String topicName, String creatorID, String topicDesc) {
+        this.topicName = topicName;
+        this.topicID = UUID.randomUUID().toString(); //Generate a random final ID for the new Topic
+        this.topicDesc = topicDesc;
+        this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
+        this.memberCount = 0;
+        this.imageResId = R.drawable.marquee_logo;
+    }
+
+    //Constructor to load a Topic from Firestore
+    public Topic(String topicID, String topicName, String creatorID, String topicDesc, int imageResId, int memberCount) {
+        this.topicID = topicID;
+        this.topicName = topicName;
+        this.creatorID = creatorID;
+        this.topicDesc = topicDesc;
+        this.memberCount = memberCount;
         this.imageResId = imageResId;
     }
 
