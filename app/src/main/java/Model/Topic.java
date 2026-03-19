@@ -30,14 +30,16 @@ public class Topic {
     private int memberCount;
     private List<String> memberIDs; //IDs of all participating members
     //communityBoard - What is a community board? Just a list of Posts?
+    private int imageResId;     // <-- New field for topic image resource
 
     //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
-    public Topic(String topicName, String creatorID, String topicDesc) {
+    public Topic(String topicName, String creatorID, String topicDesc, int imageResId) {
         this.topicName = topicName;
         this.topicID = UUID.randomUUID().toString(); //Generate a random final ID for the new Topic
         this.topicDesc = topicDesc;
         this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
+        this.imageResId = imageResId;
     }
 
     public String getTopicName() {
@@ -97,4 +99,7 @@ public class Topic {
     public void setMemberIDs(List<String> memberIDs) {
         this.memberIDs = memberIDs;
     }
+    // New getter/setter for image
+    public int getImageResId() { return imageResId; }
+    public void setImageResId(int imageResId) { this.imageResId = imageResId; }
 }

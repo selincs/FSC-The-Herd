@@ -41,6 +41,10 @@
         <activity
             android:name=".AccountSettingsActivity"
             android:exported="false"/>
+        <activity
+            android:name=".TopicsActivity"
+            android:exported="false"/>
+
     </application>
 
 </manifest>
