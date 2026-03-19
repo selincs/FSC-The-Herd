@@ -6,7 +6,7 @@ object FirestoreDatabase {
 
     val db: FirebaseFirestore by lazy {
         FirebaseFirestore.getInstance()
-    }// thiss creates the database connection
+    }// this creates the database connection
 
 
     // Collections (Tables)

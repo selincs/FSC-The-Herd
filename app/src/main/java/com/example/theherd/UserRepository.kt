@@ -160,6 +160,7 @@ object UserRepository {
 
                         //if the profile document does not exist login fails.
                         if (!profileDoc.exists()) {
+                            println("Profile missing for user: $userId")
                             onDone(false)
                             return@addOnSuccessListener
                         }

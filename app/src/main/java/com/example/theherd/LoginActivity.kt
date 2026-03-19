@@ -44,6 +44,9 @@ class LoginActivity : AppCompatActivity() {
                     UserRepository.login(email, password) { success ->
                         if (success) {
                             Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+
+                            TopicRepository.initializeTestTopic() //Remove
+
                             startActivity(Intent(this, MainActivity::class.java))
                         } else {
                             validationField.text = "Error: Invalid username or password"
@@ -61,14 +64,4 @@ class LoginActivity : AppCompatActivity() {
         }
 
     }
-
-    /**
-     * validEmail: checks if the user entered a valid email
-     */
-    fun validLogin(email: String, password: String): Boolean {
-        // if (email.isEmpty() || )
-//        return true
-        return FakeUserDatabase.validateLogin(email, password) //Selin entry- temp till Firestore integration
-    }
-
 }
