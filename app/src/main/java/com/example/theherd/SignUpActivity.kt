@@ -89,6 +89,7 @@ class SignUpActivity : AppCompatActivity() {
                     validationMessage.text = "Please select your expected graduation year."
                 }
                 else -> {
+                    println("account created!!!")
                     validationMessage.text = ""
 
                     //User creation code goes here?
@@ -129,7 +130,7 @@ class SignUpActivity : AppCompatActivity() {
         // login button event listener
         loginButton.setOnClickListener {
             println("in login button event listener")
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
     }

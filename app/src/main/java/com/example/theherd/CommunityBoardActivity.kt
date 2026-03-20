@@ -7,9 +7,9 @@ import android.widget.AdapterView
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Spinner
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class CommunityBoardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,6 +24,7 @@ class CommunityBoardActivity : AppCompatActivity() {
         val communityButton: Button = findViewById(R.id.community_button)
         val profileButton: Button = findViewById(R.id.profile_button)
         val guideButton: Button = findViewById(R.id.guide_button)
+        val createBoardButton: FloatingActionButton = findViewById(R.id.fabAddCommunity)
 
         // toolbar
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
@@ -95,6 +96,11 @@ class CommunityBoardActivity : AppCompatActivity() {
 
         guideButton.setOnClickListener {
             val intent = Intent(this, GuidesActivity::class.java)
+            startActivity(intent)
+        }
+
+        createBoardButton.setOnClickListener {
+            val intent = Intent(this, CreateCommunityActivity::class.java)
             startActivity(intent)
         }
 
