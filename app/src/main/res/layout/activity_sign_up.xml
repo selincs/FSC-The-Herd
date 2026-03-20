@@ -263,6 +263,16 @@
                 android:autofillHints="password"
                 android:layout_marginBottom="12dp"/>
 
+            <TextView
+                android:id="@+id/passwordHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Password must be at least 12 characters and include:\n• 1 uppercase letter\n• 1 lowercase letter\n• 1 digit\n• 1 special character"
+                android:textColor="#555555"
+                android:textSize="12sp"
+                android:lineSpacingExtra="2dp" />
+
             <!-- Validation message -->
             <TextView
                 android:id="@+id/validationMessage"
