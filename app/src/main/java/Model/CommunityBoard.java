@@ -107,7 +107,6 @@ public class CommunityBoard {
         //Post(String postedByUID, String postTitle, String postContents)
         Post newPost = new Post(postedByUID, postTitle, postContents);
         boardPosts.add(newPost);
-
         return newPost;
     }
 
