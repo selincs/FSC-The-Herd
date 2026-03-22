@@ -35,7 +35,7 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         holder.name.text = topic.topicName
         holder.description.text = topic.topicDesc
         holder.members.text = "${topic.memberCount} members"
-        holder.image.setImageResource(topic.getImageResId());
+        holder.image.setImageResource(topic.getImageResId())
 
         holder.joinButton.setOnClickListener {
             topic.incrementMembers()
@@ -55,6 +55,11 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         } else {
             allTopics.filter { it.topicName.contains(query, ignoreCase = true) }
         }
+        notifyDataSetChanged()
+    }
+
+    fun updateList(newList: List<Topic>) {
+        topics = newList
         notifyDataSetChanged()
     }
 }
