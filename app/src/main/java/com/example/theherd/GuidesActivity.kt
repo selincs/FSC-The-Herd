@@ -46,10 +46,10 @@ class GuidesActivity : AppCompatActivity() {
 //            startActivity(intent)
 //        }
 //
-//        interestsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        interestsButton.setOnClickListener {
+            val intent = Intent(this, TopicsActivity::class.java)
+            startActivity(intent)
+        }
 
         communityButton.setOnClickListener {
             val intent = Intent(this, CommunityBoardActivity::class.java)

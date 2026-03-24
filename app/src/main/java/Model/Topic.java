@@ -55,6 +55,16 @@ public class Topic {
         this.imageResId = R.drawable.marquee_logo;
     }
 
+    // Test party merging constructor, clean these up once Firestore is working and we don't need all these options
+    public Topic(String topicID, String topicName, String creatorID, String topicDesc, int imageResId) {
+        this.topicID = topicID;
+        this.topicName = topicName;
+        this.creatorID = creatorID;
+        this.topicDesc = topicDesc;
+        this.memberCount = memberCount;
+        this.imageResId = imageResId;
+    }
+
     //Constructor to load a Topic from Firestore
     public Topic(String topicID, String topicName, String creatorID, String topicDesc, int imageResId, int memberCount) {
         this.topicID = topicID;
