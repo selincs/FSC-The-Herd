@@ -80,4 +80,8 @@
     <string name="clubs">Clubs</string>
     <string name="miscellaneous">Miscellaneous</string>
     <string name="health_and_wellness">Health and Wellness</string>
+    <string-array name="sort_options">
+        <item>Newest</item>
+        <item>Oldest</item>
+    </string-array>
 </resources>

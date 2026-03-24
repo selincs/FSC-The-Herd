@@ -36,7 +36,7 @@ public class Topic {
         this.topicName = topicName;
         this.topicID = UUID.randomUUID().toString(); //Generate a random final ID for the new Topic
         this.topicDesc = topicDesc;
-        this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
+        // this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
     }
 

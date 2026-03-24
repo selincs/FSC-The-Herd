@@ -6,120 +6,55 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#EAF1EA"
-    tools:context=".CommunityBoardActivity">
+    tools:context=".CreateCommunityActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/topToolbar"
+    <View
+        android:id="@+id/headerBackground"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:background="#2F442F"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:navigationIcon="?attr/homeAsUpIndicator"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <ImageView
-            android:id="@+id/logoImage"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/ic_launcher"
-            android:contentDescription="@string/logo_desc"
-            android:layout_marginStart="8dp"
-            android:layout_gravity="start|center_vertical" />
-
-        <TextView
-            android:id="@+id/guides_main_page_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/toolbar_title"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:layout_marginStart="8dp"
-            android:layout_gravity="start|center_vertical" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <ImageButton
-            android:id="@+id/settingsButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_settings"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/settings_desc"
-            app:tint="@android:color/white"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"/>
-
-        <ImageButton
-            android:id="@+id/homeButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_home"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/home_desc"
-            app:tint="@android:color/white"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"/>
-    </androidx.appcompat.widget.Toolbar>
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/main_page_toolbar"
-        android:layout_width="0dp"
-        android:layout_height="117dp"
-        android:background="#2F442F"
-        app:layout_constraintEnd_toEndOf="parent"
+    <TextView
+        android:id="@+id/btnCancelCreate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Cancel"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:padding="8dp"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintBottom_toBottomOf="@id/headerBackground"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topToolbar" />
+        app:layout_constraintTop_toTopOf="@id/headerBackground" />
 
-    <androidx.constraintlayout.helper.widget.Flow
-        android:id="@+id/flow_row1"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/headerTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:constraint_referenced_ids="profile_button,friends_button,events_button,guide_button"
-        app:flow_horizontalStyle="packed"
-        app:flow_horizontalGap="10dp"
-        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
-        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
-        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar" />
-
-    <androidx.constraintlayout.helper.widget.Flow
-        android:id="@+id/flow_row2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        app:constraint_referenced_ids="community_button,interests_button,motivation_button"
-        app:flow_horizontalStyle="packed"
-        app:flow_horizontalGap="10dp"
-        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
-        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
-        app:layout_constraintTop_toBottomOf="@id/flow_row1" />
-
-    <Button style="@style/PillButton" android:id="@+id/profile_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profile" />
-    <Button style="@style/PillButton" android:id="@+id/friends_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Friends" />
-    <Button style="@style/PillButton" android:id="@+id/events_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Events" />
-    <Button style="@style/PillButton" android:id="@+id/guide_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Guides" />
-    <Button style="@style/PillButton" android:id="@+id/community_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Community" />
-    <Button style="@style/PillButton" android:id="@+id/interests_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Interests" />
-    <Button style="@style/PillButton" android:id="@+id/motivation_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Motivation" />
-
+        android:text="Launch New Community"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@id/headerBackground"
+        app:layout_constraintBottom_toBottomOf="@id/headerBackground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
     <TextView
         android:id="@+id/createBoardHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Create a New Board"
+        android:text="Community Details"
         android:textColor="#2F442F"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/main_page_toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/headerBackground" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/name_layout"
@@ -174,5 +109,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/description_layout" />
+
+    <LinearLayout
+        android:id="@+id/footerLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#2F442F"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/footerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/footer_text"
+            android:textColor="#FCF5FD"
+            android:textSize="12sp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
