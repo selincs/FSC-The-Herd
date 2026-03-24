@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TheHerd">
         <activity
+            android:name=".SpecificCommunityActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
@@ -22,22 +25,22 @@
         </activity>
         <activity
             android:name=".SignUpActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".ProfileActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".GuidesActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".CreateGuideActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".CommunityBoardActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".AccountSettingsActivity"
             android:exported="false"/>
@@ -45,6 +48,16 @@
             android:name=".TopicsActivity"
             android:exported="false"/>
 
+        <activity
+            android:name=".CreateCommunityActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreatePostActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".PostDetailActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

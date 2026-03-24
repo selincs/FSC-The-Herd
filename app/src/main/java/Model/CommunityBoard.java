@@ -3,6 +3,7 @@ package Model;
 import android.os.Build;
 
 import com.example.theherd.FakeUserDatabase;
+import com.google.firebase.firestore.PropertyName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +13,13 @@ import java.util.stream.Collectors;
 public class CommunityBoard {
     //TODO: Verify CommunityBoard hierarchy flows correctly
     //TODO: Does a CommunityBoard need pictures or videos?
+
+    public CommunityBoard() {
+
+    }
     //A user does not own a CommBoard, it is its own entity where 2 users connect.
     //A topic HAS a community board among other things(guides, events, etc) -> Where does this list of Topics live?
-    private List<Post> boardPosts;  //A Topic's community board has : Posts (Posts have likes & comments)
+    /* private List<Post> boardPosts;  //A Topic's community board has : Posts (Posts have likes & comments)
     private String cbName;
     private final String cbID;
     private final String topicId;// The Topic this board belongs to (used for backend lookup / Firestore path)
@@ -60,7 +65,7 @@ public class CommunityBoard {
 
         for (String memberID : memberIDs) {
             //Need a way to search the User object by ID for this function to work
-//            if ( /*this member.getOnlineStatus of members in CommBoard == true */) {
+//            if ( /*this member.getOnlineStatus of members in CommBoard == true ) {
 //                onlineCt++;
 //            }
         }
@@ -111,7 +116,7 @@ public class CommunityBoard {
     }
 
     //Needs testing, unverified and uses fake user db, not sustainable..
-    /*
+
     public List<Post> filterByAuthorName(String name) {
         return boardPosts.stream()
                 .filter(post -> {

@@ -67,14 +67,14 @@
             android:layout_marginEnd="8dp"/>
     </androidx.appcompat.widget.Toolbar>
 
-    <androidx.appcompat.widget.Toolbar
+    <View
         android:id="@+id/main_page_toolbar"
         android:layout_width="0dp"
         android:layout_height="117dp"
         android:background="#2F442F"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topToolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topToolbar" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.constraintlayout.helper.widget.Flow
         android:id="@+id/flow_row1"
@@ -113,7 +113,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Community List"
+        android:text="Community Board"
         android:textColor="#2F442F"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -136,7 +136,7 @@
         app:layout_constraintTop_toBottomOf="@id/communityListTitle" />
 
     <LinearLayout
-        android:id="@+id/filterRow"
+        android:id="@+id/filter_row"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -161,7 +161,8 @@
             android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:background="@android:drawable/btn_dropdown"
-            android:spinnerMode="dropdown" />
+            android:spinnerMode="dropdown"
+            android:entries="@array/sort_options"/>
 
         <Button
             android:id="@+id/myListsButton"
@@ -172,4 +173,62 @@
             android:textColor="#2F442F" />
     </LinearLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/community_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/filter_row"
+        app:layout_constraintBottom_toTopOf="@id/footerLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/activity_item_community" />
+
+    <TextView
+        android:id="@+id/emptyStateText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="No communities yet. Create one to get started!"
+        android:textColor="#808080"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filter_row"
+        app:layout_constraintBottom_toTopOf="@id/footerLayout" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddCommunity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="Add Community"
+        app:backgroundTint="#2F442F"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:tint="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/footerLayout" />
+
+    <LinearLayout
+        android:id="@+id/footerLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#2F442F"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/footerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/footer_text"
+            android:textColor="#FCF5FD"
+            android:textSize="12sp" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,10 @@ import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.Toolbar
@@ -19,10 +23,45 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var newTopicInput: EditText
     private lateinit var addTopicButton: Button
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile) // connects XML
+
+        val nameDisplay: TextView = findViewById(R.id.nameText)
+        val editProfileButton: Button = findViewById(R.id.editProfileButton)
+
+        // Initial load from PrefsManager
+        nameDisplay.text = PreferencesManager.getFullName(this)
+
+        editProfileButton.setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Edit Name")
+
+            val layout = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(60, 20, 60, 20)
+            }
+
+            val etFirst = EditText(this).apply { hint = "First Name" }
+            val etLast = EditText(this).apply { hint = "Last Name" }
+
+            layout.addView(etFirst)
+            layout.addView(etLast)
+            builder.setView(layout)
+
+            builder.setPositiveButton("Save") { _, _ ->
+                val fName = etFirst.text.toString().trim()
+                val lName = etLast.text.toString().trim()
+
+                if (fName.isNotEmpty() && lName.isNotEmpty()) {
+                    PreferencesManager.saveFullName(this, fName, lName)
+                    nameDisplay.text = "$fName $lName"
+                    Toast.makeText(this, "Profile Saved", Toast.LENGTH_SHORT).show()
+                }
+            }
+            builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+            builder.show()
+        }
 
         // buttons
         val eventsButton: Button = findViewById(R.id.events_button)

@@ -149,102 +149,115 @@
         android:id="@+id/navigation_guide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="268dp"
+        android:layout_marginTop="24dp"
         android:autoLink="web"
         android:text="@string/navigation"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/guide_categories_title" />
 
     <TextView
         android:id="@+id/travel_guide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="316dp"
+        android:layout_marginTop="16dp"
         android:autoLink="web"
         android:text="@string/travel"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/navigation_guide" />
 
     <TextView
         android:id="@+id/academic_guide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="364dp"
+        android:layout_marginTop="16dp"
         android:autoLink="email"
         android:text="@string/academic"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/travel_guide" />
 
     <TextView
         android:id="@+id/financial_aid_guid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="408dp"
+        android:layout_marginTop="16dp"
         android:autoLink="web"
         android:text="@string/financial_aid"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/academic_guide" />
 
     <TextView
         android:id="@+id/housing_guides"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="448dp"
+        android:layout_marginTop="16dp"
         android:autoLink="web"
         android:text="@string/housing"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/financial_aid_guid" />
 
     <TextView
         android:id="@+id/clubs_guide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="492dp"
+        android:layout_marginTop="16dp"
         android:autoLink="web"
         android:text="@string/clubs"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/housing_guides" />
 
     <TextView
         android:id="@+id/health_wellness_guide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="532dp"
+        android:layout_marginTop="16dp"
         android:text="@string/health_and_wellness"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/clubs_guide" />
 
     <TextView
         android:id="@+id/miscellaneous_guides"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="576dp"
+        android:layout_marginTop="16dp"
         android:autoLink="web"
         android:text="@string/miscellaneous"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/health_wellness_guide" />
 
+    <LinearLayout
+        android:id="@+id/footerLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#2F442F"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/footerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/footer_text"
+            android:textColor="#FCF5FD"
+            android:textSize="12sp" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
