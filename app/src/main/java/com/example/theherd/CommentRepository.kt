@@ -1,4 +1,5 @@
 package com.example.theherd
+import Model.Comment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import java.util.UUID
@@ -13,7 +14,7 @@ object CommentRepository{
 
         topicID : String,
         postId : String,
-        commmcontents: String,
+        commmContents: String,
         onDone : (Boolean) -> Unit
     ){
 
@@ -32,7 +33,7 @@ object CommentRepository{
         val commentData = hashMapOf(
             "commentID" to commentID,
             "commentedByUID"  to userID,
-            "commContents" to commmcontents,
+            "commContents" to commmContents,
             "parentCommentID" to "", // not every comment is a reply,
             "likeCt" to 0,
             "createdAt" to FieldValue.serverTimestamp()
@@ -48,7 +49,22 @@ object CommentRepository{
             .document(commentID)
             .set(commentData)
             .addOnSuccessListener {
-                onDone(true)
+                //pointing to the location in firestore.
+                // this is to count the number of comments
+                FirestoreDatabase.topics
+                    .document(topicID)
+                    .collection("posts")
+                    .document(postId)
+                    .update("commentCount", FieldValue.increment(1))
+                    .addOnSuccessListener {
+                        onDone(true)
+                    }
+                    .addOnFailureListener {
+                        onDone(false)
+                    }
+
+
+
             }
             .addOnFailureListener {
                 onDone(false)
@@ -59,6 +75,49 @@ object CommentRepository{
 
 
 
+    }
+
+    // this functions gets all the documents and covert it into a comment object to a list.
+    fun getComments(
+        topicID: String,
+        postId: String,
+        onResult:(List<Comment>) -> Unit
+    ){
+        FirestoreDatabase.topics
+            .document(topicID)
+            .collection("posts")
+            .document(postId)
+            .collection("comments")
+            .get()
+            .addOnSuccessListener { result ->
+                val commentsList = mutableListOf<Comment>()
+
+                for( doc in result){
+                    val commentID = doc.getString("commentID") ?: continue
+                    val commmContents = doc.getString("commContents") ?: ""
+                    val commentedByUUID = doc.getString("commentedByUID") ?: continue
+                    val parentCommentID = doc.getString("parentCommentID") ?: ""
+                    val likeCt = doc.getLong("likeCt")?.toInt() ?: 0
+                    val comment = Comment(
+                        commentID,
+                        commentedByUUID,
+                        commmContents,
+                        likeCt,
+                        parentCommentID
+                    )
+                    //each documents gets turned into a comment object and stored into the list.
+                    commentsList.add(comment)
+
+
+
+                }
+                onResult(commentsList)
+
+
+            }
+            .addOnFailureListener {
+                onResult(emptyList())
+            }
     }
 
 

@@ -22,7 +22,7 @@ public class Comment {
 
     //To create a comment, a User must provide just the comment contents. User ID is recorded, boolean flag set based on if they
     //are replying to another comment or not via GUI.
-    public Comment(String commentedByUID, String commContents, boolean isReply) {
+    public Comment(String commentedByUID, String commContents) {
         this.commContents = commContents; // The user's message
         this.commentedByUID = commentedByUID; //User ID always exists beforehand
         this.commentID = UUID.randomUUID().toString(); //Need to generate this randomly & consistently for all Posts/Comments
@@ -31,6 +31,23 @@ public class Comment {
         this.likeCt = 0;
 //        this.isReply = isReply;
     }
+
+    // this is a second constructor for the firebase sttore
+    public Comment(
+            String commentID,
+            String commentedByUID,
+            String commContents,
+            int likeCt,
+            String parentCommentID
+    ) {
+        this.commentID = commentID;
+        this.commentedByUID = commentedByUID;
+        this.commContents = commContents;
+        this.likeCt = likeCt;
+        this.parentCommentID = parentCommentID;
+        this.createdAt = LocalDateTime.now(); // or ignore for now
+    }
+
 
 //    public void addReply(Comment comment) {
 //        //if isReply
