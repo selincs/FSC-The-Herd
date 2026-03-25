@@ -16,13 +16,11 @@ class CreateGuideActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_guide)
 
-        // xml views
         val guideTitle: EditText = findViewById(R.id.enter_guide_title)
         val categories: Spinner = findViewById(R.id.guide_categories)
         val guideContent: EditText = findViewById(R.id.guide_content_field)
         val submitButton: Button = findViewById(R.id.submit_request_button)
 
-        // display dropdown list of categories
         val categoriesList = arrayOf( "Navigation", "Travel", "Academic", "Financial Aid", "Housing", "Clubs", "Health & Wellness", "Other (specify below)")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoriesList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
