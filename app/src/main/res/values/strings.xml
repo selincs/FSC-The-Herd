@@ -103,6 +103,9 @@
     <string name="student_life">Student Life</string>
     <string name="other">Other</string>
     <string name="suggest_a_new_guide">+ Suggest a New Guide</string>
+    <string name="WiFi_symbol">wifiSymbol</string>
+    <string name="submit_a_new_guide">Submit a New Guide</string>
+    <string name="title_e_g_fsc_shuttle_schedule">Title (e.g., FSC Shuttle Schedule)</string>
     <string-array name="guide_categories">
         <item>Campus Services</item>
         <item>Academic Resources</item>

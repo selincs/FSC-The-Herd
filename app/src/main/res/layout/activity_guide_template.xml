@@ -232,7 +232,7 @@
                 android:background="#9BB194"
                 android:gravity="center"
                 android:padding="12dp"
-                android:text="How to Wi-Fi"
+                android:text="@string/how_to_wifi_title"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -241,7 +241,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="Secure campus Wi-Fi is available across all university buildings. Use your student credentials for access."
+                    android:text="@string/how_to_wifi_desc"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
@@ -252,7 +252,7 @@
                 android:background="#9BB194"
                 android:gravity="center"
                 android:padding="12dp"
-                android:text="How to Connect"
+                android:text="@string/how_to_connect_title"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -261,7 +261,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="1. Select 'Campus_Secure' from the Wi-Fi list.\n2. Enter your Student ID and Password.\n3. Accept the certificate if prompted."
+                    android:text="@string/how_to_connect_desc"
                     android:textColor="#000000"
                     android:lineSpacingExtra="4dp"
                     android:textSize="14sp" />
@@ -272,7 +272,7 @@
                 android:background="#9BB194"
                 android:gravity="center"
                 android:padding="12dp"
-                android:text="How to Wi-Fi"
+                android:text="@string/dealing_with_issues"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -281,30 +281,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="Secure campus Wi-Fi is available across all university buildings. Use your student credentials for access."
+                    android:text="@string/dealing_with_issues_desc"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="#9BB194"
-                android:gravity="center"
-                android:padding="12dp"
-                android:text="How to Connect"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:text="1. Select 'Campus_Secure' from the Wi-Fi list.\n2. Enter your Student ID and Password.\n3. Accept the certificate if prompted."
-                    android:textColor="#000000"
-                    android:lineSpacingExtra="4dp"
-                    android:textSize="14sp" />
 
             </LinearLayout>
 

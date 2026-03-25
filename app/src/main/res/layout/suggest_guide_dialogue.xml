@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Submit a New Guide"
+        android:text="@string/submit_a_new_guide"
         android:textColor="#1B3022"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:background="@drawable/bg_edittext_rounded"
-        android:hint="Title (e.g., FSC Bus Schedule)" />
+        android:hint="@string/title_e_g_fsc_shuttle_schedule" />
 
     <Spinner
         android:id="@+id/spinnerCategory"
