@@ -162,7 +162,8 @@
         android:text="Create Topic"
         android:layout_marginTop="12dp"
         android:layout_marginStart="16dp"
-
+        android:backgroundTint="#2F442F"
+        android:textColor="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/searchTopics"
         app:layout_constraintStart_toStartOf="parent"/>
 

@@ -44,6 +44,10 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
             Toast.makeText(holder.itemView.context,
                 "You joined ${topic.topicName}!", Toast.LENGTH_SHORT).show()
         }
+        holder.joinButton.setBackgroundColor(
+            android.graphics.Color.parseColor("#2F442F") // Hex for a nice green
+        )
+        holder.joinButton.setTextColor(android.graphics.Color.WHITE)
     }
 
     override fun getItemCount(): Int = topics.size
