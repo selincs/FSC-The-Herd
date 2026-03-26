@@ -13,10 +13,24 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Button
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.widget.ImageButton
+import android.widget.Toast
+
+
+
 class TopicsActivity : AppCompatActivity() {
 
     private lateinit var adapter: TopicsAdapter
     private lateinit var topicsList: MutableList<Topic>
+
+    private var selectedImageUri: Uri? = null  // Stores the uploaded image
+
+    companion object {
+        private const val IMAGE_PICK_CODE = 1001
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,22 +69,18 @@ class TopicsActivity : AppCompatActivity() {
 
             val nameInput = dialogView.findViewById<EditText>(R.id.inputTopicName)
             val descInput = dialogView.findViewById<EditText>(R.id.inputTopicDesc)
-            val spinner = dialogView.findViewById<Spinner>(R.id.imageSpinner)
+            val uploadButton = dialogView.findViewById<ImageButton>(R.id.uploadImageButton)
 
-            // Image options
-            val imageOptions = listOf("Gym", "Chess", "Hiking", "Food")
-            val imageMap = mapOf(
-                "Gym" to R.drawable.gym,
-                "Chess" to R.drawable.chess,
-                "Hiking" to R.drawable.hiking,
-                "Food" to R.drawable.food
-            )
+            // Reset selected image for each dialog open
+            selectedImageUri = null
 
-            val adapterSpinner = ArrayAdapter(this,
-                android.R.layout.simple_spinner_dropdown_item,
-                imageOptions)
-
-            spinner.adapter = adapterSpinner
+            // Upload button opens device image picker
+            uploadButton.setOnClickListener {
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.type = "image/*"
+                startActivityForResult(intent, IMAGE_PICK_CODE)
+            }
 
             AlertDialog.Builder(this)
                 .setTitle("Create New Topic")
@@ -79,17 +89,37 @@ class TopicsActivity : AppCompatActivity() {
 
                     val name = nameInput.text.toString()
                     val desc = descInput.text.toString()
-                    val selectedImage = imageMap[spinner.selectedItem.toString()] ?: R.drawable.gym
 
                     if (name.isNotEmpty()) {
-                        val newTopic = Topic(name, "currentUser", desc, selectedImage)
+                        val newTopic = if (selectedImageUri != null) {
+                            // Store the URI as a string for your Topic model
+                            Topic(name, "currentUser", desc, selectedImageUri.toString())
+                        } else {
+                            // Default image if none selected
+                            Topic(name, "currentUser", desc, R.drawable.fsclogo)
+                        }
 
                         topicsList.add(newTopic)
                         adapter.updateList(topicsList)
+                        Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Topic name cannot be empty.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
+        }
+    }
+
+    // Handle image picker result
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
+            selectedImageUri = data?.data
+            if (selectedImageUri != null) {
+                Toast.makeText(this, "Image selected!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

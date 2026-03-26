@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import Model.Topic
+import android.net.Uri
 
 // to populate topic bubbles in topicActivity
 class TopicsAdapter(private val allTopics: List<Topic>) :
@@ -35,7 +36,13 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         holder.name.text = topic.topicName
         holder.description.text = topic.topicDesc
         holder.members.text = "${topic.memberCount} members"
-        holder.image.setImageResource(topic.getImageResId())
+
+        // Display uploaded image if exists, else default drawable
+        if (topic.getImageUriString() != null) {
+            holder.image.setImageURI(Uri.parse(topic.getImageUriString()))
+        } else {
+            holder.image.setImageResource(topic.getImageResId())
+        }
 
         holder.joinButton.setOnClickListener {
             topic.incrementMembers()
@@ -45,7 +52,7 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
                 "You joined ${topic.topicName}!", Toast.LENGTH_SHORT).show()
         }
         holder.joinButton.setBackgroundColor(
-            android.graphics.Color.parseColor("#2F442F") // Hex for a nice green
+            android.graphics.Color.parseColor("#2F442F") //green btn
         )
         holder.joinButton.setTextColor(android.graphics.Color.WHITE)
     }
