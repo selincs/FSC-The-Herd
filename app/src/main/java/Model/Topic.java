@@ -55,13 +55,13 @@ public class Topic {
         this.imageResId = R.drawable.marquee_logo;
     }
 
-    // Test party merging constructor, clean these up once Firestore is working and we don't need all these options
+    // Test party merging constructor, clean these up once Firestore is working if we don't need all these fields, likely we do
     public Topic(String topicID, String topicName, String creatorID, String topicDesc, int imageResId) {
         this.topicID = topicID;
         this.topicName = topicName;
         this.creatorID = creatorID;
         this.topicDesc = topicDesc;
-        this.memberCount = memberCount;
+        this.memberCount = 1;   //Creator is the only member
         this.imageResId = imageResId;
     }
 

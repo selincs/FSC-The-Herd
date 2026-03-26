@@ -10,10 +10,12 @@ import android.widget.EditText
 import Model.Topic
 import android.app.AlertDialog
 import android.content.Intent
+import android.se.omapi.Session
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 
 class TopicsActivity : AppCompatActivity() {
@@ -44,9 +46,6 @@ class TopicsActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Mutable list so we can add Firestore data later
-//        val topicsList = mutableListOf<Topic>() dont use local var, moved to data members of class
-
         // Sample topics
         topicsList = mutableListOf(
             Topic("Gym Buddies", "user123", "Connect with fellow gym goers", R.drawable.gym),
@@ -71,10 +70,10 @@ class TopicsActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
+        //Create Button starts here
         val createButton = findViewById<Button>(R.id.createTopicButton)
 
         createButton.setOnClickListener {
-
             val dialogView = layoutInflater.inflate(R.layout.dialog_create_topic, null)
 
             val nameInput = dialogView.findViewById<EditText>(R.id.inputTopicName)
@@ -82,18 +81,18 @@ class TopicsActivity : AppCompatActivity() {
             val spinner = dialogView.findViewById<Spinner>(R.id.imageSpinner)
 
             // Image options
-            val imageOptions = listOf("Gym", "Chess", "Hiking", "Food")
+            val imageOptions = listOf("Gym", "Chess", "Hiking", "Food", "Herd")
             val imageMap = mapOf(
                 "Gym" to R.drawable.gym,
                 "Chess" to R.drawable.chess,
                 "Hiking" to R.drawable.hiking,
-                "Food" to R.drawable.food
+                "Food" to R.drawable.food,
+                "Herd" to R.drawable.marquee_logo
             )
 
             val adapterSpinner = ArrayAdapter(this,
                 android.R.layout.simple_spinner_dropdown_item,
                 imageOptions)
-
             spinner.adapter = adapterSpinner
 
             AlertDialog.Builder(this)
@@ -106,10 +105,30 @@ class TopicsActivity : AppCompatActivity() {
                     val selectedImage = imageMap[spinner.selectedItem.toString()] ?: R.drawable.gym
 
                     if (name.isNotEmpty()) {
-                        val newTopic = Topic(name, "currentUser", desc, selectedImage)
+//                        val newTopic = Topic(name, "currentUser", desc, selectedImage)
+                        //If User is null, stop topic creation and return
+                        val userID = SessionManager.getUser()?.userID ?: return@setPositiveButton
 
-                        topicsList.add(newTopic)
-                        adapter.updateList(topicsList)
+                     //Firestore createTopic() fnc call
+                        TopicRepository.createTopic(
+                            name,
+                            desc,
+                            selectedImage,
+                            userID,
+                            onSuccess = { topicID ->
+
+                                val newTopic = Topic(name, userID, desc, selectedImage)
+
+                                topicsList.add(newTopic)
+//                                adapter.updateList(topicsList)
+                                //Update the Topics List with a new Topic at the bottom
+                                adapter.notifyItemInserted(topicsList.size - 1) //Doesn't work
+                                Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
+                            },
+                            onFailure = { exception ->
+                                Toast.makeText(this,exception.message ?: "Failed to create topic",Toast.LENGTH_LONG).show()
+                            }
+                        )
                     }
                 }
                 .setNegativeButton("Cancel", null)

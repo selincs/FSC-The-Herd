@@ -45,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
                         if (success) {
                             Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
 
-                            TopicRepository.initializeTestTopic() //Remove when Topic impl is done
+//                            TopicRepository.initializeTestTopic() //Remove when Topic impl is done
 
                             startActivity(Intent(this, MainActivity::class.java))
                         } else {

@@ -3,23 +3,145 @@ package com.example.theherd
 import Model.Topic
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
 //Firestore Topic access is done through FirestoreDatabase.topics
 object TopicRepository {
     private const val USE_FIRESTORE = true  //what does this do?
+    private const val SYSTEM_USER = "system"
     private val auth: FirebaseAuth = FirebaseAuth.getInstance() //Call the singleton Firebase db instance
 
-    fun initializeTestTopic() {
-        createTopic(
-            "Firestore",
-            "Testing Firestore topic creation via initialization function until GUI allows",
-            R.drawable.marquee_logo
-        ) { success ->
-            println("Initialization result: $success")
-        }
-    }
+//    fun initializeTestTopic() {
+//        createTopic(
+//            "Firestore",
+//            "Testing Firestore topic creation via initialization function until GUI allows",
+//            R.drawable.marquee_logo
+//        ) { success ->
+//            println("Initialization result: $success")
+//        }
+//    }
 
+    //Create Topic atomically via batch
+    fun createTopic(
+        topicName: String,
+        topicDesc: String,
+        imageResId: Int,
+        creatorID: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+
+        val db = FirebaseFirestore.getInstance()
+
+        // Step 1: Prevent duplicate topic names
+        db.collection("topics")
+            .whereEqualTo("topicName", topicName.trim())
+            .get()
+            .addOnSuccessListener { query ->
+
+                if (!query.isEmpty) {
+                    onFailure(Exception("Topic name already exists"))
+                    return@addOnSuccessListener
+                }
+
+                val topicRef = db.collection("topics").document()
+                val topicID = topicRef.id
+
+                val rulesPostRef = topicRef.collection("posts").document()
+                val postID = rulesPostRef.id
+
+                val rulesCommentRef =
+                    rulesPostRef.collection("comments").document()
+
+                val batch = db.batch()
+
+                // ------------------------
+                // Topic document
+                // ------------------------
+
+                val topicData = hashMapOf(
+                    "topicName" to topicName,
+                    "topicDesc" to topicDesc,
+                    "imageResId" to imageResId,
+                    "creatorID" to creatorID,
+                    "memberCount" to 1,
+                    "createdAt" to FieldValue.serverTimestamp(),
+                    "isArchived" to false
+                )
+
+                batch.set(topicRef, topicData)
+
+                // ------------------------
+                // Creator membership
+                // ------------------------
+
+                val memberRef = topicRef
+                    .collection("members")
+                    .document(creatorID)
+
+                val memberData = hashMapOf(
+                    "topicID" to topicID,
+                    "role" to "moderator",
+                    "joinedAt" to FieldValue.serverTimestamp()
+                )
+
+                batch.set(memberRef, memberData)
+
+                // ------------------------
+                // Default Rules Post
+                // ------------------------
+
+                val rulesPostData = hashMapOf(
+                    "topicID" to topicID,
+                    "posterID" to "system",
+                    "postTitle" to "Community Rules",
+                    "postText" to """
+                    1. Be respectful
+                    2. Stay on topic
+                    3. No harassment
+                """.trimIndent(),
+                    "likeCount" to 1,
+                    "commentCount" to 1,
+                    "postedAt" to FieldValue.serverTimestamp(),
+                    "isPinned" to true
+                )
+
+                batch.set(rulesPostRef, rulesPostData)
+
+                // ------------------------
+                // Default Rules Comment
+                // ------------------------
+
+                val rulesCommentData = hashMapOf(
+                    "topicID" to topicID,
+                    "postID" to postID,
+                    "commenterID" to "system",
+                    "commentText" to "Have fun!",
+                    "parentCommentID" to null,
+                    "likeCount" to 1,
+                    "createdAt" to FieldValue.serverTimestamp()
+                )
+
+                batch.set(rulesCommentRef, rulesCommentData)
+
+                // ------------------------
+                // Commit Batch
+                // ------------------------
+
+                batch.commit()
+                    .addOnSuccessListener {
+                        onSuccess(topicID)
+                    }
+                    .addOnFailureListener {
+                        onFailure(it)
+                    }
+            }
+            .addOnFailureListener {
+                onFailure(it)
+            }
+    }
+/*
     ///Create the topic document, add creator as the first member, then set memberCount==1
     fun createTopic(
         topicName: String,
@@ -27,7 +149,7 @@ object TopicRepository {
         imageResId: Int,
         onDone: (Boolean) -> Unit
     ) {
-        //Validate creating User account for later insert as the first member
+        //Validate creator User account by ID for recording as a valid first member
         val creatorID = auth.currentUser?.uid ?: run {
             onDone(false)
             println("Creator ID fauth failed")
@@ -38,17 +160,18 @@ object TopicRepository {
             .whereEqualTo("topicName", topicName)
             .get()
             .addOnSuccessListener { querySnapshot ->
-
                 if (!querySnapshot.isEmpty) {
                     // Topic already exists, do not create
                     println("Topic '$topicName' already exists. Skipping creation.")
+                    println("Code to inform user topic !exists is not implemented")
+                    //This will need to tell the user it already exists at some point
                     onDone(false)
                     return@addOnSuccessListener
                 }
 
-            // Topic Vs User UUID?
             val topicID = UUID.randomUUID().toString()
 
+                //Data that lives in a Topic Document
             val topicData = hashMapOf(
                 "topicID" to topicID,          //TopicID
                 "topicName" to topicName,       //Name of the Topic
@@ -71,6 +194,7 @@ object TopicRepository {
                         "role" to "moderator",
                         "joinedAt" to FieldValue.serverTimestamp()
                     )
+                    //Create the members subcollection in the Topic's document
                     FirestoreDatabase.topics
                         .document(topicID)
                         .collection("members")
@@ -96,6 +220,8 @@ object TopicRepository {
             }
     }
 
+ */
+
     //TODO:Improve to preserve TopicID for further diving -> Might be needed for post ID and stuff
     //Load Topics from Firestore
     fun getTopics(onResult: (List<Topic>) -> Unit) {
@@ -115,6 +241,7 @@ object TopicRepository {
                     val memberCount = doc.getLong("memberCount")?.toInt() ?: 0
                     val imageResId = doc.getLong("imageResId")?.toInt() ?: R.drawable.marquee_logo
 
+                    //I think this could be technically just added to list below as a anonymous topic instead of declaring it here
                     val topic = Topic(
                         topicID,
                         name,
