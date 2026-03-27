@@ -160,18 +160,29 @@
             </FrameLayout>
 
             <!-- Name -->
-            <TextView
-                android:id="@+id/nameText"
+            <EditText
+                android:id="@+id/firstNameInput"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/profile_name"
+                android:hint="First Name"
+                android:gravity="center"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/fugaz_one"/>
+
+            <EditText
+                android:id="@+id/lastNameInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Last Name"
+                android:gravity="center"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/fugaz_one"/>
 
             <!-- Username -->
-            <TextView
-                android:id="@+id/usernameText"
+            <EditText
+                android:id="@+id/usernameInput"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/profile_username"
@@ -179,16 +190,16 @@
                 android:layout_marginTop="4dp" />
 
             <!-- Major -->
-            <TextView
-                android:id="@+id/majorText"
+            <EditText
+                android:id="@+id/majorInput"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/profile_major"
                 android:layout_marginTop="8dp" />
 
             <!-- Graduation Year -->
-            <TextView
-                android:id="@+id/gradYearText"
+            <EditText
+                android:id="@+id/gradYearInput"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/profile_grad_year"
@@ -234,6 +245,14 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/selectedInterestsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Selected Interests:"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
 
             <!-- Interest Checkboxes -->
             <CheckBox
@@ -282,15 +301,6 @@
                         android:minHeight="48dp"
                         android:hint="@string/interest_other"
                         android:padding="12dp"/>
-
-                    <Button
-                        android:id="@+id/saveOtherInterestButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="48dp"
-                        android:text="@string/save_button"
-                        android:layout_marginStart="8dp"
-                        android:backgroundTint="#2F442F"
-                        android:textColor="@android:color/white"/>
                 </LinearLayout>
 
             <!-- Bio Section -->
@@ -317,15 +327,6 @@
                         android:gravity="top"
                         android:padding="8dp"/>
 
-                    <Button
-                        android:id="@+id/saveBioButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="48dp"
-                        android:text="@string/save_button"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginStart="8dp"
-                        android:backgroundTint="#2F442F"
-                        android:textColor="@android:color/white"/>
                 </LinearLayout>
 
 

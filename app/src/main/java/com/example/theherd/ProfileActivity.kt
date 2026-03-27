@@ -15,54 +15,118 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.Toolbar
 
+
+import android.widget.*
+
+
 class ProfileActivity : AppCompatActivity() {
 
 
     private lateinit var askMeRecycler: RecyclerView
     private lateinit var adapter: AskMeAdapter
     private val topics = mutableListOf<String>()
+
     private lateinit var newTopicInput: EditText
     private lateinit var addTopicButton: Button
+    private lateinit var editProfileButton: Button
+
+    private var isEditing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_profile) // connects XML
+        setContentView(R.layout.activity_profile)
 
-        val nameDisplay: TextView = findViewById(R.id.nameText)
-        val editProfileButton: Button = findViewById(R.id.editProfileButton)
+        editProfileButton = findViewById(R.id.editProfileButton)
 
-        // Initial load from PrefsManager
-        nameDisplay.text = PreferencesManager.getFullName(this)
+        val firstNameInput = findViewById<EditText>(R.id.firstNameInput)
+        val lastNameInput = findViewById<EditText>(R.id.lastNameInput)
+        val usernameInput = findViewById<EditText>(R.id.usernameInput)
+        val majorInput = findViewById<EditText>(R.id.majorInput)
+        val gradYearInput = findViewById<EditText>(R.id.gradYearInput)
+        val bioInput = findViewById<EditText>(R.id.bioInput)
 
-        editProfileButton.setOnClickListener {
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Edit Name")
+        val interestsText = findViewById<TextView>(R.id.selectedInterestsText)
+        val otherInterestInput = findViewById<EditText>(R.id.otherInterestInput)
 
-            val layout = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                setPadding(60, 20, 60, 20)
-            }
+        val fitnessCheck = findViewById<CheckBox>(R.id.fitnessCheck)
+        val codingCheck = findViewById<CheckBox>(R.id.codingCheck)
+        val musicCheck = findViewById<CheckBox>(R.id.musicCheck)
+        val gamingCheck = findViewById<CheckBox>(R.id.gamingCheck)
+        val artCheck = findViewById<CheckBox>(R.id.artCheck)
 
-            val etFirst = EditText(this).apply { hint = "First Name" }
-            val etLast = EditText(this).apply { hint = "Last Name" }
+        // Load saved data
 
-            layout.addView(etFirst)
-            layout.addView(etLast)
-            builder.setView(layout)
+        usernameInput.setText(PreferencesManager.getUsername(this))
+        gradYearInput.setText(PreferencesManager.getGradYear(this))
+        bioInput.setText(PreferencesManager.getBio(this))
 
-            builder.setPositiveButton("Save") { _, _ ->
-                val fName = etFirst.text.toString().trim()
-                val lName = etLast.text.toString().trim()
+        val fullName = PreferencesManager.getFullName(this)
+        val parts = fullName.split(" ")
 
-                if (fName.isNotEmpty() && lName.isNotEmpty()) {
-                    PreferencesManager.saveFullName(this, fName, lName)
-                    nameDisplay.text = "$fName $lName"
-                    Toast.makeText(this, "Profile Saved", Toast.LENGTH_SHORT).show()
+        if (parts.isNotEmpty()) firstNameInput.setText(parts[0])
+        if (parts.size > 1) lastNameInput.setText(parts[1])
+
+        bioInput.setText(PreferencesManager.getBio(this))
+
+        val savedInterests = PreferencesManager.getInterests(this)
+        interestsText.text = savedInterests.joinToString(", ")
+        // OPTIONAL: put "other" back into input if it's not a default one
+        val defaultInterests = listOf("Fitness", "Coding", "Music", "Gaming", "Art")
+
+        val customInterest = savedInterests.find { it !in defaultInterests }
+        if (customInterest != null) {
+            otherInterestInput.setText(customInterest)
+        }
+
+        askMeRecycler = findViewById(R.id.askMeRecycler)
+        newTopicInput = findViewById(R.id.newTopicInput)
+        addTopicButton = findViewById(R.id.addTopicButton)
+
+        adapter = AskMeAdapter(this, topics, false)
+        askMeRecycler.layoutManager = LinearLayoutManager(this)
+        askMeRecycler.adapter = adapter
+
+        addTopicButton.setOnClickListener {
+            if (isEditing) {
+                val topic = newTopicInput.text.toString().trim()
+                if (topic.isNotEmpty()) {
+                    topics.add(topic)
+                    adapter.notifyItemInserted(topics.size - 1)
+                    newTopicInput.text.clear()
                 }
             }
-            builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
-            builder.show()
         }
+
+        editProfileButton.setOnClickListener {
+            isEditing = !isEditing
+
+            if (isEditing) {
+                setEditMode(true)
+                adapter.setEditMode(true)
+                editProfileButton.text = "Save Changes"
+            } else {
+                saveAll(
+                    firstNameInput,
+                    lastNameInput,
+                    usernameInput,
+                    majorInput,
+                    gradYearInput,
+                    bioInput,
+                    fitnessCheck,
+                    codingCheck,
+                    musicCheck,
+                    gamingCheck,
+                    artCheck,
+                    otherInterestInput,
+                    interestsText
+                )
+                setEditMode(false)
+                adapter.setEditMode(false)
+                editProfileButton.text = "Edit Profile"
+            }
+        }
+
+        setEditMode(false)
 
         // buttons
         val eventsButton: Button = findViewById(R.id.events_button)
@@ -74,27 +138,11 @@ class ProfileActivity : AppCompatActivity() {
         val guideButton: Button = findViewById(R.id.guide_button)
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
 
-        // toolbar
+        // Toolbar
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         val homeButton: ImageButton = findViewById(R.id.homeButton)
         setSupportActionBar(toolbar)
 
-        // button event listeners
-//        eventsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
-//        motivationButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
-//        friendsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
         interestsButton.setOnClickListener {
             val intent = Intent(this, TopicsActivity::class.java)
             startActivity(intent)
@@ -114,6 +162,7 @@ class ProfileActivity : AppCompatActivity() {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
         }
+
         settingsButton.setOnClickListener { view ->
 
             // Creates popup menu connected to settings btn
@@ -152,33 +201,98 @@ class ProfileActivity : AppCompatActivity() {
             popupMenu.show()
         }
 
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
-
         homeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
-        // Ask Me About RecyclerView
-        askMeRecycler = findViewById(R.id.askMeRecycler)
-        newTopicInput = findViewById(R.id.newTopicInput)
-        addTopicButton = findViewById(R.id.addTopicButton)
 
-        adapter = AskMeAdapter(this, topics)
-        askMeRecycler.layoutManager = LinearLayoutManager(this)
-        askMeRecycler.adapter = adapter
-
-        // Add new topic
-        addTopicButton.setOnClickListener {
-            val newTopic = newTopicInput.text.toString().trim()
-            if (newTopic.isNotEmpty()) {
-                topics.add(newTopic)
-                adapter.notifyItemInserted(topics.size - 1)
-                askMeRecycler.scrollToPosition(topics.size - 1)
-                newTopicInput.text.clear()
-            }
+        toolbar.setNavigationOnClickListener {
+            finish()
         }
+    }
+
+    private fun setEditMode(isEditing: Boolean) {
+
+        val inputs = listOf(
+            R.id.firstNameInput,
+            R.id.lastNameInput,
+            R.id.usernameInput,
+            R.id.majorInput,
+            R.id.gradYearInput,
+            R.id.bioInput,
+            R.id.newTopicInput,
+            R.id.otherInterestInput
+        )
+
+        inputs.forEach {
+            val et = findViewById<EditText>(it)
+            et.isEnabled = isEditing
+            et.isFocusable = isEditing
+            et.isFocusableInTouchMode = isEditing
+            et.isCursorVisible = isEditing
+        }
+
+        val checkboxes = listOf(
+            R.id.fitnessCheck,
+            R.id.codingCheck,
+            R.id.musicCheck,
+            R.id.gamingCheck,
+            R.id.artCheck
+        )
+
+        checkboxes.forEach {
+            findViewById<CheckBox>(it).isEnabled = isEditing
+        }
+
+        findViewById<Button>(R.id.addTopicButton).visibility =
+            if (isEditing) Button.VISIBLE else Button.GONE
+    }
+
+    private fun saveAll(
+        firstNameInput: EditText,
+        lastNameInput: EditText,
+        usernameInput: EditText,
+        majorInput: EditText,
+        gradYearInput: EditText,
+        bioInput: EditText,
+        fitnessCheck: CheckBox,
+        codingCheck: CheckBox,
+        musicCheck: CheckBox,
+        gamingCheck: CheckBox,
+        artCheck: CheckBox,
+        otherInterestInput: EditText,
+        interestsText: TextView
+    ) {
+
+        val fName = firstNameInput.text.toString().trim()
+        val lName = lastNameInput.text.toString().trim()
+        PreferencesManager.saveUsername(this, usernameInput.text.toString().trim())
+        PreferencesManager.saveGradYear(this, gradYearInput.text.toString().trim())
+
+        if (fName.isNotEmpty() && lName.isNotEmpty()) {
+            PreferencesManager.saveFullName(this, fName, lName)
+        }
+
+        PreferencesManager.saveBio(this, bioInput.text.toString().trim())
+
+        val interests = mutableListOf<String>()
+
+        if (fitnessCheck.isChecked) interests.add("Fitness")
+        if (codingCheck.isChecked) interests.add("Coding")
+        if (musicCheck.isChecked) interests.add("Music")
+        if (gamingCheck.isChecked) interests.add("Gaming")
+        if (artCheck.isChecked) interests.add("Art")
+
+        //Other interests
+        val otherInterest = otherInterestInput.text.toString().trim()
+        if (otherInterest.isNotEmpty()) {
+            interests.add(otherInterest)
+        }
+
+        PreferencesManager.saveInterests(this, interests)
+        interestsText.text = interests.joinToString(", ")
+
+        Toast.makeText(this, "Profile Updated", Toast.LENGTH_SHORT).show()
     }
 }

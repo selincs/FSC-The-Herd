@@ -12,10 +12,58 @@ object PreferencesManager {
     private const val FIRST_NAME_KEY = "first_name"
     private const val LAST_NAME_KEY = "last_name"
     private const val COMMUNITIES_KEY = "saved_communities"
+
+    private const val BIO_KEY = "bio"
+    private const val INTERESTS_KEY = "interests"
+    private const val GRAD_YEAR_KEY = "grad_year"
     private val gson = Gson()
 
     private fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    // USERNAME
+    fun saveUsername(context: Context, username: String) {
+        getPrefs(context).edit().putString(USERNAME_KEY, username).apply()
+    }
+
+    fun getUsername(context: Context): String {
+        return getPrefs(context).getString(USERNAME_KEY, "") ?: ""
+    }
+
+    // GRAD YEAR
+    fun saveGradYear(context: Context, year: String) {
+        getPrefs(context).edit().putString(GRAD_YEAR_KEY, year).apply()
+    }
+
+    fun getGradYear(context: Context): String {
+        return getPrefs(context).getString(GRAD_YEAR_KEY, "") ?: ""
+    }
+
+    // Save Bio
+    fun saveBio(context: Context, bio: String) {
+        getPrefs(context).edit()
+            .putString(BIO_KEY, bio)
+            .apply()
+    }
+
+    // Get Bio
+    fun getBio(context: Context): String {
+        return getPrefs(context).getString(BIO_KEY, "") ?: ""
+    }
+
+    // Save Interests
+    fun saveInterests(context: Context, interests: List<String>) {
+        getPrefs(context).edit()
+            .putStringSet(INTERESTS_KEY, interests.toSet())
+            .apply()
+    }
+
+    // Get Interests
+    fun getInterests(context: Context): List<String> {
+        return getPrefs(context)
+            .getStringSet(INTERESTS_KEY, emptySet())
+            ?.toList() ?: emptyList()
     }
 
     fun saveAllCommunities(context: Context, communities: List<Community>) {

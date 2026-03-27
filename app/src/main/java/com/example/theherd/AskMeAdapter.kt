@@ -14,8 +14,14 @@ import androidx.recyclerview.widget.RecyclerView
 //For the Ask me About section on the profile page
 class AskMeAdapter(
     private val context: Context,
-    private val topics: MutableList<String>
-) : RecyclerView.Adapter<AskMeAdapter.ViewHolder>() {
+    private val topics: MutableList<String>,
+    private var isEditing: Boolean
+) : RecyclerView.Adapter<AskMeAdapter.ViewHolder>(){
+
+    fun setEditMode(editing: Boolean) {
+        isEditing = editing
+        notifyDataSetChanged()
+    }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val topicText: TextView = view.findViewById(R.id.topicText)
@@ -31,6 +37,10 @@ class AskMeAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.topicText.text = topics[position]
+
+        // ✅ Show/hide buttons based on edit mode
+        holder.editButton.visibility = if (isEditing) View.VISIBLE else View.GONE
+        holder.deleteButton.visibility = if (isEditing) View.VISIBLE else View.GONE
 
         // Edit topic
         holder.editButton.setOnClickListener {

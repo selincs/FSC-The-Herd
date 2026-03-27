@@ -112,6 +112,10 @@ class SignUpActivity : AppCompatActivity() {
                         password = password
                     ) { success ->
                         if (success) {
+                            PreferencesManager.saveFullName(this, firstName, lastName)
+                            PreferencesManager.saveUsername(this, emailUsername)
+                            PreferencesManager.saveGradYear(this, selectedYear)
+
                             Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show()
                             startActivity(Intent(this, MainActivity::class.java))
                         } else {
