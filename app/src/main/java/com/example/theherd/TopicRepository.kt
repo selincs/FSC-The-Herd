@@ -12,15 +12,13 @@ object TopicRepository {
     private const val SYSTEM_USER = "system"
     private val auth: FirebaseAuth = FirebaseAuth.getInstance() //Call the singleton Firebase db instance
 
-//    fun initializeTestTopic() {
-//        createTopic(
-//            "Firestore",
-//            "Testing Firestore topic creation via initialization function until GUI allows",
-//            R.drawable.marquee_logo
-//        ) { success ->
-//            println("Initialization result: $success")
-//        }
-//    }
+    //TODO: Only createTopic() is properly implemented. Revisit all. joinTopic() must update 3 documents in Firestore in a BATCH
+    //TODO: WRITE, or else race conditions/write failures can be a problem
+    /*
+    topics/topicID/members/userID
+    users/userID/joinedTopics/topicID
+    topics/topicID/memberCount
+     */
 
     //Create Topic atomically via batch
     fun createTopic(
@@ -141,86 +139,6 @@ object TopicRepository {
                 onFailure(it)
             }
     }
-/*
-    ///Create the topic document, add creator as the first member, then set memberCount==1
-    fun createTopic(
-        topicName: String,
-        topicDesc: String,
-        imageResId: Int,
-        onDone: (Boolean) -> Unit
-    ) {
-        //Validate creator User account by ID for recording as a valid first member
-        val creatorID = auth.currentUser?.uid ?: run {
-            onDone(false)
-            println("Creator ID fauth failed")
-            return
-        }
-//        Check if topic already exists by name
-        FirestoreDatabase.topics
-            .whereEqualTo("topicName", topicName)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                if (!querySnapshot.isEmpty) {
-                    // Topic already exists, do not create
-                    println("Topic '$topicName' already exists. Skipping creation.")
-                    println("Code to inform user topic !exists is not implemented")
-                    //This will need to tell the user it already exists at some point
-                    onDone(false)
-                    return@addOnSuccessListener
-                }
-
-            val topicID = UUID.randomUUID().toString()
-
-                //Data that lives in a Topic Document
-            val topicData = hashMapOf(
-                "topicID" to topicID,          //TopicID
-                "topicName" to topicName,       //Name of the Topic
-                "topicDesc" to topicDesc,       //Description of the Topic
-                "creatorID" to creatorID,   //The ID of the User creating the Topic
-                "memberCount" to 1,         //Set member count == 1 for first user on creation
-                "imageResId" to imageResId, //Topic Image for Card Display
-                "createdAt" to FieldValue.serverTimestamp() //Save creation time of Topic
-            )
-
-            //Access the Singleton FirestoreDatabase -> Topics Collection, then set its data by topicID
-                //Currently does not create anything other than Members subcollection, needs to do the rest - Posts(CommBoard - Posts has Comments), Events
-                //See Firestore Architecture Doc
-            FirestoreDatabase.topics
-                .document(topicID)
-                .set(topicData)
-                .addOnSuccessListener {
-                    // Add creator as first member and moderator of the Community Board
-                    val memberData = hashMapOf(
-                        "role" to "moderator",
-                        "joinedAt" to FieldValue.serverTimestamp()
-                    )
-                    //Create the members subcollection in the Topic's document
-                    FirestoreDatabase.topics
-                        .document(topicID)
-                        .collection("members")
-                        .document(creatorID)
-                        .set(memberData)
-                        .addOnSuccessListener {
-                            println("Topic '$topicName' created successfully!")
-                            onDone(true)
-                        }
-                        .addOnFailureListener {
-                            println("Failed to add creator as member")
-                            onDone(false)
-                        }
-                }
-                .addOnFailureListener {
-                    println("Failed to create topic")
-                    onDone(false)
-                }
-            }
-            .addOnFailureListener {
-                println("Error checking if topic exists")
-                onDone(false)
-            }
-    }
-
- */
 
     //TODO:Improve to preserve TopicID for further diving -> Might be needed for post ID and stuff
     //Load Topics from Firestore
@@ -296,10 +214,7 @@ object TopicRepository {
         onDone: (Boolean) -> Unit
     ) {
 
-        val userID = auth.currentUser?.uid ?: run {
-            onDone(false)
-            return
-        }
+        val userID = FirestoreAuthManager.currentUserId ?: return
 
         //Set the joining User to a member of Topic & save Timestamp of join date
         val memberData = hashMapOf(
@@ -332,10 +247,7 @@ object TopicRepository {
         onDone: (Boolean) -> Unit
     ) {
 
-        val userID = auth.currentUser?.uid ?: run {
-            onDone(false)
-            return
-        }
+        val userID = FirestoreAuthManager.currentUserId ?: return
 
         //Open members subcollection and delete user by UserID in subcollection
         FirestoreDatabase.topics
