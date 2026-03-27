@@ -17,6 +17,7 @@ import androidx.appcompat.widget.Toolbar
 
 class ProfileActivity : AppCompatActivity() {
 
+
     private lateinit var askMeRecycler: RecyclerView
     private lateinit var adapter: AskMeAdapter
     private val topics = mutableListOf<String>()
