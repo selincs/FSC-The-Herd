@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 
@@ -35,6 +36,7 @@ class TopicsActivity : AppCompatActivity() {
         val communityButton: Button = findViewById(R.id.community_button)
         val profileButton: Button = findViewById(R.id.profile_button)
         val guideButton: Button = findViewById(R.id.guide_button)
+        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
 
         // toolbar
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
@@ -154,6 +156,44 @@ class TopicsActivity : AppCompatActivity() {
         guideButton.setOnClickListener {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
+        }
+
+        settingsButton.setOnClickListener { view ->
+
+            // Creates popup menu connected to settings btn
+            val popupMenu = PopupMenu(this, view)
+            popupMenu.menuInflater.inflate(R.menu.settings_menu, popupMenu.menu)
+
+            // Handles menu clicks
+            popupMenu.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+
+                    R.id.menu_account_settings -> {
+
+                        val intent = Intent(this, AccountSettingsActivity::class.java)
+                        startActivity(intent)
+
+                        true
+                    }
+
+                    R.id.menu_logout -> {
+
+                        //When settings btn clicked add a way to logout the user
+
+                        // Goes to LoginActivity and clears back stack
+                        val intent = Intent(this, LoginActivity::class.java)
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+
+            popupMenu.show()
         }
 
         toolbar.setNavigationOnClickListener {

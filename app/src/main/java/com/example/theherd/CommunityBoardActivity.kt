@@ -51,6 +51,12 @@ class CommunityBoardActivity : AppCompatActivity() {
         val communityButton: Button = findViewById(R.id.community_button)
         val profileButton: Button = findViewById(R.id.profile_button)
         val guideButton: Button = findViewById(R.id.guide_button)
+        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
+
+        // toolbar
+        val toolbar: Toolbar = findViewById(R.id.topToolbar)
+        val homeButton: ImageButton = findViewById(R.id.homeButton)
+        setSupportActionBar(toolbar)
 
         // event listeners
 //        eventsButton.setOnClickListener {
@@ -89,9 +95,58 @@ class CommunityBoardActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+
+        settingsButton.setOnClickListener { view ->
+
+            // Creates popup menu connected to settings btn
+            val popupMenu = PopupMenu(this, view)
+            popupMenu.menuInflater.inflate(R.menu.settings_menu, popupMenu.menu)
+
+            // Handles menu clicks
+            popupMenu.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+
+                    R.id.menu_account_settings -> {
+
+                        val intent = Intent(this, AccountSettingsActivity::class.java)
+                        startActivity(intent)
+
+                        true
+                    }
+
+                    R.id.menu_logout -> {
+
+                        //When settings btn clicked add a way to logout the user
+
+                        // Goes to LoginActivity and clears back stack
+                        val intent = Intent(this, LoginActivity::class.java)
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+
+            popupMenu.show()
+        }
+
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
+
+        homeButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+        }
+
+
         setupMenuButtons()
 
-        val toolbar: Toolbar = findViewById(R.id.topToolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         setupNavigationButtons(toolbar)
