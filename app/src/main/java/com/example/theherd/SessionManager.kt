@@ -12,6 +12,10 @@ object SessionManager {
     var currentProfile: Profile? = null
         private set
 
+    //Quick access to Firebase UID without Firebase Reads
+    val currentUserId: String?
+        get() = FirestoreAuthManager.auth.currentUser?.uid
+
     //Login Fnc, sets enum to online
     fun login(user: User, profile: Profile) {
         currentUser = user
@@ -19,17 +23,20 @@ object SessionManager {
         //Set user status to Online
         currentProfile?.setOnlineStatus(OnlineStatus.ONLINE)
         //Other on log in status change stuff can go here
-
+        println("Session started for user: ${profile.userID}")
     }
 
-    //Log the current user out of a session, only via SessionManager
+    //Logout clears session AND firebase auth
     fun logout() {
-        //Set user status to offline
+        //Set User status to Offline
         currentProfile?.setOnlineStatus(OnlineStatus.OFFLINE)
-        //Other on log out status change stuff can go here
+
+        FirestoreAuthManager.auth.signOut()
 
         currentUser = null
         currentProfile = null
+
+        println("Session cleared in SessionMgr")
     }
 
     //Log the current user into a session, only via SessionManager
@@ -41,4 +48,9 @@ object SessionManager {
 
     fun getUser(): User? = currentUser
     fun getProfile(): Profile? = currentProfile
+
+    //Used when a function REQUIRES a logged-in user
+    fun requireUserId(): String {
+        return currentUserId ?: throw IllegalStateException("User not logged in")
+    }
 }

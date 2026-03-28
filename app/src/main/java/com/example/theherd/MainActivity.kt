@@ -77,7 +77,8 @@ class MainActivity : AppCompatActivity() {
 
                     R.id.menu_logout -> {
 
-                        //When settings btn clicked add a way to logout the user
+                        //Logout User on Logout press from Settings menu - Sign out of Fbase and SsnMgr
+                        SessionManager.logout()
 
                         // Goes to LoginActivity and clears back stack
                         val intent = Intent(this, LoginActivity::class.java)

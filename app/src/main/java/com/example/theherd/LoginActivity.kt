@@ -12,6 +12,15 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //Auto Login Check before Login View is Set, commented out for now -> Broken, revisit when theres time
+//        if (FirestoreAuthManager.auth.currentUser != null) {
+//            println("User already logged in, skipping login screen")
+//            startActivity(Intent(this, MainActivity::class.java))
+//            finish()
+//            return
+//        }
+
         setContentView(R.layout.activity_login) // connects XML
 
         // text fields

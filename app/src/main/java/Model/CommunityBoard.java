@@ -2,7 +2,6 @@ package Model;
 
 import android.os.Build;
 
-import com.example.theherd.FakeUserDatabase;
 import com.google.firebase.firestore.PropertyName;
 
 import java.util.ArrayList;
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-//TODO: This class will likely be removed after Firestore Implementation
+//TODO: This class will likely be removed after Firestore Implementation with many other model classes
 public class CommunityBoard {
     //TODO: Verify CommunityBoard hierarchy flows correctly
     //TODO: Does a CommunityBoard need pictures or videos?

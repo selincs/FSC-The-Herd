@@ -13,7 +13,7 @@ object TopicRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance() //Call the singleton Firebase db instance
 
     //TODO: Only createTopic() is properly implemented. Revisit all. joinTopic() must update 3 documents in Firestore in a BATCH
-    //TODO: WRITE, or else race conditions/write failures can be a problem
+    //TODO: WRITE, or else race conditions/write failures can be a problem. FS Docs for joinTopic update below
     /*
     topics/topicID/members/userID
     users/userID/joinedTopics/topicID
