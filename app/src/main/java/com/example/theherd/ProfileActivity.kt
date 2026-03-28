@@ -4,19 +4,18 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.widget.ImageButton
-import android.widget.PopupMenu
 import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.Toolbar
 
 
 import android.widget.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class ProfileActivity : AppCompatActivity() {
@@ -40,14 +39,18 @@ class ProfileActivity : AppCompatActivity() {
 
         val firstNameInput = findViewById<EditText>(R.id.firstNameInput)
         val lastNameInput = findViewById<EditText>(R.id.lastNameInput)
+
         val usernameInput = findViewById<EditText>(R.id.usernameInput)
         val majorInput = findViewById<EditText>(R.id.majorInput)
-        val gradYearInput = findViewById<EditText>(R.id.gradYearInput)
+
+        val graduationDateInput = findViewById<EditText>(R.id.graduationDateInput)
         val bioInput = findViewById<EditText>(R.id.bioInput)
 
+        //This will need to be changed to autopop once Topic Firestore is done.
         val interestsText = findViewById<TextView>(R.id.selectedInterestsText)
         val otherInterestInput = findViewById<EditText>(R.id.otherInterestInput)
 
+        //Hard coded values
         val fitnessCheck = findViewById<CheckBox>(R.id.fitnessCheck)
         val codingCheck = findViewById<CheckBox>(R.id.codingCheck)
         val musicCheck = findViewById<CheckBox>(R.id.musicCheck)
@@ -55,10 +58,10 @@ class ProfileActivity : AppCompatActivity() {
         val artCheck = findViewById<CheckBox>(R.id.artCheck)
 
         // Load saved data
-
         usernameInput.setText(PreferencesManager.getUsername(this))
-        gradYearInput.setText(PreferencesManager.getGradYear(this))
+        graduationDateInput.setText(PreferencesManager.getGradYear(this))
         bioInput.setText(PreferencesManager.getBio(this))
+//        usernameInput.setText()
 
         val fullName = PreferencesManager.getFullName(this)
         val parts = fullName.split(" ")
@@ -110,7 +113,7 @@ class ProfileActivity : AppCompatActivity() {
                     lastNameInput,
                     usernameInput,
                     majorInput,
-                    gradYearInput,
+                    graduationDateInput,
                     bioInput,
                     fitnessCheck,
                     codingCheck,
@@ -186,7 +189,7 @@ class ProfileActivity : AppCompatActivity() {
             R.id.lastNameInput,
             R.id.usernameInput,
             R.id.majorInput,
-            R.id.gradYearInput,
+            R.id.graduationDateInput,
             R.id.bioInput,
             R.id.newTopicInput,
             R.id.otherInterestInput
@@ -221,7 +224,7 @@ class ProfileActivity : AppCompatActivity() {
         lastNameInput: EditText,
         usernameInput: EditText,
         majorInput: EditText,
-        gradYearInput: EditText,
+        graduationDateInput: EditText,
         bioInput: EditText,
         fitnessCheck: CheckBox,
         codingCheck: CheckBox,
@@ -235,7 +238,7 @@ class ProfileActivity : AppCompatActivity() {
         val fName = firstNameInput.text.toString().trim()
         val lName = lastNameInput.text.toString().trim()
         PreferencesManager.saveUsername(this, usernameInput.text.toString().trim())
-        PreferencesManager.saveGradYear(this, gradYearInput.text.toString().trim())
+        PreferencesManager.saveGradYear(this, graduationDateInput.text.toString().trim())
 
         if (fName.isNotEmpty() && lName.isNotEmpty()) {
             PreferencesManager.saveFullName(this, fName, lName)
@@ -261,5 +264,59 @@ class ProfileActivity : AppCompatActivity() {
         interestsText.text = interests.joinToString(", ")
 
         Toast.makeText(this, "Profile Updated", Toast.LENGTH_SHORT).show()
+    }
+
+    //When Ready, load the whole User Profile from Firestore
+    private fun loadProfileFromFirestore() {
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val uid = user.uid
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { document ->
+
+                if (!document.exists()) return@addOnSuccessListener
+
+                findViewById<EditText>(R.id.firstNameInput)
+                    .setText(document.getString("firstName") ?: "")
+
+                findViewById<EditText>(R.id.lastNameInput)
+                    .setText(document.getString("lastName") ?: "")
+
+                //Username is FSC Email without @farmingdale.edu
+                val email = document.getString("email") ?: ""
+                val username = email.substringBefore("@")
+//                usernameInput.setText(username)
+
+                //Idk if this works
+                findViewById<EditText>(R.id.usernameInput)
+                    .setText(document.getString(username) ?: "")
+
+
+
+                //Major Input .. Do we ask at Sign Up? Might make things annoying/complicated, maybe just profile
+                //Still will need to be stored in Firestore, but maybe starts as null or Major so User sees where
+                //to input it
+
+//                findViewById<EditText>(R.id.majorInput)
+//                    .setText(document.getString("major") ?: "")
+
+                //graduationDate field in Firestore
+                findViewById<EditText>(R.id.graduationDateInput)
+                    .setText(document.getString("graduationDate") ?: "")
+
+                findViewById<EditText>(R.id.bioInput)
+                    .setText(document.getString("bio") ?: "")
+
+                val interests = document.get("interests") as? List<String> ?: emptyList()
+
+                findViewById<TextView>(R.id.selectedInterestsText)
+                    .text = interests.joinToString(", ")
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load profile", Toast.LENGTH_LONG).show()
+            }
     }
 }

@@ -36,16 +36,6 @@ object UserRepository {
                     return@addOnSuccessListener
                 }
 
-//                //create a profile object for the app's model.
-//                //this stores the user's personal info in our system.
-//                val profile = Model.Profile(userId, firstName, lastName)
-//
-//                //if firestore storage is disabled we just stop here and return success.
-//                if (!USE_FIRESTORE) {
-//                    onDone(true)
-//                    return@addOnSuccessListener
-//                }
-
                 //data for the main user document in firestore.
                 //this stores basic account information.
                 val userData = hashMapOf(
@@ -54,19 +44,13 @@ object UserRepository {
                     "firstName" to firstName,
                     "lastName" to lastName,
                     "graduationDate" to graduationDate,
+                    "major" to "",
                     "bio" to "",
+                    "interests" to emptyList<String>(),
                     "profilePictureURL" to "",
                     "onlineStatus" to "online",
                     "createdAt" to Timestamp.now()
                 )
-
-                //data for the user's profile subcollection document.
-                //this stores additional personal info like names.
-//                val profileData = hashMapOf(
-//                    "userId" to userId,
-//                    "firstName" to firstName,
-//                    "lastName" to lastName
-//                )
 
                 //write the main user document to firestore.
                 FirestoreDatabase.users
@@ -129,17 +113,14 @@ object UserRepository {
                         //store session
                         SessionManager.login(userObj, profileObj)
 
-
                         //login successful.
                         onDone(true)
                     }
-
                     //profile fetch failed.
                     .addOnFailureListener {
                         onDone(false)
                     }
             }
-
             //firebase login failed.
             .addOnFailureListener {
                 onDone(false)

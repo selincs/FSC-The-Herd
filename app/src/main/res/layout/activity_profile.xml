@@ -199,7 +199,7 @@
 
             <!-- Graduation Year -->
             <EditText
-                android:id="@+id/gradYearInput"
+                android:id="@+id/graduationDateInput"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/profile_grad_year"
