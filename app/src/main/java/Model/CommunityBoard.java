@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-//TODO: This class will likely be removed after Firestore Implementation with many other model classes
+//TODO: This class may be removed after Firestore Implementation
 public class CommunityBoard {
     //TODO: Verify CommunityBoard hierarchy flows correctly
     //TODO: Does a CommunityBoard need pictures or videos?

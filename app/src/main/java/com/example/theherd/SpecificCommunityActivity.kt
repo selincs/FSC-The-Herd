@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -84,6 +85,12 @@ class SpecificCommunityActivity : AppCompatActivity() {
         guideButton.setOnClickListener {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
+        }
+
+        // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
+        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
+        settingsButton.setOnClickListener { view ->
+            SettingsMenuHelper.showSettingsMenu(this, view)
         }
 
         val toolbar: Toolbar = findViewById(R.id.topToolbar)

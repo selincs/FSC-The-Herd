@@ -57,6 +57,12 @@ class PostDetailActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
+        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
+        settingsButton.setOnClickListener { view ->
+            SettingsMenuHelper.showSettingsMenu(this, view)
+        }
+
         @Suppress("DEPRECATION")
         val post = intent.getSerializableExtra("SELECTED_POST") as? Post
 

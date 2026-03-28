@@ -20,13 +20,13 @@ object SessionManager {
     fun login(user: User, profile: Profile) {
         currentUser = user
         currentProfile = profile
-        //Set user status to Online
-        currentProfile?.setOnlineStatus(OnlineStatus.ONLINE)
+        currentProfile?.setOnlineStatus(OnlineStatus.ONLINE)   //Set user status to Online
         //Other on log in status change stuff can go here
         println("Session started for user: ${profile.userID}")
     }
 
     //Logout clears session AND firebase auth
+    //This function is called in MainActivity -> R.id.menu_logout
     fun logout() {
         //Set User status to Offline
         currentProfile?.setOnlineStatus(OnlineStatus.OFFLINE)
@@ -36,16 +36,16 @@ object SessionManager {
         currentUser = null
         currentProfile = null
 
-        println("Session cleared in SessionMgr")
+        println("Session cleared in SessionMgr/Fstore, User logged out")
     }
 
-    //Log the current user into a session, only via SessionManager
+    //Check login status via Firestore Auth Mgr
+    //Check login status
     fun isLoggedIn(): Boolean {
-        //isLoggedIn doesnt check if currentProfile is null atm
-        return currentUser != null
-        //return currentUser != null && currentProfile != null
+        return FirestoreAuthManager.auth.currentUser != null
     }
 
+    //Getters
     fun getUser(): User? = currentUser
     fun getProfile(): Profile? = currentProfile
 
