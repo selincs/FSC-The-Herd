@@ -14,15 +14,14 @@ class GuideMainPageActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // This line connects the Kotlin to your specific XML file
         binding = ActivityGuideMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupRecyclerView()
 
-        binding.btnSuggestGuide.setOnClickListener {
-            showSuggestDialog()
-        }
+//        binding.btnSuggestGuide.setOnClickListener {
+//            showSuggestDialog()
+//        }
     }
 
     private fun setupRecyclerView() {
@@ -40,7 +39,6 @@ class GuideMainPageActivity : AppCompatActivity() {
 
     private fun showSuggestDialog() {
         val builder = AlertDialog.Builder(this)
-        // Use R.layout.guide_dialog_suggest or whatever you named the popup XML
         val dialogView = layoutInflater.inflate(R.layout.suggest_guide_dialogue, null)
         builder.setView(dialogView).show()
     }

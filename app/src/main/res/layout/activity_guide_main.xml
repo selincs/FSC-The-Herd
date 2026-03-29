@@ -306,20 +306,6 @@
                 tools:listitem="@layout/guide_card"
                 tools:itemCount="4" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSuggestGuide"
-                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="32dp"
-                android:text="@string/suggest_a_new_guide"
-                android:textAllCaps="false"
-                android:textColor="#1B3022"
-                app:backgroundTint="#D0E8F2"
-                app:cornerRadius="12dp"
-                app:strokeColor="#5C9EAD"
-                app:strokeWidth="1dp" />
-
         </LinearLayout>
     </ScrollView>
 
