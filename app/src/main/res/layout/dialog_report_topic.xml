@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Dropdown (reason) -->
+    <Spinner
+        android:id="@+id/reportReasonSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Additional comments -->
+    <EditText
+        android:id="@+id/reportComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Additional details (optional)"
+        android:minLines="3"
+        android:gravity="top"
+        android:background="@android:drawable/editbox_background"/>
+</LinearLayout>
