@@ -17,18 +17,10 @@ public class User {
 
 
     public User(String fscEmail, String password) {
-        this.userID = createUserID(); //put randomUUID directly here next instead of private method
+        this.userID = UUID.randomUUID().toString(); //Should userID be FSC Email instead?
         this.fscEmail = fscEmail;
         this.password = password;
     }
-
-    //generate userID if no firebase -> Private method, only used for creating UID internally
-    private String createUserID(){
-        //If Firebase : FirebaseAuth.getInstance().getCurrentUser().getUid()
-        //Assuming no Firebase for now.
-        return UUID.randomUUID().toString(); //could just use this line directly in constructor. change after db decisions
-    }
-
 
     public String getUserID(){
         return this.userID;

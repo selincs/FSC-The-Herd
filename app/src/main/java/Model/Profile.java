@@ -9,7 +9,6 @@ import java.util.Set;
 
 //Social Content class for the User, behaviors etc.
 public class Profile {
-    //private User user;
     private String userID; //No need to store the whole User class here, just userID to find them
 
     private String firstName;   //Received from GUI Sign Up, used for display purposes

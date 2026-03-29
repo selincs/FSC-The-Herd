@@ -23,7 +23,13 @@ public class Post {
     //Posts will be organized by date, with more active Posts showing at the top.
 
     //To create a Post, a User must provide a Post Title & Contents (Like their message), + their User ID is recorded
-    public Post(String postedByUID, String postTitle, String postContents) {
+    public Post(
+            String postedByUID,
+
+            String postTitle,
+            String postContents
+
+    ) {
         this.postedByUID = postedByUID; //User ID always exists beforehand
         this.postID = UUID.randomUUID().toString(); //Need to generate this randomly & consistently for all Posts/Comments
         this.postTitle = postTitle;
@@ -32,6 +38,23 @@ public class Post {
         this.postDateTime = LocalDateTime.now();
         this.commentChain = new ArrayList<>();
         this.likeCt = 0;
+    }
+
+    // secind constructor adding for rebuilding a firestore loadded post
+    public Post(
+            String postedByUID,
+            String postID,
+            String postTitle,
+            String postContents,
+            int likeCt
+    ) {
+        this.postedByUID = postedByUID;
+        this.postID = postID;
+        this.postTitle = postTitle;
+        this.postContents = postContents;
+        this.postDateTime = LocalDateTime.now();
+        this.commentChain = new ArrayList<>();
+        this.likeCt = likeCt;
     }
 
     public void addComment(Comment comment) {

@@ -64,6 +64,7 @@ class SignUpActivity : AppCompatActivity() {
             val confirmPassword = confirmedPasswordField.text.toString()
             val selectedSeason = graduationSeasonSpinner.selectedItem.toString()
             val selectedYear = graduationYearSpinner.selectedItem.toString()
+            val validPass = validPassword(password, confirmPassword)
 
             // Combine username with fixed domain
             val fullEmail = "$emailUsername@farmingdale.edu"
@@ -77,8 +78,8 @@ class SignUpActivity : AppCompatActivity() {
                     validationMessage.text = "Email is not valid. Please enter your Farmingdale email username."
                 }
                 // if password is not valid, notify user
-                !validPassword(password, confirmPassword) -> {
-                    validationMessage.text = "Password is not valid."
+                validPass != null-> {
+                    validationMessage.text = validPass
                 }
                 //If season placeholder selected
                 selectedSeason == "Season" -> {
@@ -89,39 +90,35 @@ class SignUpActivity : AppCompatActivity() {
                     validationMessage.text = "Please select your expected graduation year."
                 }
                 else -> {
+                    println("account created!!!")
                     validationMessage.text = ""
 
-                    //User creation code goes here?
-                    //This is where Firestore code must be input, Firestore will create the User
-                    //Email & Pw in new User, userID auto genned
+                    val graduationDate = "$selectedSeason $selectedYear"
 
-//                    val newUser = createUser(fullEmail, password)
-//                    //Create profile of newUser, a new profile uses auto genned userID, fName, lName
-//                    val newProfile = Profile(newUser.userID, firstName, lastName)
-//                    println("New User created with Email : " + fullEmail + "Password : " + password)
-//                    println("User Profile : " + firstName + " " + lastName + ", " + newProfile.userID)
-//
-//                    //Save User Data in Fake Repo - Temp solution till Firestore saves this data
-//                    FakeUserDatabase.addUser(newUser, newProfile)
                     UserRepository.register(
                         firstName = firstName,
                         lastName = lastName,
                         email = fullEmail,
-                        password = password
+                        password = password,
+                        graduationDate = graduationDate
                     ) { success ->
+
                         if (success) {
+
+                            //Remove PrefMgr saves here once Firestore can do this job
+                            PreferencesManager.saveFullName(this, firstName, lastName)
+                            PreferencesManager.saveUsername(this, emailUsername)
+                            PreferencesManager.saveGradYear(this, selectedYear)
+
                             Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(this, MainActivity::class.java))
+
+                            startActivity(Intent(this, LoginActivity::class.java))
+                            finish()
+
                         } else {
                             validationMessage.text = "Failed to create account."
                         }
                     }
-
-                    //Login -> should only happen on login, not here...
-                    //SessionManager.login(newUser, newProfile)
-
-
-
                 }
             }
         }
@@ -129,7 +126,7 @@ class SignUpActivity : AppCompatActivity() {
         // login button event listener
         loginButton.setOnClickListener {
             println("in login button event listener")
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
     }
@@ -146,19 +143,50 @@ class SignUpActivity : AppCompatActivity() {
      * valid email: checks if email is valid or not
      */
     fun validEmail(email: String): Boolean {
-        if (!email.endsWith("@farmingdale.edu"))
-            return false
-        return true
+        return email.endsWith("@farmingdale.edu")
     }
 
     /**
      * valid password: checks if password is valid or not
      */
-    fun validPassword(pass: String, confirm: String): Boolean {
-        if (pass != confirm)
-            return false
-        if (pass.length < 8)
-            return false
-        return true
+    fun validPassword(pass: String, confirm: String): String? {
+        if (pass != confirm) // if passwords are different
+            return "Passwords do not match."
+        if (pass.length < 12)  // if password length is shorter than 12 characters
+            return "Password must be at least 12 characters long."
+        if (!hasUpperCase(pass))  // if there are no uppercase characters in password
+            return "Password must contain at least 1 uppercase letter."
+        if (!hasLowerCase(pass))  // if there are no lowercase characters  in password
+            return "Password must contain at least 1 lowercase letter."
+        if (!hasDigit(pass))    // if there are no digits in password
+            return "Password must contain a digit."
+        if (!hasSpecialChar(pass)) // if there are no special characters
+            return "Password must contain at least 1 special character."
+        return null
+    }
+
+    /**
+     * hasUpperCase: checks if the password contains any uppercase letters
+     */
+    private fun hasUpperCase(str: String): Boolean {
+        return str.any { it.isUpperCase() }
+    }
+
+    /**
+     * hasLowerCase: checks if the password contains any lowercase letters
+     */
+    private fun hasLowerCase(str: String): Boolean {
+        return str.any { it.isLowerCase() }
+    }
+
+    /**
+     * hasDigit: checks if the password contains any digits
+     */
+    private fun hasDigit(str: String): Boolean {
+        return str.any { it.isDigit() }
+    }
+
+    private fun hasSpecialChar(str: String): Boolean {
+        return str.any { it in """"!\"#\$%&'()*+,-./:;<=>?@[\\]^_`{|}~""""}
     }
 }

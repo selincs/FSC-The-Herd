@@ -55,44 +55,10 @@ class MainActivity : AppCompatActivity() {
             welcomeText.text = "Welcome, ${profile.firstName}!"
         }
 
-        // settings btn
+        // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
         settingsButton.setOnClickListener { view ->
-
-            // Creates popup menu connected to settings btn
-            val popupMenu = PopupMenu(this, view)
-            popupMenu.menuInflater.inflate(R.menu.settings_menu, popupMenu.menu)
-
-            // Handles menu clicks
-            popupMenu.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-
-                    R.id.menu_account_settings -> {
-
-                        val intent = Intent(this, AccountSettingsActivity::class.java)
-                        startActivity(intent)
-
-                        true
-                    }
-
-                    R.id.menu_logout -> {
-
-                        //When settings btn clicked add a way to logout the user
-
-                        // Goes to LoginActivity and clears back stack
-                        val intent = Intent(this, LoginActivity::class.java)
-                        intent.flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-
-            popupMenu.show()
+            SettingsMenuHelper.showSettingsMenu(this, view)
         }
 
         // buttons
@@ -120,10 +86,10 @@ class MainActivity : AppCompatActivity() {
 //            startActivity(intent)
 //        }
 //
-//        interestsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        interestsButton.setOnClickListener {
+            val intent = Intent(this, TopicsActivity::class.java)
+           startActivity(intent)
+        }
 
         communityButton.setOnClickListener {
             println("In MainActivity: communityButton onclick listener")
@@ -140,6 +106,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
         }
+
 
     }
 }

@@ -1,134 +1,127 @@
 package com.example.theherd
 
+import com.google.firebase.Timestamp
+
+
+//this repository handles user registration and login logic.
 object UserRepository {
+
+    //toggle to switch between fake database and firestore.
     private const val USE_FIRESTORE = true
 
+    //firebase authentication instance used to create and login users.
+//    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+
+    //register a new user in Firestore.
+    ///User presses SignUp btn -> FAuth + createUserEmail+Pw -> UserRepo writes Firestore Document
     fun register(
+        //function parameters.
         firstName: String,
         lastName: String,
         email: String,
         password: String,
+        graduationDate: String,
         onDone: (Boolean) -> Unit
     ) {
-        val user = Model.User(email, password)
-        val userId = user.getUserID()
-        val profile = Model.Profile(userId, firstName, lastName)
 
-        if (!USE_FIRESTORE) {
-            FakeUserDatabase.addUser(user, profile)
-            onDone(true)
-            return
-        }
+        //create a new authentication account in firebase using email and password.
+        FirestoreAuthManager.auth.createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener { authResult ->
 
-        val userData = hashMapOf(
-            "userId" to userId,
-            "email" to email,
-            "password" to password
-        )
+                //retrieve the user id that firebase generated.
+                //if userid does not exist, stop and return failure.
+                val userId = authResult.user?.uid ?: run {
+                    onDone(false)
+                    return@addOnSuccessListener
+                }
 
-        val profileData = hashMapOf(
-            "userId" to userId,
-            "firstName" to firstName,
-            "lastName" to lastName
-        )
+                //data for the main user document in firestore.
+                //this stores basic account information.
+                val userData = hashMapOf(
+                    "userID" to userId,
+                    "email" to email,
+                    "firstName" to firstName,
+                    "lastName" to lastName,
+                    "graduationDate" to graduationDate,
+                    "major" to "",
+                    "bio" to "",
+                    "interests" to emptyList<String>(),
+                    "profilePictureURL" to "",
+                    "onlineStatus" to "online",
+                    "createdAt" to Timestamp.now()
+                )
 
-        FirestoreDatabase.users.document(userId)
-            .set(userData)
-            .addOnSuccessListener {
+                //write the main user document to firestore.
                 FirestoreDatabase.users
                     .document(userId)
-                    .collection("profile")
-                    .document(userId)
-                    .set(profileData)
-                    .addOnSuccessListener { onDone(true) }
+                    .set(userData)
+
+                    .addOnSuccessListener {
+                        println("User successfully created in Firestore")
+                        onDone(true)
+                    }
+
                     .addOnFailureListener { e ->
-                        println("Firestore profile write FAILED: ${e.message}")
+                        println("Firestore user creation failed: ${e.message}")
                         onDone(false)
                     }
             }
+
             .addOnFailureListener { e ->
-                println("Firestore user write FAILED: ${e.message}")
+                println("Auth registration failed: ${e.message}")
                 onDone(false)
             }
     }
 
+
+    //login function authenticates user and loads profile.
+    //User presses login -> Fauth signIn -> Firebase returns UID -> Fstore loads user by uid -> SessMgr stores logged in User
     fun login(email: String, password: String, onDone: (Boolean) -> Unit) {
-
-        if (!USE_FIRESTORE) {
-            val ok = FakeUserDatabase.validateLogin(email, password)
-            if (!ok) {
-                onDone(false)
-                return
-            }
-
-            val user = FakeUserDatabase.findUserByEmail(email) ?: run {
-                onDone(false)
-                return
-            }
-
-            val profile = FakeUserDatabase.getProfileByUserId(user.getUserID()) ?: run {
-                onDone(false)
-                return
-            }
-
-            SessionManager.login(user, profile)
-            onDone(true)
-            return
-        }
-
-        FirestoreDatabase.users
-            .whereEqualTo("email", email)
-            .limit(1)
-            .get()
-            .addOnSuccessListener { query ->
-                if (query.isEmpty) {
+        //firebase authentication login using email and password.
+        FirestoreAuthManager.auth.signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener { authResult ->
+                //get the firebase generated user id.
+                val userId = authResult.user?.uid ?: run {
                     onDone(false)
                     return@addOnSuccessListener
                 }
 
-                val doc = query.documents[0]
+                //retrieve saved email from firebase auth.
+                val savedEmail = authResult.user?.email ?: email
 
-                val userId = doc.getString("userId") ?: run {
-                    onDone(false)
-                    return@addOnSuccessListener
-                }
-
-                val savedPassword = doc.getString("password") ?: run {
-                    onDone(false)
-                    return@addOnSuccessListener
-                }
-
-                val savedEmail = doc.getString("email") ?: email
-
-                if (savedPassword != password) {
-                    onDone(false)
-                    return@addOnSuccessListener
-                }
-
+                //fetch user document from firestore
                 FirestoreDatabase.users
                     .document(userId)
-                    .collection("profile")
-                    .document(userId)
                     .get()
-                    .addOnSuccessListener { profileDoc ->
-                        if (!profileDoc.exists()) {
+
+                    .addOnSuccessListener { userDoc ->
+
+                        if (!userDoc.exists()) {
+                            println("User document missing for uid: $userId")
                             onDone(false)
                             return@addOnSuccessListener
                         }
 
-                        val firstName = profileDoc.getString("firstName") ?: ""
-                        val lastName = profileDoc.getString("lastName") ?: ""
+                        val firstName = userDoc.getString("firstName") ?: ""
+                        val lastName = userDoc.getString("lastName") ?: ""
 
-                        val userObj = Model.User(savedEmail, savedPassword)
-                        val profileObj = Model.Profile(userId, firstName, lastName)
+                        //create user and profile model objects
+                        val userObj = Model.User(savedEmail, "")
+                        val profileObj = Model.Profile(userId, firstName, lastName) //removable likely once SessionMgr untangled
 
+                        //store session
                         SessionManager.login(userObj, profileObj)
+
+                        //login successful.
                         onDone(true)
                     }
+                    //profile fetch failed.
                     .addOnFailureListener {
                         onDone(false)
                     }
             }
+            //firebase login failed.
             .addOnFailureListener {
                 onDone(false)
             }
