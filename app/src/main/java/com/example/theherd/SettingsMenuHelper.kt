@@ -7,8 +7,8 @@ import android.widget.PopupMenu
 
 object SettingsMenuHelper {
 
+    //Consolidates the settings menu code into one Helper class, so every page doesn't need these 40 extra lines
     fun showSettingsMenu(activity: Activity, anchor: View) {
-
         val popupMenu = PopupMenu(anchor.context, anchor)
 
         popupMenu.menuInflater.inflate(R.menu.settings_menu, popupMenu.menu)
