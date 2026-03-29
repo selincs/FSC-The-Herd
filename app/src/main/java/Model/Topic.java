@@ -33,15 +33,29 @@ public class Topic {
     private List<String> memberIDs; //IDs of all participating members
     //communityBoard - What is a community board? Just a list of Posts?
     private int imageResId;     // <-- New field for topic image resource
+    private String imageUriString; // <-- New field for uploaded images
 
     //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
+    // Constructor for default drawable image
     public Topic(String topicName, String creatorID, String topicDesc, int imageResId) {
         this.topicName = topicName;
-        this.topicID = UUID.randomUUID().toString(); //Generate a random final ID for the new Topic
+        this.topicID = UUID.randomUUID().toString();
         this.topicDesc = topicDesc;
         this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
         this.imageResId = imageResId;
+        this.imageUriString = null; // no uploaded image
+    }
+
+    // Constructor for uploaded image
+    public Topic(String topicName, String creatorID, String topicDesc, String imageUriString) {
+        this.topicName = topicName;
+        this.topicID = UUID.randomUUID().toString();
+        this.topicDesc = topicDesc;
+        this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
+        this.memberCount = 0;
+        this.imageResId = 0;       // no drawable
+        this.imageUriString = imageUriString;
     }
 
     //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
@@ -135,4 +149,8 @@ public class Topic {
     // New getter/setter for image
     public int getImageResId() { return imageResId; }
     public void setImageResId(int imageResId) { this.imageResId = imageResId; }
+
+    // New getters/setters for images
+    public String getImageUriString() { return imageUriString; }
+    public void setImageUriString(String imageUriString) { this.imageUriString = imageUriString; }
 }

@@ -19,10 +19,20 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 
+import android.app.Activity
+import android.net.Uri
+
+
+
 class TopicsActivity : AppCompatActivity() {
 
     private lateinit var adapter: TopicsAdapter
     private lateinit var topicsList: MutableList<Topic>
+
+    private var selectedImageUri: Uri? = null  // Stores the uploaded image
+    companion object {
+        private const val IMAGE_PICK_CODE = 1001
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +71,7 @@ class TopicsActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
 
         // Append Firestore loaded topics to topicsList with sample topics
+        //Verify placement of loadTopicsFromFS()in code->Merging happened since this was put here
 //        loadTopicsFromFirestore(topicsList) Broken after Test Party Merge, revisit fnc later anyway
 
         // Search filter
@@ -72,6 +83,14 @@ class TopicsActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
+        //Commented out from AvSpr4, maybe the new button
+//        val communityButton = findViewById<Button>(R.id.communityBoardButton)
+
+        communityButton.setOnClickListener {
+            val intent = Intent(this, CommunityBoardActivity::class.java)
+            startActivity(intent)
+        }
+
         //Create Button starts here
         val createButton = findViewById<Button>(R.id.createTopicButton)
 
@@ -80,22 +99,18 @@ class TopicsActivity : AppCompatActivity() {
 
             val nameInput = dialogView.findViewById<EditText>(R.id.inputTopicName)
             val descInput = dialogView.findViewById<EditText>(R.id.inputTopicDesc)
-            val spinner = dialogView.findViewById<Spinner>(R.id.imageSpinner)
+            val uploadButton = dialogView.findViewById<ImageButton>(R.id.uploadImageButton)
 
-            // Image options
-            val imageOptions = listOf("Gym", "Chess", "Hiking", "Food", "Herd")
-            val imageMap = mapOf(
-                "Gym" to R.drawable.gym,
-                "Chess" to R.drawable.chess,
-                "Hiking" to R.drawable.hiking,
-                "Food" to R.drawable.food,
-                "Herd" to R.drawable.marquee_logo
-            )
+            // Reset selected image for each dialog open
+            selectedImageUri = null
 
-            val adapterSpinner = ArrayAdapter(this,
-                android.R.layout.simple_spinner_dropdown_item,
-                imageOptions)
-            spinner.adapter = adapterSpinner
+            // Upload button opens device image picker
+            uploadButton.setOnClickListener {
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.type = "image/*"
+                startActivityForResult(intent, IMAGE_PICK_CODE)
+            }
 
             AlertDialog.Builder(this)
                 .setTitle("Create New Topic")
@@ -104,10 +119,16 @@ class TopicsActivity : AppCompatActivity() {
 
                     val name = nameInput.text.toString()
                     val desc = descInput.text.toString()
-                    val selectedImage = imageMap[spinner.selectedItem.toString()] ?: R.drawable.gym
 
                     if (name.isNotEmpty()) {
 //                        val newTopic = Topic(name, "currentUser", desc, selectedImage)
+                        val newTopic = if (selectedImageUri != null) {
+                            // Store the URI as a string for your Topic model
+                            Topic(name, "currentUser", desc, selectedImageUri.toString())
+                        } else {
+                            // Default image if none selected
+                            Topic(name, "currentUser", desc, R.drawable.fsclogo)
+                        }
                         //If User is null, stop topic creation and return
                         val userID = SessionManager.getUser()?.userID ?: return@setPositiveButton
 
@@ -115,22 +136,24 @@ class TopicsActivity : AppCompatActivity() {
                         TopicRepository.createTopic(
                             name,
                             desc,
-                            selectedImage,
+                            selectedImageUri,
                             userID,
                             onSuccess = { topicID ->
 
-                                val newTopic = Topic(name, userID, desc, selectedImage)
+                                val newTopic = Topic(name, userID, desc, selectedImageUri)
 
                                 topicsList.add(newTopic)
-//                                adapter.updateList(topicsList)
+                                adapter.updateList(topicsList)
                                 //Update the Topics List with a new Topic at the bottom
-                                adapter.notifyItemInserted(topicsList.size - 1) //Doesn't work
+//                                adapter.notifyItemInserted(topicsList.size - 1) //Doesn't work
                                 Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
                             },
                             onFailure = { exception ->
                                 Toast.makeText(this,exception.message ?: "Failed to create topic",Toast.LENGTH_LONG).show()
                             }
                         )
+                    } else {
+                        Toast.makeText(this, "Topic name cannot be empty.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 .setNegativeButton("Cancel", null)
@@ -205,5 +228,17 @@ class TopicsActivity : AppCompatActivity() {
             .addOnFailureListener {
                 println("Failed to load topics from Firestore")
             }
+    }
+
+    // Handle image picker result
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
+            selectedImageUri = data?.data
+            if (selectedImageUri != null) {
+                Toast.makeText(this, "Image selected!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
