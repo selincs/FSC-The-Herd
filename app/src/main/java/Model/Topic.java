@@ -39,8 +39,9 @@ public class Topic {
     //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
     // Constructor for default drawable image
     public Topic(String topicName, String creatorID, String topicDesc, int imageResId) {
-        this.topicName = topicName;
-        this.topicID = UUID.randomUUID().toString();
+        this.topicName = topicName.trim();
+//        this.topicID = UUID.randomUUID().toString();
+        this.topicID = topicName.trim();
         this.topicDesc = topicDesc;
         this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
@@ -51,7 +52,7 @@ public class Topic {
     // Constructor for uploaded image
     public Topic(String topicName, String creatorID, String topicDesc, String imageUriString) {
         this.topicName = topicName;
-        this.topicID = UUID.randomUUID().toString();
+        this.topicID = topicName.trim();
         this.topicDesc = topicDesc;
         this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
@@ -63,7 +64,8 @@ public class Topic {
     //Imageless constructor, currently sets to herd logo
     public Topic(String topicName, String creatorID, String topicDesc) {
         this.topicName = topicName;
-        this.topicID = UUID.randomUUID().toString(); //Generate a random final ID for the new Topic
+//        this.topicID = UUID.randomUUID().toString(); //Generate a random final ID for the new Topic
+        this.topicID = topicName.trim();
         this.topicDesc = topicDesc;
         // this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;

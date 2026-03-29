@@ -54,13 +54,14 @@ class TopicsActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Sample topics
+        // Sample topics - Hardcoded
         topicsList = mutableListOf(
-            Topic("Gym Buddies", "user123", "Connect with fellow gym goers", R.drawable.gym),
-            Topic("Chess Club", "user456", "Join the strategy fun!", R.drawable.chess),
-            Topic("Hiking Lovers", "user789", "Explore trails together", R.drawable.hiking),
-            Topic("Foodies", "user321", "Share recipes and restaurants", R.drawable.food)
+            Topic("Gym Buddies", "user123", "Connect with fellow gym goers", R.drawable.gym.toString()),
+            Topic("Chess Club", "user456", "Join the strategy fun!", R.drawable.chess.toString()),
+            Topic("Hiking Lovers", "user789", "Explore trails together", R.drawable.hiking.toString()),
+            Topic("Foodies", "user321", "Share recipes and restaurants", R.drawable.food.toString())
         )
+
 
         //Adapter with sample topics
         adapter = TopicsAdapter(topicsList)
@@ -115,15 +116,16 @@ class TopicsActivity : AppCompatActivity() {
 
                     val name = nameInput.text.toString()
                     val desc = descInput.text.toString()
-
+                    //THIS IS FOR CREATING A NEW TOPIC
                     if (name.isNotEmpty()) {
-//                        val newTopic = Topic(name, "currentUser", desc, selectedImage)
                         val newTopic = if (selectedImageUri != null) {
                             // Store the URI as a string for your Topic model
                             Topic(name, "currentUser", desc, selectedImageUri.toString())
-                        } else {
-                            // Default image if none selected
-                            Topic(name, "currentUser", desc, (R.drawable.fsclogo).toString())
+                        }
+                        else {
+                            // Set imageUriString to default image if none selected
+                            println("Default image option, no image selected")
+                            Topic(name, "currentUser", desc, "default")
                         }
                         //If User is null, stop topic creation and return
                         val userID = SessionManager.getUser()?.userID ?: return@setPositiveButton
@@ -135,8 +137,14 @@ class TopicsActivity : AppCompatActivity() {
                             selectedImageUri,
                             userID,
                             onSuccess = { topicID ->
-
-                                val newTopic = Topic(name, userID, desc, selectedImageUri?.toString())
+                                //Set imageURI to either use selected image or default image
+                                val imageUriString = selectedImageUri?.toString() ?: "default"
+                                val newTopic = Topic(
+                                    name,
+                                    userID,
+                                    desc,
+                                    imageUriString
+                                )
 
                                 topicsList.add(newTopic)
                                 adapter.updateList(topicsList)

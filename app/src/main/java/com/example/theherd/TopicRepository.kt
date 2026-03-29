@@ -43,9 +43,13 @@ object TopicRepository {
                     return@addOnSuccessListener
                 }
 
-                val topicRef = db.collection("topics").document()
-                val topicID = topicRef.id
+//                val topicRef = db.collection("topics").document() old version of below 2 lines
+//                val topicID = topicRef.id
+                //Use Topic Name as Unique Identifier (Only 1 Topic of this name Exists)
+                val topicID = topicName.trim().lowercase()
+                val topicRef = db.collection("topics").document(topicID)
 
+                //But Not for posts or comments, many cases of identical content could exist
                 val rulesPostRef = topicRef.collection("posts").document()
                 val postID = rulesPostRef.id
 
@@ -67,7 +71,6 @@ object TopicRepository {
                     "isArchived" to false
                 )
                 batch.set(topicRef, topicData)
-
                 // ------------------------
                 // Creator membership - Add the Topic creator as a member & moderator of the Topic
                 // ------------------------

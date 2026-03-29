@@ -82,11 +82,40 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         holder.description.text = topic.topicDesc
         holder.members.text = "${topic.memberCount} members"
 
+//        // Display uploaded image if exists, else default drawable
+//        if (topic.getImageUriString() != null) {
+//            holder.image.setImageURI(Uri.parse(topic.getImageUriString()))
+//        } else {
+//            holder.image.setImageResource(topic.getImageResId())
+//        }
+
+        //Selin entry - Hope this works avnoor sorry
         // Display uploaded image if exists, else default drawable
-        if (topic.getImageUriString() != null) {
-            holder.image.setImageURI(Uri.parse(topic.getImageUriString()))
-        } else {
-            holder.image.setImageResource(topic.getImageResId())
+        val imageUriString = topic.getImageUriString()
+        if (imageUriString != null && imageUriString != "default") {
+            //Accommodate hard coded sample topics - Remove when backend works starting w/ this comment
+            if (imageUriString == R.drawable.gym.toString()) {
+                holder.image.setImageResource(R.drawable.gym)
+            } else if (imageUriString == R.drawable.chess.toString()) {
+                holder.image.setImageResource(R.drawable.chess)
+            } else if (imageUriString == R.drawable.hiking.toString()) {
+                holder.image.setImageResource(R.drawable.hiking)
+            } else if (imageUriString == R.drawable.food.toString()) {
+                holder.image.setImageResource(R.drawable.food)
+            }
+            else {  //When the above if/else ifs are removed, leave this as the only code in the block
+                //Remove up to here and the corresponding closing bracket for the else statement
+
+                // User uploaded an image -> show it
+                println("User image set")
+                holder.image.setImageURI(Uri.parse(imageUriString))
+            }
+        }
+
+        else {
+            // No image uploaded -> show default logo
+            println("Default set in Topics Adapter else block")
+            holder.image.setImageResource(R.drawable.marquee_logo)
         }
 
         holder.joinButton.setOnClickListener {
