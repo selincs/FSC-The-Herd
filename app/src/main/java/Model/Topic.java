@@ -35,6 +35,7 @@ public class Topic {
     private int imageResId;     // <-- New field for topic image resource
     private String imageUriString; // <-- New field for uploaded images
 
+    //TODO: Fix these constructors to work with Uri Strings instead of int resId -> Remove unneeded constructors
     //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
     // Constructor for default drawable image
     public Topic(String topicName, String creatorID, String topicDesc, int imageResId) {
@@ -70,23 +71,24 @@ public class Topic {
     }
 
     // Test party merging constructor, clean these up once Firestore is working if we don't need all these fields, likely we do
-    public Topic(String topicID, String topicName, String creatorID, String topicDesc, int imageResId) {
+    public Topic(String topicID, String topicName, String creatorID, String topicDesc, String imageUriString) {
         this.topicID = topicID;
         this.topicName = topicName;
         this.creatorID = creatorID;
         this.topicDesc = topicDesc;
         this.memberCount = 1;   //Creator is the only member
-        this.imageResId = imageResId;
+        this.imageUriString = imageUriString;
     }
 
     //Constructor to load a Topic from Firestore
-    public Topic(String topicID, String topicName, String creatorID, String topicDesc, int imageResId, int memberCount) {
+    public Topic(String topicID, String topicName, String creatorID, String topicDesc, String imageUriString, int memberCount) {
         this.topicID = topicID;
         this.topicName = topicName;
         this.creatorID = creatorID;
         this.topicDesc = topicDesc;
         this.memberCount = memberCount;
-        this.imageResId = imageResId;
+        this.imageResId = 0;       // no drawable -> remove?
+        this.imageUriString = imageUriString;
     }
 
     public String getTopicName() {

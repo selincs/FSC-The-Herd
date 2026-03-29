@@ -1,10 +1,10 @@
 package com.example.theherd
 
 import Model.Topic
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.UUID
 
 //Firestore Topic access is done through FirestoreDatabase.topics
 object TopicRepository {
@@ -24,7 +24,7 @@ object TopicRepository {
     fun createTopic(
         topicName: String,
         topicDesc: String,
-        imageResId: Int,
+        imageUri: Uri?,
         creatorID: String,
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit
@@ -55,25 +55,22 @@ object TopicRepository {
                 val batch = db.batch()
 
                 // ------------------------
-                // Topic document
+                // Topic document - trim() prevents white space duplication of Topic Names on save to FS
                 // ------------------------
-
                 val topicData = hashMapOf(
-                    "topicName" to topicName,
-                    "topicDesc" to topicDesc,
-                    "imageResId" to imageResId,
+                    "topicName" to topicName.trim(),
+                    "topicDesc" to topicDesc.trim(),
+                    "imageUri" to imageUri?.toString(),
                     "creatorID" to creatorID,
                     "memberCount" to 1,
                     "createdAt" to FieldValue.serverTimestamp(),
                     "isArchived" to false
                 )
-
                 batch.set(topicRef, topicData)
 
                 // ------------------------
-                // Creator membership
+                // Creator membership - Add the Topic creator as a member & moderator of the Topic
                 // ------------------------
-
                 val memberRef = topicRef
                     .collection("members")
                     .document(creatorID)
@@ -83,13 +80,11 @@ object TopicRepository {
                     "role" to "moderator",
                     "joinedAt" to FieldValue.serverTimestamp()
                 )
-
                 batch.set(memberRef, memberData)
 
                 // ------------------------
-                // Default Rules Post
+                // Default Rules Post - "system - Community Rules : 1, 2, 3"
                 // ------------------------
-
                 val rulesPostData = hashMapOf(
                     "topicID" to topicID,
                     "posterID" to "system",
@@ -104,13 +99,11 @@ object TopicRepository {
                     "postedAt" to FieldValue.serverTimestamp(),
                     "isPinned" to true
                 )
-
                 batch.set(rulesPostRef, rulesPostData)
 
                 // ------------------------
-                // Default Rules Comment
+                // Default Rules Comment Creation - "System - Have fun!"
                 // ------------------------
-
                 val rulesCommentData = hashMapOf(
                     "topicID" to topicID,
                     "postID" to postID,
@@ -120,13 +113,11 @@ object TopicRepository {
                     "likeCount" to 1,
                     "createdAt" to FieldValue.serverTimestamp()
                 )
-
                 batch.set(rulesCommentRef, rulesCommentData)
 
                 // ------------------------
-                // Commit Batch
+                // Commit Batch - Write everything in 1 complete batch, or fail the Topic Creation entirely
                 // ------------------------
-
                 batch.commit()
                     .addOnSuccessListener {
                         onSuccess(topicID)
@@ -142,39 +133,42 @@ object TopicRepository {
 
     //TODO:Improve to preserve TopicID for further diving -> Might be needed for post ID and stuff
     //Load Topics from Firestore
-    fun getTopics(onResult: (List<Topic>) -> Unit) {
-
-        FirestoreDatabase.topics
-            .get()
-            .addOnSuccessListener { result ->
-
-                val topicsList = mutableListOf<Topic>()
-
-                for (doc in result) {
-
-                    val topicID = doc.getString("topicID") ?: continue
-                    val name = doc.getString("topicName") ?: ""
-                    val desc = doc.getString("topicDesc") ?: ""
-                    val creatorID = doc.getString("creatorID") ?: ""
-                    val memberCount = doc.getLong("memberCount")?.toInt() ?: 0
-                    val imageResId = doc.getLong("imageResId")?.toInt() ?: R.drawable.marquee_logo
-
-                    //I think this could be technically just added to list below as a anonymous topic instead of declaring it here
-                    val topic = Topic(
-                        topicID,
-                        name,
-                        creatorID,
-                        desc,
-                        imageResId,
-                        memberCount
-                    )
-
-                    topicsList.add(topic)
-                }
-
-                onResult(topicsList)
-            }
-    }
+    //Reading the URI for loading a topic, after TestParty changes of resId->Uri
+//    val uriString = document.getString("imageUri")
+//    val imageUri = uriString?.let { Uri.parse(it) }
+//    fun getTopics(onResult: (List<Topic>) -> Unit) {
+//
+//        FirestoreDatabase.topics
+//            .get()
+//            .addOnSuccessListener { result ->
+//
+//                val topicsList = mutableListOf<Topic>()
+//
+//                for (doc in result) {
+//
+//                    val topicID = doc.getString("topicID") ?: continue
+//                    val name = doc.getString("topicName") ?: ""
+//                    val desc = doc.getString("topicDesc") ?: ""
+//                    val creatorID = doc.getString("creatorID") ?: ""
+//                    val memberCount = doc.getLong("memberCount")?.toInt() ?: 0
+//                    val imageResId = doc.getLong("imageResId")?.toInt() ?: R.drawable.marquee_logo
+//
+//                    //I think this could be technically just added to list below as a anonymous topic instead of declaring it here
+//                    val topic = Topic(
+//                        topicID,
+//                        name,
+//                        creatorID,
+//                        desc,
+//                        imageResId,
+//                        memberCount
+//                    )
+//
+//                    topicsList.add(topic)
+//                }
+//
+//                onResult(topicsList)
+//            }
+//    }
 
     //To hopefully enable keyword searching
     /* If searching by keyword "Chess", will show

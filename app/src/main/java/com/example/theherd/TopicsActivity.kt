@@ -10,12 +10,8 @@ import android.widget.EditText
 import Model.Topic
 import android.app.AlertDialog
 import android.content.Intent
-import android.se.omapi.Session
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 
@@ -83,10 +79,10 @@ class TopicsActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        //Commented out from AvSpr4, maybe the new button
-//        val communityButton = findViewById<Button>(R.id.communityBoardButton)
+        //Enter Community Button in Topics Activity - Not the one in the NavBar
+        val enterCommunityBtn = findViewById<Button>(R.id.communityBoardButton)
 
-        communityButton.setOnClickListener {
+        enterCommunityBtn.setOnClickListener {
             val intent = Intent(this, CommunityBoardActivity::class.java)
             startActivity(intent)
         }
@@ -127,7 +123,7 @@ class TopicsActivity : AppCompatActivity() {
                             Topic(name, "currentUser", desc, selectedImageUri.toString())
                         } else {
                             // Default image if none selected
-                            Topic(name, "currentUser", desc, R.drawable.fsclogo)
+                            Topic(name, "currentUser", desc, (R.drawable.fsclogo).toString())
                         }
                         //If User is null, stop topic creation and return
                         val userID = SessionManager.getUser()?.userID ?: return@setPositiveButton
@@ -140,7 +136,7 @@ class TopicsActivity : AppCompatActivity() {
                             userID,
                             onSuccess = { topicID ->
 
-                                val newTopic = Topic(name, userID, desc, selectedImageUri)
+                                val newTopic = Topic(name, userID, desc, selectedImageUri?.toString())
 
                                 topicsList.add(newTopic)
                                 adapter.updateList(topicsList)
