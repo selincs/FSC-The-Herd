@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import android.view.View
 
 import android.app.Activity
 import android.net.Uri
@@ -48,6 +49,12 @@ class TopicsActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         val homeButton: ImageButton = findViewById(R.id.homeButton)
         setSupportActionBar(toolbar)
+
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+        backButton.visibility = View.VISIBLE
+        backButton.setOnClickListener {
+            finish() // Closes this page and goes back
+        }
 
         val recyclerView = findViewById<RecyclerView>(R.id.topicsRecyclerView)
         val searchBar = findViewById<EditText>(R.id.searchTopics)

@@ -2,12 +2,12 @@ package com.example.theherd
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageButton
 import androidx.appcompat.widget.PopupMenu
+import android.view.View
 
 
 class GuidesActivity : AppCompatActivity() {
@@ -29,6 +29,12 @@ class GuidesActivity : AppCompatActivity() {
         // toolbar
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         setSupportActionBar(toolbar)
+
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+        backButton.visibility = View.VISIBLE
+        backButton.setOnClickListener {
+            finish() // Closes this page and goes back
+        }
 
         // button event listeners
 //        eventsButton.setOnClickListener {
