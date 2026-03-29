@@ -206,7 +206,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Want to view topics you've added?"
+            android:text="Want to view topics you've joined?"
             android:textSize="14sp"
             android:textColor="#555555" />
 
