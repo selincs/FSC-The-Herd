@@ -61,6 +61,13 @@ class TopicsActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
+        val communityButton = findViewById<Button>(R.id.communityBoardButton)
+
+        communityButton.setOnClickListener {
+            val intent = Intent(this, CommunityBoardActivity::class.java)
+            startActivity(intent)
+        }
+
         val createButton = findViewById<Button>(R.id.createTopicButton)
 
         createButton.setOnClickListener {
