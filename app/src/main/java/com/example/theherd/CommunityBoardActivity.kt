@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Locale
 
@@ -96,6 +97,12 @@ class CommunityBoardActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         setupNavigationButtons(toolbar)
 
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+        backButton.visibility = View.VISIBLE
+        backButton.setOnClickListener {
+            finish() // Closes this page and goes back
+        }
+
         recyclerView = findViewById(R.id.community_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -124,7 +131,7 @@ class CommunityBoardActivity : AppCompatActivity() {
             filterList(searchView.query.toString())
         }
 
-        findViewById<FloatingActionButton>(R.id.fabAddCommunity).setOnClickListener {
+        findViewById<ExtendedFloatingActionButton>(R.id.fabAddCommunity).setOnClickListener {
             val intent = Intent(this, CreateCommunityActivity::class.java)
             startCreateCommunity.launch(intent)
         }

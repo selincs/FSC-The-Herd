@@ -1,9 +1,12 @@
 package com.example.theherd
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class SpecificCommunityActivity : AppCompatActivity() {
@@ -89,8 +93,12 @@ class SpecificCommunityActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         setSupportActionBar(toolbar)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+        backButton.visibility = View.VISIBLE
+        backButton.setOnClickListener {
+            finish() // Closes this page and goes back
+        }
+
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         toolbar.setNavigationOnClickListener { finish() }
@@ -113,7 +121,7 @@ class SpecificCommunityActivity : AppCompatActivity() {
         postAdapter = PostAdapter(postsList, communityName)
         recyclerView.adapter = postAdapter
 
-        findViewById<FloatingActionButton>(R.id.fabAddPost).setOnClickListener {
+        findViewById<ExtendedFloatingActionButton>(R.id.fabAddPost).setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             intent.putExtra("COMMUNITY_NAME", communityName)
             startCreatePost.launch(intent)
@@ -122,40 +130,44 @@ class SpecificCommunityActivity : AppCompatActivity() {
     }
 
     private fun setupJoinLeaveSystem() {
-        val btnJoin = findViewById<Button>(R.id.btnJoinCommunity)
-        val btnLeave = findViewById<Button>(R.id.btnLeaveCommunity)
+        val btnMembership = findViewById<Button>(R.id.btnJoinCommunity) ?: return
+        btnMembership.visibility = View.VISIBLE
+
+        // 1. Define the color
+        val deepRed = Color.parseColor("#8B0000")
+
+        // 2. Force the tint mode to SRC_ATOP so it paints OVER any theme defaults
+        btnMembership.backgroundTintMode = android.graphics.PorterDuff.Mode.SRC_ATOP
+
+        // 3. Apply the color to the background tint
+        btnMembership.backgroundTintList = ColorStateList.valueOf(deepRed)
+
+        // 4. (Optional) If it's a MaterialButton, this ensures the stroke doesn't flicker green
+        btnMembership.setBackgroundColor(deepRed)
 
         val allClubs = PreferencesManager.loadAllCommunities(this)
         val currentClub = allClubs.find { it.name == communityName }
 
-        if (currentClub?.isJoined == true) {
-            btnLeave.visibility = View.VISIBLE
-            btnJoin.visibility = View.GONE
-        } else {
-            btnJoin.visibility = View.VISIBLE
-            btnLeave.visibility = View.GONE
-        }
+        btnMembership.text = if (currentClub?.isJoined == true) "Leave" else "Join"
 
-        btnJoin.setOnClickListener {
+        btnMembership.setOnClickListener {
             val clubs = PreferencesManager.loadAllCommunities(this)
-            clubs.find { it.name == communityName }?.isJoined = true
+            val club = clubs.find { it.name == communityName }
+
+            if (club?.isJoined == true) {
+                club.isJoined = false
+                btnMembership.text = "Join"
+                Toast.makeText(this, "Left $communityName", Toast.LENGTH_SHORT).show()
+            } else {
+                club?.isJoined = true
+                btnMembership.text = "Leave"
+                Toast.makeText(this, "Joined $communityName!", Toast.LENGTH_SHORT).show()
+            }
+
+            // Re-confirm the red color after the click event finishes
+            btnMembership.backgroundTintList = ColorStateList.valueOf(deepRed)
+
             PreferencesManager.saveAllCommunities(this, clubs)
-
-            btnJoin.visibility = View.GONE
-            btnLeave.visibility = View.VISIBLE
-            Toast.makeText(this, "Joined $communityName!", Toast.LENGTH_SHORT).show()
-        }
-
-        btnLeave.setOnClickListener {
-            val clubs = PreferencesManager.loadAllCommunities(this)
-            clubs.find { it.name == communityName }?.isJoined = false
-            PreferencesManager.saveAllCommunities(this, clubs)
-
-            btnLeave.visibility = View.GONE
-            btnJoin.visibility = View.VISIBLE
-            Toast.makeText(this, "Left $communityName", Toast.LENGTH_SHORT).show()
-
-            finish()
         }
     }
 }

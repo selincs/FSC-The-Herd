@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
+import android.view.View
 
 class CreateGuideActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +22,12 @@ class CreateGuideActivity : AppCompatActivity() {
 
         // Settings btn
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
+
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+        backButton.visibility = View.VISIBLE
+        backButton.setOnClickListener {
+            finish() // Closes this page and goes back
+        }
 
         settingsButton.setOnClickListener { view ->
 
