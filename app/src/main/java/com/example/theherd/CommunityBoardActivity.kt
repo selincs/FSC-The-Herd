@@ -14,7 +14,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Locale
 
 class CommunityBoardActivity : AppCompatActivity() {
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: CommunityAdapter
     private lateinit var searchView: SearchView

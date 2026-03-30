@@ -16,7 +16,7 @@ object PostRepository {
         postContents: String,
         onDone: (Boolean) -> Unit
     ){
-        // if there is no user , stop immmediately
+        // if there is no user , stop immediately
         val userID = auth.currentUser?.uid ?: run{
             onDone(false)
             return
