@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import Model.Post
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -20,23 +21,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class SpecificCommunityActivity : AppCompatActivity() {
 
     private lateinit var postAdapter: PostAdapter
-    private val postsList = ArrayList<Post>()
+    private val postsList = ArrayList<Post>() // this is now the model.POSt
     private var communityName: String = "General"
+
+    private var topicID: String = "" // know which community's posts to load.
 
     private val startCreatePost = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
-            val data = result.data
-            val title = data?.getStringExtra("POST_TITLE") ?: ""
-            val content = data?.getStringExtra("POST_CONTENT") ?: ""
-            val author = data?.getStringExtra("POST_AUTHOR") ?: PreferencesManager.getFullName(this)
-
-            val newPost = Post(title, content, author)
-            postsList.add(0, newPost)
-
-            postAdapter.notifyItemInserted(0)
-            findViewById<RecyclerView>(R.id.posts_recycler_view).scrollToPosition(0)
-
-            PreferencesManager.savePosts(this, communityName, postsList)
+            loadPostsFromFirestore()
         }
     }
 
@@ -103,30 +95,39 @@ class SpecificCommunityActivity : AppCompatActivity() {
 
         toolbar.setNavigationOnClickListener { finish() }
 
+        // screen now knows the real display name and firestore doc id.
+
+        topicID = intent.getStringExtra("TOPIC_ID") ?: ""
         communityName = intent.getStringExtra("COMMUNITY_NAME") ?: "General"
         findViewById<TextView>(R.id.specificCommunityTitle).text = communityName
-
-        postsList.clear()
-        val savedPosts = PreferencesManager.loadPosts(this, communityName)
-        postsList.addAll(savedPosts)
-
-        if (postsList.isEmpty()) {
-            postsList.add(Post("Welcome!", "This is the start of the $communityName board.", "Admin"))
-            PreferencesManager.savePosts(this, communityName, postsList)
-        }
 
         val recyclerView: RecyclerView = findViewById(R.id.posts_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        postAdapter = PostAdapter(postsList, communityName)
+        postAdapter = PostAdapter(postsList, communityName, topicID)
         recyclerView.adapter = postAdapter
+
+        loadPostsFromFirestore()
 
         findViewById<ExtendedFloatingActionButton>(R.id.fabAddPost).setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             intent.putExtra("COMMUNITY_NAME", communityName)
+            intent.putExtra("TOPIC_ID", topicID)
             startCreatePost.launch(intent)
         }
         setupJoinLeaveSystem()
+    }
+
+    private fun loadPostsFromFirestore() {
+        if (topicID.isEmpty()) return
+
+        PostRepository.getPosts(topicID) { posts ->
+            runOnUiThread {
+                postsList.clear()
+                postsList.addAll(posts)
+                postAdapter.notifyDataSetChanged()
+            }
+        }
     }
 
     private fun setupJoinLeaveSystem() {
