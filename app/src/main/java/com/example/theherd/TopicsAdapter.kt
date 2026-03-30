@@ -2,6 +2,8 @@ package com.example.theherd
 
 import android.view.LayoutInflater
 import android.view.View
+import android.content.Intent
+import com.example.theherd.SpecificCommunityActivity
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
@@ -36,6 +38,15 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         holder.description.text = topic.topicDesc
         holder.members.text = "${topic.memberCount} members"
         holder.image.setImageResource(topic.getImageResId())
+        holder.itemView.setOnClickListener {
+            //used for opening the correct community and sending the real topic data with it.
+            val context = holder.itemView.context
+            val intent = Intent(context, SpecificCommunityActivity::class.java)
+            // attaches the real firestore topic id to the intent.
+            intent.putExtra("TOPIC_ID", topic.getTopicID())
+            intent.putExtra("COMMUNITY_NAME", topic.getTopicName())
+            context.startActivity(intent)
+        }
 
         holder.joinButton.setOnClickListener {
             topic.incrementMembers()
