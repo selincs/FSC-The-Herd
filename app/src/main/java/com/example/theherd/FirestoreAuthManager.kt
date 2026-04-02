@@ -8,7 +8,7 @@ object FirestoreAuthManager {
             FirebaseAuth.getInstance()
         }
 
-    //Helper that gets the currently logged-in user's UID - Can replace Session Manager soon with this
+    //Helper that gets the currently logged-in user's UID - Can I replace Session Manager soon with this? Prob need both
     val currentUserId: String?
         get() = auth.currentUser?.uid
 

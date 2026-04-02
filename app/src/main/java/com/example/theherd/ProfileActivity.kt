@@ -29,12 +29,14 @@ class ProfileActivity : AppCompatActivity() {
 
     private var isEditing = false
 
+    //Loads the User's profile from Firestore
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
         editProfileButton = findViewById(R.id.editProfileButton)
 
+        //Declare GUI elements as Vals
         val firstNameInput = findViewById<EditText>(R.id.firstNameInput)
         val lastNameInput = findViewById<EditText>(R.id.lastNameInput)
 
@@ -55,20 +57,19 @@ class ProfileActivity : AppCompatActivity() {
         val gamingCheck = findViewById<CheckBox>(R.id.gamingCheck)
         val artCheck = findViewById<CheckBox>(R.id.artCheck)
 
-        // Load saved data
-        usernameInput.setText(PreferencesManager.getUsername(this))
-        graduationDateInput.setText(PreferencesManager.getGradYear(this))
-        bioInput.setText(PreferencesManager.getBio(this))
+        // Load saved data from Firestore into Profile
+        loadProfileFromFirestore()
+//        usernameInput.setText(PreferencesManager.getUsername(this))
+//        graduationDateInput.setText(PreferencesManager.getGradYear(this))
+//        bioInput.setText(PreferencesManager.getBio(this))
 //        usernameInput.setText()
+//        val fullName = PreferencesManager.getFullName(this)
+//        val parts = fullName.split(" ")
+//        if (parts.isNotEmpty()) firstNameInput.setText(parts[0])
+//        if (parts.size > 1) lastNameInput.setText(parts[1])
+//        bioInput.setText(PreferencesManager.getBio(this))
 
-        val fullName = PreferencesManager.getFullName(this)
-        val parts = fullName.split(" ")
-
-        if (parts.isNotEmpty()) firstNameInput.setText(parts[0])
-        if (parts.size > 1) lastNameInput.setText(parts[1])
-
-        bioInput.setText(PreferencesManager.getBio(this))
-
+        //Interests not pop from Firestore yet, use default
         val savedInterests = PreferencesManager.getInterests(this)
         interestsText.text = savedInterests.joinToString(", ")
         // OPTIONAL: put "other" back into input if it's not a default one
@@ -98,6 +99,7 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
+        //Listener for editing profile
         editProfileButton.setOnClickListener {
             isEditing = !isEditing
 
@@ -265,6 +267,7 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     //When Ready, load the whole User Profile from Firestore
+    //Move to user Repository?
     private fun loadProfileFromFirestore() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val uid = user.uid
@@ -286,20 +289,12 @@ class ProfileActivity : AppCompatActivity() {
                 //Username is FSC Email without @farmingdale.edu
                 val email = document.getString("email") ?: ""
                 val username = email.substringBefore("@")
-//                usernameInput.setText(username)
-
-                //Idk if this works
                 findViewById<EditText>(R.id.usernameInput)
-                    .setText(document.getString(username) ?: "")
+                    .setText(username)
 
-
-
-                //Major Input .. Do we ask at Sign Up? Might make things annoying/complicated, maybe just profile
-                //Still will need to be stored in Firestore, but maybe starts as null or Major so User sees where
-                //to input it
-
-//                findViewById<EditText>(R.id.majorInput)
-//                    .setText(document.getString("major") ?: "")
+                //Major starts as unlisted, can be updated by user in profile
+                findViewById<EditText>(R.id.majorInput)
+                    .setText(document.getString("major") ?: "Add your Major here!")
 
                 //graduationDate field in Firestore
                 findViewById<EditText>(R.id.graduationDateInput)
@@ -310,8 +305,11 @@ class ProfileActivity : AppCompatActivity() {
 
                 val interests = document.get("interests") as? List<String> ?: emptyList()
 
-                findViewById<TextView>(R.id.selectedInterestsText)
-                    .text = interests.joinToString(", ")
+                //Implement interests after other fields populate
+//                findViewById<TextView>(R.id.selectedInterestsText)
+//                    .text = interests.joinToString(", ")
+
+                println("Profile loaded for user " + FirestoreAuthManager.currentUserId)
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to load profile", Toast.LENGTH_LONG).show()

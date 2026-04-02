@@ -44,8 +44,8 @@ object UserRepository {
                     "firstName" to firstName,
                     "lastName" to lastName,
                     "graduationDate" to graduationDate,
-                    "major" to "",
-                    "bio" to "",
+                    "major" to "Major Unlisted",
+                    "bio" to "Add your bio here!",
                     "interests" to emptyList<String>(),
                     "profilePictureURL" to "",
                     "onlineStatus" to "online",
@@ -126,4 +126,7 @@ object UserRepository {
                 onDone(false)
             }
     }
+
+
+
 }
