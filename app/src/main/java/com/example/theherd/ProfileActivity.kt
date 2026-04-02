@@ -46,6 +46,14 @@ class ProfileActivity : AppCompatActivity() {
         val graduationDateInput = findViewById<EditText>(R.id.graduationDateInput)
         val bioInput = findViewById<EditText>(R.id.bioInput)
 
+        //Disable the Profile fields a User cannot directly change
+        lastNameInput.isFocusable = false //Last name probably cant change without some verification
+        lastNameInput.isClickable = false
+        usernameInput.isFocusable = false //Username = Email? Decide at some point
+        usernameInput.isClickable = false
+        graduationDateInput.isFocusable = false //Graduation Date editable once in acc settings
+        graduationDateInput.isClickable = false
+
         //This will need to be changed to autopop once Topic Firestore is done.
         val interestsText = findViewById<TextView>(R.id.selectedInterestsText)
         val otherInterestInput = findViewById<EditText>(R.id.otherInterestInput)
@@ -59,15 +67,6 @@ class ProfileActivity : AppCompatActivity() {
 
         // Load saved data from Firestore into Profile
         loadProfileFromFirestore()
-//        usernameInput.setText(PreferencesManager.getUsername(this))
-//        graduationDateInput.setText(PreferencesManager.getGradYear(this))
-//        bioInput.setText(PreferencesManager.getBio(this))
-//        usernameInput.setText()
-//        val fullName = PreferencesManager.getFullName(this)
-//        val parts = fullName.split(" ")
-//        if (parts.isNotEmpty()) firstNameInput.setText(parts[0])
-//        if (parts.size > 1) lastNameInput.setText(parts[1])
-//        bioInput.setText(PreferencesManager.getBio(this))
 
         //Interests not pop from Firestore yet, use default
         val savedInterests = PreferencesManager.getInterests(this)
@@ -110,10 +109,7 @@ class ProfileActivity : AppCompatActivity() {
             } else {
                 saveAll(
                     firstNameInput,
-                    lastNameInput,
-                    usernameInput,
                     majorInput,
-                    graduationDateInput,
                     bioInput,
                     fitnessCheck,
                     codingCheck,
@@ -141,7 +137,7 @@ class ProfileActivity : AppCompatActivity() {
         val guideButton: Button = findViewById(R.id.guide_button)
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
 
-        // Toolbar
+        // Toolbar + Listeners
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         val homeButton: ImageButton = findViewById(R.id.homeButton)
         setSupportActionBar(toolbar)
@@ -150,17 +146,14 @@ class ProfileActivity : AppCompatActivity() {
             val intent = Intent(this, TopicsActivity::class.java)
             startActivity(intent)
         }
-
         communityButton.setOnClickListener {
             val intent = Intent(this, CommunityBoardActivity::class.java)
             startActivity(intent)
         }
-
         profileButton.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
-
         guideButton.setOnClickListener {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
@@ -186,10 +179,10 @@ class ProfileActivity : AppCompatActivity() {
 
         val inputs = listOf(
             R.id.firstNameInput,
-            R.id.lastNameInput,
-            R.id.usernameInput,
+//            R.id.lastNameInput,
+//            R.id.usernameInput,
             R.id.majorInput,
-            R.id.graduationDateInput,
+//            R.id.graduationDateInput,
             R.id.bioInput,
             R.id.newTopicInput,
             R.id.otherInterestInput
@@ -221,10 +214,7 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun saveAll(
         firstNameInput: EditText,
-        lastNameInput: EditText,
-        usernameInput: EditText,
         majorInput: EditText,
-        graduationDateInput: EditText,
         bioInput: EditText,
         fitnessCheck: CheckBox,
         codingCheck: CheckBox,
@@ -234,40 +224,36 @@ class ProfileActivity : AppCompatActivity() {
         otherInterestInput: EditText,
         interestsText: TextView
     ) {
-
-        val fName = firstNameInput.text.toString().trim()
-        val lName = lastNameInput.text.toString().trim()
-        PreferencesManager.saveUsername(this, usernameInput.text.toString().trim())
-        PreferencesManager.saveGradYear(this, graduationDateInput.text.toString().trim())
-
-        if (fName.isNotEmpty() && lName.isNotEmpty()) {
-            PreferencesManager.saveFullName(this, fName, lName)
+        //Validate user via Fauth mgr
+        val user = FirestoreAuthManager.auth.currentUser
+        if (user == null) {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
+            return
         }
+        val uid = user.uid
 
-        PreferencesManager.saveBio(this, bioInput.text.toString().trim())
+        val firstName = firstNameInput.text.toString().trim()
+        val major = majorInput.text.toString().trim()
+        val bio = bioInput.text.toString().trim()
 
-        val interests = mutableListOf<String>()
-
-        if (fitnessCheck.isChecked) interests.add("Fitness")
-        if (codingCheck.isChecked) interests.add("Coding")
-        if (musicCheck.isChecked) interests.add("Music")
-        if (gamingCheck.isChecked) interests.add("Gaming")
-        if (artCheck.isChecked) interests.add("Art")
-
-        //Other interests
-        val otherInterest = otherInterestInput.text.toString().trim()
-        if (otherInterest.isNotEmpty()) {
-            interests.add(otherInterest)
-        }
-
-        PreferencesManager.saveInterests(this, interests)
-        interestsText.text = interests.joinToString(", ")
-
-        Toast.makeText(this, "Profile Updated", Toast.LENGTH_SHORT).show()
+        val updates = hashMapOf<String, Any>(
+            "firstName" to firstName,
+            "major" to major,
+            "bio" to bio
+        )
+        FirestoreDatabase.users
+            .document(uid)
+            .update(updates)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Profile Updated", Toast.LENGTH_SHORT).show()
+                println("Profile updated in FS")
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show()
+            }
     }
 
-    //When Ready, load the whole User Profile from Firestore
-    //Move to user Repository?
+    //Loads the Firestore profile via FirebaseAuth of current logged-in User - Can this move to userRepository?
     private fun loadProfileFromFirestore() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val uid = user.uid
