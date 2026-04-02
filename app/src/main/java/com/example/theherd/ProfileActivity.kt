@@ -3,6 +3,7 @@ package com.example.theherd
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.widget.ImageButton
 import android.widget.Button
 import android.widget.EditText
@@ -26,6 +27,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var newTopicInput: EditText
     private lateinit var addTopicButton: Button
     private lateinit var editProfileButton: Button
+    private var defaultFieldBackground: Drawable? = null    //Default highlight color
 
     private var isEditing = false
 
@@ -111,13 +113,6 @@ class ProfileActivity : AppCompatActivity() {
                     firstNameInput,
                     majorInput,
                     bioInput,
-                    fitnessCheck,
-                    codingCheck,
-                    musicCheck,
-                    gamingCheck,
-                    artCheck,
-                    otherInterestInput,
-                    interestsText
                 )
                 setEditMode(false)
                 adapter.setEditMode(false)
@@ -179,10 +174,7 @@ class ProfileActivity : AppCompatActivity() {
 
         val inputs = listOf(
             R.id.firstNameInput,
-//            R.id.lastNameInput,
-//            R.id.usernameInput,
             R.id.majorInput,
-//            R.id.graduationDateInput,
             R.id.bioInput,
             R.id.newTopicInput,
             R.id.otherInterestInput
@@ -194,6 +186,12 @@ class ProfileActivity : AppCompatActivity() {
             et.isFocusable = isEditing
             et.isFocusableInTouchMode = isEditing
             et.isCursorVisible = isEditing
+            //Set editable fields to highlight color
+            if (isEditing) {
+                et.setBackgroundResource(R.drawable.edit_field_background)
+            } else {
+                et.background = defaultFieldBackground
+            }
         }
 
         val checkboxes = listOf(
@@ -216,13 +214,6 @@ class ProfileActivity : AppCompatActivity() {
         firstNameInput: EditText,
         majorInput: EditText,
         bioInput: EditText,
-        fitnessCheck: CheckBox,
-        codingCheck: CheckBox,
-        musicCheck: CheckBox,
-        gamingCheck: CheckBox,
-        artCheck: CheckBox,
-        otherInterestInput: EditText,
-        interestsText: TextView
     ) {
         //Validate user via Fauth mgr
         val user = FirestoreAuthManager.auth.currentUser
