@@ -29,7 +29,6 @@ object TopicRepository {
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-
         val db = FirebaseFirestore.getInstance()
 
         // Step 1: Prevent duplicate topic names
@@ -57,7 +56,6 @@ object TopicRepository {
                     rulesPostRef.collection("comments").document()
 
                 val batch = db.batch()
-
                 // ------------------------
                 // Topic document - trim() prevents white space duplication of Topic Names on save to FS
                 // ------------------------
@@ -77,20 +75,18 @@ object TopicRepository {
                 val memberRef = topicRef
                     .collection("members")
                     .document(creatorID)
-
                 val memberData = hashMapOf(
                     "topicID" to topicID,
                     "role" to "moderator",
                     "joinedAt" to FieldValue.serverTimestamp()
                 )
                 batch.set(memberRef, memberData)
-
                 // ------------------------
                 // Default Rules Post - "system - Community Rules : 1, 2, 3"
                 // ------------------------
                 val rulesPostData = hashMapOf(
                     "topicID" to topicID,
-                    "posterID" to "system",
+                    "posterID" to "Ram-Bo",
                     "postTitle" to "Community Rules",
                     "postText" to """
                     1. Be respectful
@@ -103,14 +99,13 @@ object TopicRepository {
                     "isPinned" to true
                 )
                 batch.set(rulesPostRef, rulesPostData)
-
                 // ------------------------
                 // Default Rules Comment Creation - "System - Have fun!"
                 // ------------------------
                 val rulesCommentData = hashMapOf(
                     "topicID" to topicID,
                     "postID" to postID,
-                    "commenterID" to "system",
+                    "commenterID" to "Ram-Bo",
                     "commentText" to "Have fun!",
                     "parentCommentID" to null,
                     "likeCount" to 1,
