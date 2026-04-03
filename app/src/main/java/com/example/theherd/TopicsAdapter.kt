@@ -102,36 +102,68 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
                 holder.image.setImageResource(R.drawable.hiking)
             } else if (imageUriString == R.drawable.food.toString()) {
                 holder.image.setImageResource(R.drawable.food)
-            }
-            else {  //When the above if/else ifs are removed, leave this as the only code in the block
+            } else {  //When the above if/else ifs are removed, leave this as the only code in the block
                 //Remove up to here and the corresponding closing bracket for the else statement
 
                 // User uploaded an image -> show it
                 println("User image set")
                 holder.image.setImageURI(Uri.parse(imageUriString))
             }
-        }
-
-        else {
+        } else {
             // No image uploaded -> show default logo
             println("Default set in Topics Adapter else block")
             holder.image.setImageResource(R.drawable.marquee_logo)
         }
 
-        holder.joinButton.setOnClickListener {
-            topic.incrementMembers()
-            holder.members.text = "${topic.memberCount} members"
-            holder.joinButton.text = "Joined"
-            Toast.makeText(holder.itemView.context,
-                "You joined ${topic.topicName}!", Toast.LENGTH_SHORT).show()
+        // ---------------- JOIN / UNJOIN ----------------
+        fun updateButtonUI() {
+            if (topic.isJoined) {
+                holder.joinButton.text = "Joined"
+                holder.joinButton.setBackgroundColor(
+                    android.graphics.Color.parseColor("#2F442F")
+                )
+            } else {
+                holder.joinButton.text = "Join"
+                holder.joinButton.setBackgroundColor(
+                    android.graphics.Color.GRAY
+                )
+            }
+            holder.joinButton.setTextColor(android.graphics.Color.WHITE)
         }
-        holder.joinButton.setBackgroundColor(
-            android.graphics.Color.parseColor("#2F442F") //green btn
-        )
-        holder.joinButton.setTextColor(android.graphics.Color.WHITE)
+
+        // Set initial UI state
+        updateButtonUI()
+
+        holder.joinButton.setOnClickListener {
+            if (!topic.isJoined) {
+                topic.incrementMembers()
+                topic.isJoined = true
+
+                Toast.makeText(
+                    holder.itemView.context,
+                    "You joined ${topic.topicName}!",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            } else {
+                topic.decrementMembers()
+                topic.isJoined = false
+
+                Toast.makeText(
+                    holder.itemView.context,
+                    "You left ${topic.topicName}!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            // Update UI
+            holder.members.text = "${topic.memberCount} members"
+            updateButtonUI()
+        }
     }
 
-    override fun getItemCount(): Int = topics.size
+
+        override fun getItemCount(): Int = topics.size
 
     // Search filter
     fun filter(query: String) {
