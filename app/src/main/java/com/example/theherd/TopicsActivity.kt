@@ -62,14 +62,13 @@ class TopicsActivity : AppCompatActivity() {
             Topic("Foodies", "user321", "Share recipes and restaurants", R.drawable.food.toString())
         )
 
-
         //Adapter with sample topics
         adapter = TopicsAdapter(topicsList)
         recyclerView.adapter = adapter
 
         // Append Firestore loaded topics to topicsList with sample topics
         //Verify placement of loadTopicsFromFS()in code->Merging happened since this was put here
-//        loadTopicsFromFirestore(topicsList) Broken after Test Party Merge, revisit fnc later anyway
+        loadTopics()
 
         // Search filter
         searchBar.addTextChangedListener(object : TextWatcher {
@@ -201,37 +200,24 @@ class TopicsActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadTopicsFromFirestore(list: MutableList<Topic>) {
+    private fun loadTopics() {
+        TopicRepository.loadTopics(
+            onSuccess = { topics ->
 
-        FirestoreDatabase.db.collection("topics")
-            .get()
-            .addOnSuccessListener { result ->
+                topicsList.clear()
+                topicsList.addAll(topics)
+                adapter.updateList(topicsList)
+            },
 
-                for (doc in result) {
-
-                    val topicID = doc.getString("topicID") ?: continue
-                    val topicName = doc.getString("topicName") ?: ""
-                    val topicDesc = doc.getString("topicDesc") ?: ""
-                    val creatorID = doc.getString("creatorID") ?: ""
-                    val memberCount = doc.getLong("memberCount")?.toInt() ?: 0
-                    val imageResId = doc.getLong("imageResId")?.toInt() ?: R.drawable.marquee_logo
-
-
-                    // Create Topic object (using your constructor)
-                    val topic = Topic(topicName, creatorID, topicDesc, imageResId)
-
-                    topic.setMemberCount(memberCount)
-
-                    // Add to list
-                    list.add(topic)
-                }
-
-                // RecyclerView doesnt auto refresh, use notifyDataSetChanged() to update
-                adapter.notifyDataSetChanged()
+            onFailure = { exception ->
+                Toast.makeText(
+                    this,
+                    exception.message ?: "Failed to load topics",
+                    Toast.LENGTH_LONG
+                ).show()
             }
-            .addOnFailureListener {
-                println("Failed to load topics from Firestore")
-            }
+        )
+        println("Topics from FS loaded!")
     }
 
     // Handle image picker result

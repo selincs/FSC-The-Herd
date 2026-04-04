@@ -8,7 +8,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 //Firestore Topic access is done through FirestoreDatabase.topics
 object TopicRepository {
-    private const val USE_FIRESTORE = true  //what does this do?
     private const val SYSTEM_USER = "system"
     private val auth: FirebaseAuth = FirebaseAuth.getInstance() //Call the singleton Firebase db instance
 
@@ -42,9 +41,8 @@ object TopicRepository {
                     return@addOnSuccessListener
                 }
 
-//                val topicRef = db.collection("topics").document() old version of below 2 lines
-//                val topicID = topicRef.id
                 //Use Topic Name as Unique Identifier (Only 1 Topic of this name Exists)
+                //Topic Name is stored in the document for access purposes for ID (same values)
                 val topicID = topicName.trim().lowercase()
                 val topicRef = db.collection("topics").document(topicID)
 
@@ -60,7 +58,7 @@ object TopicRepository {
                 // Topic document - trim() prevents white space duplication of Topic Names on save to FS
                 // ------------------------
                 val topicData = hashMapOf(
-                    "topicName" to topicName.trim(),
+                    "topicName" to topicName.trim(),    //topic Name == topic ID, so this field can be used to retrieve topicID in the document
                     "topicDesc" to topicDesc.trim(),
                     "imageUri" to imageUri?.toString(),
                     "creatorID" to creatorID,
@@ -129,44 +127,46 @@ object TopicRepository {
             }
     }
 
+    fun loadTopics(
+        onSuccess: (List<Topic>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+        // If we allow topics to be archived/deleted, the isArchived boolean doesn't load archived Topics
+        db.collection("topics")
+            .whereEqualTo("isArchived", false)
+            .get()
+            .addOnSuccessListener { documents ->
+                val topics = mutableListOf<Topic>()
+
+                for (doc in documents) {
+                    val id = doc.id
+                    val name = doc.getString("topicName") ?: continue
+                    val desc = doc.getString("topicDesc") ?: ""
+                    val creator = doc.getString("creatorID") ?: "unknown"
+                    val imageUri = doc.getString("imageUri") ?: "default"
+                    val memberCt = doc.getLong("memberCount")?.toInt() ?: 0
+                    //Constructor to load a Topic from Firestore
+//             Topic(String topicID, String topicName, String topicDesc, String imageUriString, int memberCount)
+                    val topic = Topic(
+                        id, //Topic ID == Document ID
+                        name,
+                        desc,
+                        imageUri,
+                        memberCt
+                    )
+                    topics.add(topic)
+                }
+                onSuccess(topics)
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception)
+            }
+    }
+
     //TODO:Improve to preserve TopicID for further diving -> Might be needed for post ID and stuff
     //Load Topics from Firestore
     //Reading the URI for loading a topic, after TestParty changes of resId->Uri
-//    val uriString = document.getString("imageUri")
-//    val imageUri = uriString?.let { Uri.parse(it) }
-//    fun getTopics(onResult: (List<Topic>) -> Unit) {
-//
-//        FirestoreDatabase.topics
-//            .get()
-//            .addOnSuccessListener { result ->
-//
-//                val topicsList = mutableListOf<Topic>()
-//
-//                for (doc in result) {
-//
-//                    val topicID = doc.getString("topicID") ?: continue
-//                    val name = doc.getString("topicName") ?: ""
-//                    val desc = doc.getString("topicDesc") ?: ""
-//                    val creatorID = doc.getString("creatorID") ?: ""
-//                    val memberCount = doc.getLong("memberCount")?.toInt() ?: 0
-//                    val imageResId = doc.getLong("imageResId")?.toInt() ?: R.drawable.marquee_logo
-//
-//                    //I think this could be technically just added to list below as a anonymous topic instead of declaring it here
-//                    val topic = Topic(
-//                        topicID,
-//                        name,
-//                        creatorID,
-//                        desc,
-//                        imageResId,
-//                        memberCount
-//                    )
-//
-//                    topicsList.add(topic)
-//                }
-//
-//                onResult(topicsList)
-//            }
-//    }
 
     //To hopefully enable keyword searching
     /* If searching by keyword "Chess", will show

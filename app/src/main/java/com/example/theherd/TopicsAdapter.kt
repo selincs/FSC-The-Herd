@@ -65,7 +65,7 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
                     val selectedReason = spinner.selectedItem.toString()
                     val userComment = comment.text.toString()
 
-                    // write implementation for backend here
+                    // write implementation for backend here (Topic Reporting)
 
                     Toast.makeText(
                         context,
@@ -81,13 +81,6 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         holder.name.text = topic.topicName
         holder.description.text = topic.topicDesc
         holder.members.text = "${topic.memberCount} members"
-
-//        // Display uploaded image if exists, else default drawable
-//        if (topic.getImageUriString() != null) {
-//            holder.image.setImageURI(Uri.parse(topic.getImageUriString()))
-//        } else {
-//            holder.image.setImageResource(topic.getImageResId())
-//        }
 
         //Selin entry - Hope this works avnoor sorry
         // Display uploaded image if exists, else default drawable
@@ -107,8 +100,14 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
                 //Remove up to here and the corresponding closing bracket for the else statement
 
                 // User uploaded an image -> show it
-                println("User image set")
-                holder.image.setImageURI(Uri.parse(imageUriString))
+                try {
+                    holder.image.setImageURI(Uri.parse(imageUriString))
+                    println("User image set")
+                }
+                catch (e: Exception) {
+                    println("URI failed to load")
+                    holder.image.setImageResource(R.drawable.marquee_logo)
+                }
             }
         }
 
@@ -125,6 +124,7 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
             Toast.makeText(holder.itemView.context,
                 "You joined ${topic.topicName}!", Toast.LENGTH_SHORT).show()
         }
+
         holder.joinButton.setBackgroundColor(
             android.graphics.Color.parseColor("#2F442F") //green btn
         )

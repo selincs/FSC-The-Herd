@@ -83,13 +83,11 @@ public class Topic {
     }
 
     //Constructor to load a Topic from Firestore
-    public Topic(String topicID, String topicName, String creatorID, String topicDesc, String imageUriString, int memberCount) {
+    public Topic(String topicID, String topicName, String topicDesc, String imageUriString, int memberCount) {
         this.topicID = topicID;
         this.topicName = topicName;
-        this.creatorID = creatorID;
         this.topicDesc = topicDesc;
         this.memberCount = memberCount;
-        this.imageResId = 0;       // no drawable -> remove?
         this.imageUriString = imageUriString;
     }
 
@@ -101,6 +99,7 @@ public class Topic {
         return memberCount;
     }
 
+    //Need to add firestore validation here to prevent a user from double incrementing
     public void incrementMembers() {
         memberCount++;
     }
