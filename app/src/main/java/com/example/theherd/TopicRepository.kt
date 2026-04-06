@@ -1,10 +1,13 @@
 package com.example.theherd
 
 import Model.Topic
+import android.content.Context
 import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 
 //Firestore Topic access is done through FirestoreDatabase.topics
 object TopicRepository {
@@ -233,32 +236,70 @@ object TopicRepository {
             }
     }
 
-    //Allows a User to leave a Topic/Community
-    fun leaveTopic(
-        topicID: String,
-        onDone: (Boolean) -> Unit
+
+    //This is Broken unless we decide to upgrade our Firebase plan.
+    //It works but it doesn't actually upload images--saves them as a string and loads them if found locally on the device
+    fun uploadImage(
+        context: Context,
+        imageUri: Uri,
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
     ) {
-
-        val userID = FirestoreAuthManager.currentUserId ?: return
-
-        //Open members subcollection and delete user by UserID in subcollection
-        FirestoreDatabase.topics
-            .document(topicID)
-            .collection("members")
-            .document(userID)
-            .delete()
-            .addOnSuccessListener {
-
-                FirestoreDatabase.topics
-                    .document(topicID)
-                    .update("memberCount", FieldValue.increment(-1))
-                    .addOnSuccessListener { onDone(true) }
-                    .addOnFailureListener { onDone(false) }
+        try {
+            println("Uploading image triggered")
+            val inputStream = context.contentResolver.openInputStream(imageUri)
+            if (inputStream == null) {
+                onFailure(Exception("Cannot open selected image"))
+                return
             }
-            .addOnFailureListener {
-                onDone(false)
-            }
+
+            // Generate a unique path in Firebase Storage
+            val filename = "topic_images/${UUID.randomUUID()}.jpg"
+            val storageRef = FirebaseStorage.getInstance().reference.child(filename)
+
+            storageRef.putStream(inputStream)
+                .addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { uri ->
+                        val downloadUrl = uri.toString()
+                        println("TEST UPLOAD SUCCESS")
+                        println("DOWNLOAD URL: $downloadUrl")
+                        onSuccess(downloadUrl)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    println("Image upload failed: ${exception.message}")
+                    onFailure(exception)
+                }
+        } catch (e: Exception) {
+            onFailure(e)
+        }
     }
+    //Allows a User to leave a Topic/Community
+//    fun leaveTopic(
+//        topicID: String,
+//        onDone: (Boolean) -> Unit
+//    ) {
+//
+//        val userID = FirestoreAuthManager.currentUserId ?: return
+//
+//        //Open members subcollection and delete user by UserID in subcollection
+//        FirestoreDatabase.topics
+//            .document(topicID)
+//            .collection("members")
+//            .document(userID)
+//            .delete()
+//            .addOnSuccessListener {
+//
+//                FirestoreDatabase.topics
+//                    .document(topicID)
+//                    .update("memberCount", FieldValue.increment(-1))
+//                    .addOnSuccessListener { onDone(true) }
+//                    .addOnFailureListener { onDone(false) }
+//            }
+//            .addOnFailureListener {
+//                onDone(false)
+//            }
+//    }
 
     //CommunityBoard functions
     /*

@@ -15,6 +15,7 @@ import android.widget.Spinner
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import android.widget.ImageButton
+import androidx.core.net.toUri
 
 // to populate topic bubbles in topicActivity
 class TopicsAdapter(private val allTopics: List<Topic>) :
@@ -82,38 +83,39 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         holder.description.text = topic.topicDesc
         holder.members.text = "${topic.memberCount} members"
 
-        //Selin entry - Hope this works avnoor sorry
-        // Display uploaded image if exists, else default drawable
+        // Display uploaded imageUri if exists in Firestore, else default drawable
         val imageUriString = topic.getImageUriString()
-        if (imageUriString != null && imageUriString != "default") {
-            //Accommodate hard coded sample topics - Remove when backend works starting w/ this comment
-            if (imageUriString == R.drawable.gym.toString()) {
-                holder.image.setImageResource(R.drawable.gym)
-            } else if (imageUriString == R.drawable.chess.toString()) {
-                holder.image.setImageResource(R.drawable.chess)
-            } else if (imageUriString == R.drawable.hiking.toString()) {
-                holder.image.setImageResource(R.drawable.hiking)
-            } else if (imageUriString == R.drawable.food.toString()) {
-                holder.image.setImageResource(R.drawable.food)
-            }
-            else {  //When the above if/else ifs are removed, leave this as the only code in the block
-                //Remove up to here and the corresponding closing bracket for the else statement
+        println("Topic imageUri from Firestore: $imageUriString")
 
-                // User uploaded an image -> show it
-                try {
-                    holder.image.setImageURI(Uri.parse(imageUriString))
-                    println("User image set")
+        try {
+            when {
+                imageUriString == null || imageUriString == "default" -> {
+                    // Default fallback
+                    println("Default image used")
+                    holder.image.setImageResource(R.drawable.marquee_logo)
                 }
-                catch (e: Exception) {
-                    println("URI failed to load")
+
+                imageUriString.startsWith("content://") -> {
+                    // Local image chosen by user
+                    val uri = imageUriString.toUri()
+                    holder.image.setImageURI(uri)
+                    println("Loaded local content URI image")
+                }
+
+                imageUriString.startsWith("http") -> {
+                    // Future Firebase Storage URL
+                    val uri = imageUriString.toUri()
+                    holder.image.setImageURI(uri)
+                    println("Loaded remote image URL")
+                }
+
+                else -> {
+                    println("Unknown image format")
                     holder.image.setImageResource(R.drawable.marquee_logo)
                 }
             }
-        }
-
-        else {
-            // No image uploaded -> show default logo
-            println("Default set in Topics Adapter else block")
+        } catch (e: Exception) {
+            println("Image loading failed: ${e.message}")
             holder.image.setImageResource(R.drawable.marquee_logo)
         }
 
