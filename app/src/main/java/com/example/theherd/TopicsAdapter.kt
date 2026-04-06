@@ -90,7 +90,7 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         try {
             when {
                 imageUriString == null || imageUriString == "default" -> {
-                    // Default fallback
+                    // Default image for no selection
                     println("Default image used")
                     holder.image.setImageResource(R.drawable.marquee_logo)
                 }
@@ -103,19 +103,19 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
                 }
 
                 imageUriString.startsWith("http") -> {
-                    // Future Firebase Storage URL
+                    // Firebase storage URL case, but this doesn't work unless we pay $$$ I think
                     val uri = imageUriString.toUri()
                     holder.image.setImageURI(uri)
                     println("Loaded remote image URL")
                 }
 
                 else -> {
-                    println("Unknown image format")
+                    println("Unknown image format - TopicsAdapter")
                     holder.image.setImageResource(R.drawable.marquee_logo)
                 }
             }
         } catch (e: Exception) {
-            println("Image loading failed: ${e.message}")
+            println("Image loading failed-Topics Adapter: ${e.message}")
             holder.image.setImageResource(R.drawable.marquee_logo)
         }
 

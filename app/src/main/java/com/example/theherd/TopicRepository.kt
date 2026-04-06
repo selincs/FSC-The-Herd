@@ -166,17 +166,46 @@ object TopicRepository {
                 onFailure(exception)
             }
     }
+    
+    //This is "Broken" unless we decide to upgrade our Firebase plan.
+    //It works but it doesn't actually upload images--saves them as a string and loads them if found locally on the device
+    fun uploadImage(
+        context: Context,
+        imageUri: Uri,
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        try {
+            println("Uploading image triggered")
+            val inputStream = context.contentResolver.openInputStream(imageUri)
+            if (inputStream == null) {
+                onFailure(Exception("Cannot open selected image"))
+                return
+            }
+
+            // Generate a unique path in Firebase Storage
+            val filename = "topic_images/${UUID.randomUUID()}.jpg"
+            val storageRef = FirebaseStorage.getInstance().reference.child(filename)
+
+            storageRef.putStream(inputStream)
+                .addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { uri ->
+                        val downloadUrl = uri.toString()
+                        println("TEST UPLOAD SUCCESS")
+                        println("DOWNLOAD URL: $downloadUrl")
+                        onSuccess(downloadUrl)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    println("Image upload failed: ${exception.message}")
+                    onFailure(exception)
+                }
+        } catch (e: Exception) {
+            onFailure(e)
+        }
+    }
 
     //TODO:Improve to preserve TopicID for further diving -> Might be needed for post ID and stuff
-    //Load Topics from Firestore
-    //Reading the URI for loading a topic, after TestParty changes of resId->Uri
-
-    //To hopefully enable keyword searching
-    /* If searching by keyword "Chess", will show
-        Chess
-        Chess Club
-        Chess Tournament
-     */
     fun searchTopics(
         keyword: String,
         onResult: (List<Model.Topic>) -> Unit
@@ -237,43 +266,7 @@ object TopicRepository {
     }
 
 
-    //This is Broken unless we decide to upgrade our Firebase plan.
-    //It works but it doesn't actually upload images--saves them as a string and loads them if found locally on the device
-    fun uploadImage(
-        context: Context,
-        imageUri: Uri,
-        onSuccess: (String) -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        try {
-            println("Uploading image triggered")
-            val inputStream = context.contentResolver.openInputStream(imageUri)
-            if (inputStream == null) {
-                onFailure(Exception("Cannot open selected image"))
-                return
-            }
 
-            // Generate a unique path in Firebase Storage
-            val filename = "topic_images/${UUID.randomUUID()}.jpg"
-            val storageRef = FirebaseStorage.getInstance().reference.child(filename)
-
-            storageRef.putStream(inputStream)
-                .addOnSuccessListener {
-                    storageRef.downloadUrl.addOnSuccessListener { uri ->
-                        val downloadUrl = uri.toString()
-                        println("TEST UPLOAD SUCCESS")
-                        println("DOWNLOAD URL: $downloadUrl")
-                        onSuccess(downloadUrl)
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    println("Image upload failed: ${exception.message}")
-                    onFailure(exception)
-                }
-        } catch (e: Exception) {
-            onFailure(e)
-        }
-    }
     //Allows a User to leave a Topic/Community
 //    fun leaveTopic(
 //        topicID: String,

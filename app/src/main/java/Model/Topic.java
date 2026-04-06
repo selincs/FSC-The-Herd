@@ -61,6 +61,7 @@ public class Topic {
     }
 
     //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
+
     //Imageless constructor, currently sets to herd logo
     public Topic(String topicName, String creatorID, String topicDesc) {
         this.topicName = topicName;

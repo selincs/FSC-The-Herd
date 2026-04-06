@@ -180,7 +180,7 @@ class TopicsActivity : AppCompatActivity() {
         }
     }
 
-    //Helper function to create a topic in Firestore
+    //Helper function to create a topic in Firestore via TopicRepository
     private fun createTopicInFirestore(name: String, desc: String, imageUrl: String) {
         val userID = SessionManager.getUser()?.userID ?: return
 
@@ -199,7 +199,7 @@ class TopicsActivity : AppCompatActivity() {
         )
     }
 
-    //Calls loadTopics() in TopicRepository
+    //Helper fnc calls loadTopics() in TopicRepository
     private fun loadTopics() {
         TopicRepository.loadTopics(
             onSuccess = { topics ->
@@ -212,7 +212,7 @@ class TopicsActivity : AppCompatActivity() {
             onFailure = { exception ->
                 Toast.makeText(
                     this,
-                    exception.message ?: "Failed to load topics",
+                    exception.message ?: "Failed to load topics - TopicsAct Helper",
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -229,17 +229,14 @@ class TopicsActivity : AppCompatActivity() {
             data?.data?.let { uri ->
 
                 // Persist permission so it works after restart
-                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 //                val takeFlags = data.flags and
-//                        (Intent.FLAG_GRANT_READ_URI_PERMISSION or
-//                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-
-                contentResolver.takePersistableUriPermission(uri, takeFlags)
+//                        (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
                 selectedImageUri = uri
 
                 println("Persisted permission for URI: $uri")
-            println("ImagePicker - selectedImageUri value: $selectedImageUri")
+                println("ImagePicker - selectedImageUri value: $selectedImageUri")
                 }
             if (selectedImageUri != null) {
                 Toast.makeText(this, "Image selected!", Toast.LENGTH_SHORT).show()
