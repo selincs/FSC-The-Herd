@@ -1,6 +1,7 @@
 package com.example.theherd
 
 import android.content.Intent
+import com.google.firebase.firestore.FirebaseFirestore
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -24,18 +25,27 @@ class CommunityBoardActivity : AppCompatActivity() {
 
     private val startCreateCommunity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
-            val name = result.data?.getStringExtra("COMMUNITY_NAME") ?: ""
-            val desc = result.data?.getStringExtra("COMMUNITY_DESC") ?: ""
+            //get  all the topics from topic collection
+            loadCommunitiesFromFirestore()
+        }
+    }
+    private fun loadCommunitiesFromFirestore(){
+        //clears the old list.
+        allCommunities.clear()
+        FirebaseFirestore.getInstance()
+            .collection("topics")
+            .get()
+            .addOnSuccessListener{
+                result ->
+                for( doc in result){
+                    val name = doc.getString("topicName") ?: ""
+                    val desc = doc.getString("topicDesc") ?: ""
 
-            if (name.isNotEmpty()) {
-                val newCommunity = Community(name, desc, isJoined = true)
-                allCommunities.add(0, newCommunity)
-
-                PreferencesManager.saveAllCommunities(this, allCommunities)
-
+                    val community = Community(name, desc)
+                    allCommunities.add(community)
+                }
                 filterList(searchView.query.toString())
             }
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -127,7 +137,7 @@ class CommunityBoardActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
-        setupSampleData()
+
 
         searchView = findViewById(R.id.communitySearchView)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -173,15 +183,7 @@ class CommunityBoardActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupSampleData() {
-        if (allCommunities.isEmpty()) {
-            val savedList = PreferencesManager.loadAllCommunities(this)
-            if (savedList.isNotEmpty()) {
-                allCommunities.addAll(savedList)
-            }
-            filterList("")
-        }
-    }
+
 
     private fun filterList(query: String?) {
         displayList.clear()
@@ -252,9 +254,6 @@ class CommunityBoardActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val updatedList = PreferencesManager.loadAllCommunities(this)
-        allCommunities.clear()
-        allCommunities.addAll(updatedList)
-        filterList(searchView.query.toString())
+        loadCommunitiesFromFirestore()
     }
 }
