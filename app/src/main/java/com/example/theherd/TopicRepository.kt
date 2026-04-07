@@ -191,8 +191,7 @@ object TopicRepository {
                 .addOnSuccessListener {
                     storageRef.downloadUrl.addOnSuccessListener { uri ->
                         val downloadUrl = uri.toString()
-                        println("TEST UPLOAD SUCCESS")
-                        println("DOWNLOAD URL: $downloadUrl")
+                        println("Image uploaded, DOWNLOAD URL: $downloadUrl")
                         onSuccess(downloadUrl)
                     }
                 }
@@ -205,42 +204,26 @@ object TopicRepository {
         }
     }
 
-    //TODO:Improve to preserve TopicID for further diving -> Might be needed for post ID and stuff
-    fun searchTopics(
-        keyword: String,
-        onResult: (List<Model.Topic>) -> Unit
-    ) {
-
-        FirestoreDatabase.topics
-            .whereGreaterThanOrEqualTo("topicName", keyword)
-            .whereLessThanOrEqualTo("topicName", keyword + "\uf8ff")
-            .get()
-            .addOnSuccessListener { result ->
-
-                val topics = mutableListOf<Model.Topic>()
-
-                for (doc in result) {
-
-                    val topicName = doc.getString("topicName") ?: ""
-                    val topicDesc = doc.getString("topicDesc") ?: ""
-                    val creatorID = doc.getString("creatorID") ?: ""
-
-                    topics.add(Model.Topic(topicName, creatorID, topicDesc))
-                }
-
-                onResult(topics)
-            }
-    }
-
+    //TODO: joinTopic() must update 3 documents in Firestore in a BATCH
+    //TODO: WRITE, or else race conditions/write failures can be a problem. FS Docs for joinTopic update below
+    /*
+    topics/topicID/members/userID
+    users/userID/joinedTopics/topicID
+    topics/topicID/memberCount
+    */
     // Allows a User to join a Topic as a member of the Community
     fun joinTopic(
         topicID: String,
         onDone: (Boolean) -> Unit
     ) {
-
         val userID = FirestoreAuthManager.currentUserId ?: return
 
-        //Set the joining User to a member of Topic & save Timestamp of join date
+        //Validate user is not already a member here
+        //If already joined, call leave topic?
+        //if the TopicID is found in User's joinedTopics subcollection -> user is already a member
+
+
+        //Otherwise, set the joining User to a member of Topic & save Timestamp of join date
         val memberData = hashMapOf(
             "role" to "member",
             "joinedAt" to FieldValue.serverTimestamp()
@@ -294,7 +277,7 @@ object TopicRepository {
 //            }
 //    }
 
-    //CommunityBoard functions
+    //Topic Event functions
     /*
         createEvent()
         getEvents()
@@ -315,12 +298,18 @@ object TopicRepository {
 
 /*
 Create a Topic X
-Fetch Topics X
+Load a Topic’s CommunityBoard X
 Join/leave a Topic
-Load a Topic’s CommunityBoard
+//Event stuff in Topic needs thought
+
 Create Posts
 Load Posts
-Like/Comment on Posts
+Like Posts
+Comment on Posts
+
+Create comments
+Load comments
+Like comment
  */
 
 
