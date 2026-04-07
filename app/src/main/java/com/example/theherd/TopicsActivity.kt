@@ -67,7 +67,7 @@ class TopicsActivity : AppCompatActivity() {
         adapter = TopicsAdapter(topicsList)
         recyclerView.adapter = adapter
 
-        //Call loadTopics helper in TopicsActivity to topicsList with sample topics
+        //Call loadTopics helper in TopicsActivity to load Firestore Topics
         loadTopics()
 
         // Search filter
@@ -87,7 +87,7 @@ class TopicsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        //Create Button starts here
+        //Create Topic Button
         val createButton = findViewById<Button>(R.id.createTopicButton)
 
         createButton.setOnClickListener {
@@ -116,14 +116,15 @@ class TopicsActivity : AppCompatActivity() {
                     val desc = descInput.text.toString()
                     //THIS IS FOR CREATING A NEW TOPIC
                     if (name.isEmpty()) {
+                        //Currently if name is empty, dialog closes
                         Toast.makeText(this, "Topic name cannot be empty.", Toast.LENGTH_SHORT).show()
                         return@setPositiveButton
                     }
-                    // Only upload the image if the user picked one
+                    // Only upload the image if the user picked one using TopicRepository uploadImage()
                     if (selectedImageUri != null) {
                         println("Uploading image: $selectedImageUri")
                         TopicRepository.uploadImage(
-                            this, // pass activity context
+                            this, // pass activity context to uploadImage in TopicRepository
                             selectedImageUri!!,
                             onSuccess = { downloadUrl ->
                                 createTopicInFirestore(name, desc, downloadUrl)
@@ -180,11 +181,11 @@ class TopicsActivity : AppCompatActivity() {
         }
     }
 
-    //Helper function to create a topic in Firestore via TopicRepository
+    //Helper function to create a topic in Firestore via TopicRepository, then creates the new topic and updates the list
     private fun createTopicInFirestore(name: String, desc: String, imageUrl: String) {
         val userID = SessionManager.getUser()?.userID ?: return
 
-        // passes the Firebase URL as a Uri string
+        // passes the Firebase URL as a Uri string to TopicRepository function
         TopicRepository.createTopic(
             name,desc,Uri.parse(imageUrl),userID,
             onSuccess = { topicID ->
@@ -194,12 +195,12 @@ class TopicsActivity : AppCompatActivity() {
                 Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
             },
             onFailure = { exception ->
-                Toast.makeText(this, exception.message ?: "Failed to create topic", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, exception.message ?: "Error: Failed to create topic", Toast.LENGTH_LONG).show()
             }
         )
     }
 
-    //Helper fnc calls loadTopics() in TopicRepository
+    //Helper fnc calls loadTopics() in TopicRepository to populate the Topic List
     private fun loadTopics() {
         TopicRepository.loadTopics(
             onSuccess = { topics ->
@@ -227,14 +228,12 @@ class TopicsActivity : AppCompatActivity() {
         println("Image picker onActivityResult triggered")
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
             data?.data?.let { uri ->
-
                 // Persist permission so it works after restart
                 contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 //                val takeFlags = data.flags and
 //                        (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
                 selectedImageUri = uri
-
                 println("Persisted permission for URI: $uri")
                 println("ImagePicker - selectedImageUri value: $selectedImageUri")
                 }

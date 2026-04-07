@@ -90,13 +90,13 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         try {
             when {
                 imageUriString == null || imageUriString == "default" -> {
-                    // Default image for no selection
+                    // Default image for no selection (The Herd logo)
                     println("Default image used")
                     holder.image.setImageResource(R.drawable.marquee_logo)
                 }
 
                 imageUriString.startsWith("content://") -> {
-                    // Local image chosen by user
+                    // Local image chosen by user was stored, load the local device image
                     val uri = imageUriString.toUri()
                     holder.image.setImageURI(uri)
                     println("Loaded local content URI image")
@@ -119,6 +119,7 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
             holder.image.setImageResource(R.drawable.marquee_logo)
         }
 
+        //Backend implementation for join button goes in here, at increment line
         holder.joinButton.setOnClickListener {
             topic.incrementMembers()
             holder.members.text = "${topic.memberCount} members"
