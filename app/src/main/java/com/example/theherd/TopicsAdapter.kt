@@ -15,7 +15,7 @@ import android.widget.Spinner
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import android.widget.ImageButton
-
+import android.content.Intent
 // to populate topic bubbles in topicActivity
 class TopicsAdapter(private val allTopics: List<Topic>) :
     RecyclerView.Adapter<TopicsAdapter.TopicViewHolder>() {
@@ -81,6 +81,19 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         holder.name.text = topic.topicName
         holder.description.text = topic.topicDesc
         holder.members.text = "${topic.memberCount} members"
+
+        //when a topic is clicked
+        holder.itemView.setOnClickListener {
+            val context = holder.itemView.context
+            val intent = Intent(context, TopicDetailActivity::class.java)
+
+            // Pass topic data
+            intent.putExtra("topicName", topic.topicName)
+            intent.putExtra("topicDesc", topic.topicDesc)
+            intent.putExtra("memberCount", topic.memberCount)
+
+            context.startActivity(intent)
+        }
 
 //        // Display uploaded image if exists, else default drawable
 //        if (topic.getImageUriString() != null) {

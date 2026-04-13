@@ -49,6 +49,10 @@
             android:exported="false"/>
 
         <activity
+            android:name=".TopicDetailActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".CreateCommunityActivity"
             android:exported="false" />
         <activity
