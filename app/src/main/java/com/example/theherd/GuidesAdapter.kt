@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-// REMOVED the "onClick" parameter from the top
 class GuidesAdapter : ListAdapter<Guide, GuidesAdapter.GuideViewHolder>(GuideDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GuideViewHolder {
@@ -31,7 +30,6 @@ class GuidesAdapter : ListAdapter<Guide, GuidesAdapter.GuideViewHolder>(GuideDif
         private val badge: TextView = view.findViewById(R.id.tvStatusBadge)
         private val icon: ImageView = view.findViewById(R.id.ivGuideIcon)
 
-        // REMOVED the conflicting 'init' block that was here!
 
         fun bind(guide: Guide) {
             title.text = guide.title
@@ -50,7 +48,6 @@ class GuidesAdapter : ListAdapter<Guide, GuidesAdapter.GuideViewHolder>(GuideDif
 
             icon.setImageResource(iconResource)
 
-            // The ONLY click listener is here, and we know exactly what it's packing
             itemView.setOnClickListener {
                 val intent = Intent(itemView.context, GuideTemplateActivity::class.java)
                 intent.putExtra("GUIDE_ID", guide.id)

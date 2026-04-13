@@ -179,7 +179,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Was this helpful?"
+                    android:text="@string/was_this_helpful"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:layout_gravity="center_horizontal"
@@ -197,7 +197,7 @@
                         android:layout_height="56dp"
                         android:src="@drawable/ic_thumbs_up"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="Yes" />
+                        android:contentDescription="@string/thumbs_up" />
 
                     <ImageButton
                         android:id="@+id/thumbsDownButton"
@@ -205,7 +205,7 @@
                         android:layout_height="56dp"
                         android:src="@drawable/ic_thumbs_down"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="No" />
+                        android:contentDescription="@string/thumbs_down" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -220,18 +220,19 @@
                         android:id="@+id/feedbackEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="How can we improve?"
-                        android:inputType="textCapSentences"
+                        android:hint="@string/how_can_we_improve"
                         android:padding="12dp"
                         android:background="@drawable/bg_edit_text_subtle"
+                        android:inputType="textMultiLine|textCapSentences"
                         android:minLines="3"
+                        android:importantForAutofill="no"
                         android:gravity="top" />
 
                     <Button
                         android:id="@+id/submitFeedbackButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Submit Feedback"
+                        android:text="@string/submit_feedback"
                         android:layout_gravity="end"
                         app:backgroundTint="#2F442F"
                         android:textColor="#FFFFFF"
@@ -250,7 +251,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Questions"
+                android:text="@string/questions"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:padding="16dp" />
@@ -267,7 +268,7 @@
                 android:id="@+id/askQuestionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ask a Question"
+                android:text="@string/ask_a_question"
                 app:backgroundTint="#2F442F"
                 android:textColor="#FFFFFF"
                 android:layout_gravity="center_horizontal"

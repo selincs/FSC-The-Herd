@@ -107,6 +107,13 @@
     <string name="WiFi_symbol">wifiSymbol</string>
     <string name="submit_a_new_guide">Submit a New Guide</string>
     <string name="title_e_g_fsc_shuttle_schedule">Title (e.g., FSC Shuttle Schedule)</string>
+    <string name="ask_a_question">Ask a Question</string>
+    <string name="questions">Questions</string>
+    <string name="submit_feedback">Submit Feedback</string>
+    <string name="how_can_we_improve">How can we improve?</string>
+    <string name="thumbs_down">Thumbs Down</string>
+    <string name="thumbs_up">Thumbs Up</string>
+    <string name="was_this_helpful">Was this helpful?</string>
     <string-array name="guide_categories">
         <item>Campus Services</item>
         <item>Academic Resources</item>

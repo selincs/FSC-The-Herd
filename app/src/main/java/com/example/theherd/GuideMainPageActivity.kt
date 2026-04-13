@@ -23,10 +23,6 @@ class GuideMainPageActivity : AppCompatActivity() {
 
         setupRecyclerView()
 
-//        binding.btnSuggestGuide.setOnClickListener {
-//            showSuggestDialog()
-//        }
-
         val eventsButton: Button = findViewById(R.id.events_button)
         val motivationButton: Button = findViewById(R.id.motivation_button)
         val friendsButton: Button = findViewById(R.id.friends_button)
@@ -78,18 +74,7 @@ class GuideMainPageActivity : AppCompatActivity() {
         }
     }
 
-//    private fun setupRecyclerView() {
-//        val guidesAdapter = GuidesAdapter { guide ->
-//            val intent = Intent(this, GuideTemplateActivity::class.java)
-//            intent.putExtra("GUIDE_ID", guide.id)
-//            startActivity(intent)
-//        }
-//
-//        binding.rvCampusServices.apply {
-//            layoutManager = GridLayoutManager(this@GuideMainPageActivity, 2)
-//            adapter = guidesAdapter
-//        }
-//    }
+
 private fun setupRecyclerView() {
     val allGuides = Model.GuideRepository.getAllGuides()
     val incomingCategory = intent.getStringExtra("CATEGORY_NAME")
@@ -100,14 +85,12 @@ private fun setupRecyclerView() {
         allGuides
     }
 
-    // --- STEP 1: DEFINE THE LISTS FIRST ---
-    // We create these variables so the visibility checks (the IF statements) can see them
+
     val campusGuides = displayedGuides.filter { it.category == "Navigation" || it.category == "Travel" }
     val academicGuides = displayedGuides.filter { it.category == "Academic" || it.category == "Financial Aid" }
     val studentLifeGuides = displayedGuides.filter { it.category == "Housing" || it.category == "Clubs" || it.category == "Health & Wellness" }
     val otherGuides = displayedGuides.filter { it.category == "Miscellaneous" || it.category == "Other (specify below)" }
 
-    // --- STEP 2: SETUP ADAPTERS (Keep this as you had it) ---
     val campusAdapter = GuidesAdapter()
     val academicAdapter = GuidesAdapter()
     val studentLifeAdapter = GuidesAdapter()
@@ -118,20 +101,16 @@ private fun setupRecyclerView() {
     binding.rvStudentLife.adapter = studentLifeAdapter
     binding.rvOther.adapter = otherAdapter
 
-    // Set LayoutManagers (Assuming they are set in XML or add them here)
     binding.rvCampusServices.layoutManager = GridLayoutManager(this, 2)
     binding.rvAcademicServices.layoutManager = GridLayoutManager(this, 2)
     binding.rvStudentLife.layoutManager = GridLayoutManager(this, 2)
     binding.rvOther.layoutManager = GridLayoutManager(this, 2)
 
-    // --- STEP 3: SUBMIT THE SAVED LISTS ---
     campusAdapter.submitList(campusGuides)
     academicAdapter.submitList(academicGuides)
     studentLifeAdapter.submitList(studentLifeGuides)
     otherAdapter.submitList(otherGuides)
 
-    // --- STEP 4: VISIBILITY CHECKS ---
-    // Now 'campusGuides' exists as a variable, so this won't break!
     if (campusGuides.isEmpty()) {
         binding.tvCampusHeader.visibility = android.view.View.GONE
         binding.rvCampusServices.visibility = android.view.View.GONE
