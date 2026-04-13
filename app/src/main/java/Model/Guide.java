@@ -23,13 +23,13 @@ public class Guide {
         this.title = title;
     }
 
-    public Guide (String id, String title, String description, String category) {
+    public Guide (String id, String title, String description, Boolean isVerified, Boolean isUserSuggested, String category) {
         this.id = id;
         this.title = title;
         this.description = description;
+        this.isVerified = isVerified;
+        this.isUserSuggested = isUserSuggested;
         this.category = category;
-        this.isVerified = false;
-        this.isUserSuggested = false;
     }
 
     public String getDescription() {

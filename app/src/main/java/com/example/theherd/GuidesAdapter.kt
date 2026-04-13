@@ -1,5 +1,7 @@
 package com.example.theherd
 
+import Model.Guide
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,41 +10,52 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.theherd.R
-import Model.Guide
 
-class GuidesAdapter(private val onClick: (Guide) -> Unit) :
-    ListAdapter<Guide, GuidesAdapter.GuideViewHolder>(GuideDiffCallback()) {
+// REMOVED the "onClick" parameter from the top
+class GuidesAdapter : ListAdapter<Guide, GuidesAdapter.GuideViewHolder>(GuideDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GuideViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.guide_card, parent, false)
-        return GuideViewHolder(view, onClick)
+        return GuideViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: GuideViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class GuideViewHolder(view: View, val onClick: (Guide) -> Unit) :
-        RecyclerView.ViewHolder(view) {
+    class GuideViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         private val title: TextView = view.findViewById(R.id.tvGuideTitle)
         private val desc: TextView = view.findViewById(R.id.tvGuideDesc)
         private val badge: TextView = view.findViewById(R.id.tvStatusBadge)
         private val icon: ImageView = view.findViewById(R.id.ivGuideIcon)
-        private var currentGuide: Guide? = null
 
-        init {
-            view.setOnClickListener {
-                currentGuide?.let { onClick(it) }
-            }
-        }
+        // REMOVED the conflicting 'init' block that was here!
 
         fun bind(guide: Guide) {
-            currentGuide = guide
             title.text = guide.title
             desc.text = guide.description
+
+            val iconResource = when (guide.category) {
+                "Navigation" -> R.drawable.ic_navigation
+                "Travel" -> R.drawable.ic_travel
+                "Academic" -> R.drawable.ic_academic
+                "Financial Aid" -> R.drawable.ic_financial_aid
+                "Housing" -> R.drawable.ic_home
+                "Clubs" -> R.drawable.ic_clubs
+                "Health & Wellness" -> R.drawable.ic_health
+                else -> R.drawable.ic_miscellaneous
+            }
+
+            icon.setImageResource(iconResource)
+
+            // The ONLY click listener is here, and we know exactly what it's packing
+            itemView.setOnClickListener {
+                val intent = Intent(itemView.context, GuideTemplateActivity::class.java)
+                intent.putExtra("GUIDE_ID", guide.id)
+                itemView.context.startActivity(intent)
+            }
 
             when {
                 guide.isVerified -> {
@@ -59,11 +72,9 @@ class GuidesAdapter(private val onClick: (Guide) -> Unit) :
                     badge.visibility = View.GONE
                 }
             }
-
         }
     }
 }
-
 
 class GuideDiffCallback : DiffUtil.ItemCallback<Guide>() {
     override fun areItemsTheSame(oldItem: Guide, newItem: Guide): Boolean = oldItem.id == newItem.id

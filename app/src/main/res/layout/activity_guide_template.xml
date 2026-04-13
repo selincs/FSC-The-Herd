@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_guide_template"
+    android:background="#EAF1EA"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".GuideTemplateActivity">
@@ -18,6 +19,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="?attr/homeAsUpIndicator"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         <!-- Logo image on left -->
@@ -40,6 +42,11 @@
             android:text="@string/toolbar_title"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <!-- Settings button -->
         <ImageButton
@@ -67,149 +74,60 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <!--Toolbar Background -->
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_page_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="135dp"
+        android:layout_width="437dp"
+        android:layout_height="117dp"
+        android:layout_marginTop="64dp"
         android:background="#2F442F"
         android:backgroundTint="#2F442F"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.538"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topToolbar" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Top Row of Buttons -->
-    <Button
-        android:id="@+id/profile_button"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_row1"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:backgroundTint="@android:color/transparent"
-        android:includeFontPadding="false"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/profile_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toStartOf="@+id/interests_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topToolbar"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
+        android:layout_marginTop="20dp"
+        app:constraint_referenced_ids="profile_button,friends_button,events_button,guide_button"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalGap="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar" />
 
-    <Button
-        android:id="@+id/interests_button"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_row2"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/interests_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toStartOf="@+id/motivation_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_of_view="@+id/profile_button"
-        app:layout_constraintStart_toEndOf="@+id/profile_button"
-        app:layout_constraintTop_toBottomOf="@+id/topToolbar"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
+        android:layout_marginTop="12dp"
+        app:constraint_referenced_ids="community_button,interests_button,motivation_button"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalGap="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toBottomOf="@id/flow_row1" />
 
-    <Button
-        android:id="@+id/motivation_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/motivation_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toStartOf="@+id/community_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_of_view="@+id/interests_button"
-        app:layout_constraintStart_toEndOf="@+id/interests_button"
-        app:layout_constraintTop_toBottomOf="@+id/topToolbar"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
+    <Button style="@style/PillButton" android:id="@+id/profile_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profile" />
+    <Button style="@style/PillButton" android:id="@+id/friends_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Friends" />
+    <Button style="@style/PillButton" android:id="@+id/events_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Events" />
+    <Button style="@style/PillButton" android:id="@+id/guide_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Guides" />
+    <Button style="@style/PillButton" android:id="@+id/community_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Community" />
+    <Button style="@style/PillButton" android:id="@+id/interests_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Interests" />
+    <Button style="@style/PillButton" android:id="@+id/motivation_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Motivation" />
 
-    <Button
-        android:id="@+id/community_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="16dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/community_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/motivation_button"
-        app:layout_constraintTop_toBottomOf="@+id/topToolbar"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
-
-    <!-- Second Row of Buttons -->
-    <Button
-        android:id="@+id/friends_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/friends_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toStartOf="@+id/events_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_button"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
-
-    <Button
-        android:id="@+id/events_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/events_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toStartOf="@+id/guide_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/friends_button"
-        app:layout_constraintTop_toBottomOf="@+id/profile_button"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
-
-    <Button
-        android:id="@+id/guide_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/guide_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/events_button"
-        app:layout_constraintTop_toBottomOf="@+id/profile_button"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
+    <!--Body-->
 
     <ScrollView
         android:layout_width="match_parent"
@@ -227,64 +145,25 @@
                 android:padding="16dp">
 
             <TextView
+                android:id="@+id/dynamic_guide_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#9BB194"
                 android:gravity="center"
                 android:padding="12dp"
-                android:text="@string/how_to_wifi_title"
+                tools:text="Guide Title Loads Here"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:text="@string/how_to_wifi_desc"
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
 
             <TextView
+                android:id="@+id/dynamic_guide_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="#9BB194"
-                android:gravity="center"
-                android:padding="12dp"
-                android:text="@string/how_to_connect_title"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:text="@string/how_to_connect_desc"
-                    android:textColor="#000000"
-                    android:lineSpacingExtra="4dp"
-                    android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#9BB194"
-                android:gravity="center"
-                android:padding="12dp"
-                android:text="@string/dealing_with_issues"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:text="@string/dealing_with_issues_desc"
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
+                android:padding="16dp"
+                tools:text="Guide description and contents will load here..."
+                android:textColor="#000000"
+                android:textSize="14sp" />
 
 
             <LinearLayout
@@ -342,6 +221,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="How can we improve?"
+                        android:inputType="textCapSentences"
                         android:padding="12dp"
                         android:background="@drawable/bg_edit_text_subtle"
                         android:minLines="3"
@@ -353,6 +233,8 @@
                         android:layout_height="wrap_content"
                         android:text="Submit Feedback"
                         android:layout_gravity="end"
+                        app:backgroundTint="#2F442F"
+                        android:textColor="#FFFFFF"
                         android:layout_marginTop="8dp" />
 
                 </LinearLayout>
@@ -386,6 +268,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ask a Question"
+                app:backgroundTint="#2F442F"
+                android:textColor="#FFFFFF"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp" />
         </LinearLayout>

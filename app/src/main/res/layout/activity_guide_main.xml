@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_guide_template"
+    android:background="#EAF1EA"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".GuideMainPageActivity">
@@ -18,6 +19,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="?attr/homeAsUpIndicator"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         <!-- Logo image on left -->
@@ -69,145 +71,200 @@
 
     <!--Toolbar Background -->
 
+<!--    <androidx.appcompat.widget.Toolbar-->
+<!--        android:id="@+id/main_page_toolbar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="135dp"-->
+<!--        android:background="#2F442F"-->
+<!--        android:backgroundTint="#2F442F"-->
+<!--        android:minHeight="?attr/actionBarSize"-->
+<!--        android:theme="?attr/actionBarTheme"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/topToolbar" />-->
+
+<!--    &lt;!&ndash; Top Row of Buttons &ndash;&gt;-->
+<!--    <Button-->
+<!--        android:id="@+id/profile_button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginTop="4dp"-->
+<!--        android:backgroundTint="@android:color/transparent"-->
+<!--        android:includeFontPadding="false"-->
+<!--        android:paddingStart="8dp"-->
+<!--        android:paddingEnd="8dp"-->
+<!--        android:text="@string/profile_button"-->
+<!--        app:cornerRadius="6dp"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/interests_button"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/topToolbar"-->
+<!--        app:strokeColor="@android:color/white"-->
+<!--        app:strokeWidth="1dp" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/interests_button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="4dp"-->
+<!--        android:backgroundTint="@android:color/transparent"-->
+<!--        android:paddingStart="8dp"-->
+<!--        android:paddingEnd="8dp"-->
+<!--        android:text="@string/interests_button"-->
+<!--        app:cornerRadius="6dp"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/motivation_button"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/profile_button"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/topToolbar"-->
+<!--        app:strokeColor="@android:color/white"-->
+<!--        app:strokeWidth="1dp" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/motivation_button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="4dp"-->
+<!--        android:backgroundTint="@android:color/transparent"-->
+<!--        android:paddingStart="8dp"-->
+<!--        android:paddingEnd="8dp"-->
+<!--        android:text="@string/motivation_button"-->
+<!--        app:cornerRadius="6dp"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/community_button"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/interests_button"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/topToolbar"-->
+<!--        app:strokeColor="@android:color/white"-->
+<!--        app:strokeWidth="1dp" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/community_button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="4dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:backgroundTint="@android:color/transparent"-->
+<!--        android:paddingStart="8dp"-->
+<!--        android:paddingEnd="8dp"-->
+<!--        android:text="@string/community_button"-->
+<!--        app:cornerRadius="6dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/motivation_button"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/topToolbar"-->
+<!--        app:strokeColor="@android:color/white"-->
+<!--        app:strokeWidth="1dp" />-->
+
+<!--    &lt;!&ndash; Second Row of Buttons &ndash;&gt;-->
+<!--    <Button-->
+<!--        android:id="@+id/friends_button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:backgroundTint="@android:color/transparent"-->
+<!--        android:paddingStart="8dp"-->
+<!--        android:paddingEnd="8dp"-->
+<!--        android:text="@string/friends_button"-->
+<!--        app:cornerRadius="6dp"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/events_button"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/profile_button"-->
+<!--        app:strokeColor="@android:color/white"-->
+<!--        app:strokeWidth="1dp" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/events_button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:backgroundTint="@android:color/transparent"-->
+<!--        android:paddingStart="8dp"-->
+<!--        android:paddingEnd="8dp"-->
+<!--        android:text="@string/events_button"-->
+<!--        app:cornerRadius="6dp"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/guide_button"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/friends_button"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/profile_button"-->
+<!--        app:strokeColor="@android:color/white"-->
+<!--        app:strokeWidth="1dp" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/guide_button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:backgroundTint="@android:color/transparent"-->
+<!--        android:paddingStart="8dp"-->
+<!--        android:paddingEnd="8dp"-->
+<!--        android:text="@string/guide_button"-->
+<!--        app:cornerRadius="6dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/events_button"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/profile_button"-->
+<!--        app:strokeColor="@android:color/white"-->
+<!--        app:strokeWidth="1dp" />-->
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_page_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="135dp"
+        android:layout_width="437dp"
+        android:layout_height="117dp"
+        android:layout_marginTop="64dp"
         android:background="#2F442F"
         android:backgroundTint="#2F442F"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.538"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topToolbar" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Top Row of Buttons -->
-    <Button
-        android:id="@+id/profile_button"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_row1"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:backgroundTint="@android:color/transparent"
-        android:includeFontPadding="false"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/profile_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toStartOf="@+id/interests_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topToolbar"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
+        android:layout_marginTop="20dp"
+        app:constraint_referenced_ids="profile_button,friends_button,events_button,guide_button"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalGap="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar" />
 
-    <Button
-        android:id="@+id/interests_button"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_row2"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/interests_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toStartOf="@+id/motivation_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/profile_button"
-        app:layout_constraintTop_toBottomOf="@+id/topToolbar"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
+        android:layout_marginTop="12dp"
+        app:constraint_referenced_ids="community_button,interests_button,motivation_button"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalGap="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toBottomOf="@id/flow_row1" />
 
-    <Button
-        android:id="@+id/motivation_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/motivation_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toStartOf="@+id/community_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/interests_button"
-        app:layout_constraintTop_toBottomOf="@+id/topToolbar"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
+    <Button style="@style/PillButton" android:id="@+id/profile_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profile" />
+    <Button style="@style/PillButton" android:id="@+id/friends_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Friends" />
+    <Button style="@style/PillButton" android:id="@+id/events_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Events" />
+    <Button style="@style/PillButton" android:id="@+id/guide_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Guides" />
+    <Button style="@style/PillButton" android:id="@+id/community_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Community" />
+    <Button style="@style/PillButton" android:id="@+id/interests_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Interests" />
+    <Button style="@style/PillButton" android:id="@+id/motivation_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Motivation" />
 
-    <Button
-        android:id="@+id/community_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="16dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/community_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/motivation_button"
-        app:layout_constraintTop_toBottomOf="@+id/topToolbar"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
-
-    <!-- Second Row of Buttons -->
-    <Button
-        android:id="@+id/friends_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/friends_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toStartOf="@+id/events_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_button"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
-
-    <Button
-        android:id="@+id/events_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/events_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toStartOf="@+id/guide_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/friends_button"
-        app:layout_constraintTop_toBottomOf="@+id/profile_button"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
-
-    <Button
-        android:id="@+id/guide_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:backgroundTint="@android:color/transparent"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/guide_button"
-        app:cornerRadius="6dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/events_button"
-        app:layout_constraintTop_toBottomOf="@+id/profile_button"
-        app:strokeColor="@android:color/white"
-        app:strokeWidth="1dp" />
+    <!--Body-->
 
     <ScrollView
         android:layout_width="match_parent"
@@ -223,6 +280,7 @@
 
             <!-- Category Header -->
             <TextView
+                android:id="@+id/tvCampusHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#9BB194"
@@ -244,6 +302,7 @@
                 tools:itemCount="4" />
 
             <TextView
+                android:id="@+id/tvAcademicHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#9BB194"
@@ -265,6 +324,7 @@
                 tools:itemCount="4" />
 
             <TextView
+                android:id="@+id/tvStudentLifeHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#9BB194"
@@ -286,6 +346,7 @@
                 tools:itemCount="4" />
 
             <TextView
+                android:id="@+id/tvOtherHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#9BB194"
