@@ -11,8 +11,9 @@ import java.util.UUID
 
 //Firestore Topic access is done through FirestoreDatabase.topics
 object TopicRepository {
-    private const val SYSTEM_USER = "system"
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance() //Call the singleton Firebase db instance
+    private const val SYSTEM_USER = "system" //change to rambo?
+    private val auth: FirebaseAuth =
+        FirebaseAuth.getInstance() //Call the singleton Firebase db instance
 
     //TODO: Only createTopic() is properly implemented. Revisit all. joinTopic() must update 3 documents in Firestore in a BATCH
     //TODO: WRITE, or else race conditions/write failures can be a problem. FS Docs for joinTopic update below
@@ -166,7 +167,7 @@ object TopicRepository {
                 onFailure(exception)
             }
     }
-    
+
     //This is "Broken" unless we decide to upgrade our Firebase plan.
     //It works but it doesn't actually upload images--saves them as a string and loads them if found locally on the device
     fun uploadImage(
@@ -212,70 +213,105 @@ object TopicRepository {
     topics/topicID/memberCount
     */
     // Allows a User to join a Topic as a member of the Community
-    fun joinTopic(
+    fun joinTopic(//joinTopicPressed
         topicID: String,
         onDone: (Boolean) -> Unit
     ) {
         val userID = FirestoreAuthManager.currentUserId ?: return
-
         //Validate user is not already a member here
-        //If already joined, call leave topic?
-        //if the TopicID is found in User's joinedTopics subcollection -> user is already a member
+        if (userID == null) {
+            println("Used ID auth failure in joinTopic->TopicRepo")
+            onDone(false)
+            return
+        }
+
+        val db = FirebaseFirestore.getInstance()
+        val batch = db.batch()
+
+        //Get reference for Topic being joined, member joining, and user joinedTopics list
+        val topicRef = db.collection("topics").document(topicID)
+        val memberRef = topicRef.collection("members").document(userID)
+        val userTopicRef = db.collection("users").document(userID)
+            .collection("joinedTopics")
+            .document(topicID)
 
 
-        //Otherwise, set the joining User to a member of Topic & save Timestamp of join date
+        // Data for topic membership - membership + join timestamp
         val memberData = hashMapOf(
             "role" to "member",
             "joinedAt" to FieldValue.serverTimestamp()
         )
 
-        //Open members subcollection and add new User who is joining
-        FirestoreDatabase.topics
-            .document(topicID)
-            .collection("members")
-            .document(userID)
-            .set(memberData)
-            .addOnSuccessListener {
-                //Increment member count of Topic
-                FirestoreDatabase.topics
-                    .document(topicID)
-                    .update("memberCount", FieldValue.increment(1))
-                    .addOnSuccessListener { onDone(true) }
-                    .addOnFailureListener { onDone(false) }
+        val userTopicData = hashMapOf(
+            "joinedAt" to FieldValue.serverTimestamp()
+        )
+        //if the TopicID is found in User's joinedTopics subcollection -> user is already a member
+
+        //Otherwise, set the joining User to a member of Topic & save Timestamp of join date
+
+        //if the TopicID is found in User's joinedTopics subcollection -> user is already a member
+        memberRef.get().addOnSuccessListener { doc ->
+            if (doc.exists()) { //If user has already joined (user has a reference in their joinedTopics in Firestore)
+                onDone(false) // already joined
+            } else { //Update the Firestore database
+                batch.set(memberRef, memberData)
+                batch.set(userTopicRef, userTopicData)
+                batch.update(topicRef, "memberCount", FieldValue.increment(1))
+
+                batch.commit()
+                    .addOnSuccessListener {
+                        println("User successfully joined topic")
+                        onDone(true)
+                    }
+                    .addOnFailureListener { e ->
+                        println("Join topic failed: ${e.message}")
+                        onDone(false)
+                    }
             }
-            .addOnFailureListener {
+        }
+
+        //Helper for join Topic--needs topicID passed, userID accessible from
+        //val userId = FirestoreAuthManager.currentUserId ?: return
+
+
+        //Allows a User to leave a Topic/Community
+        fun leaveTopic(
+            topicID: String,
+            onDone: (Boolean) -> Unit
+        ) {
+            val userID = FirestoreAuthManager.currentUserId
+            if (userID == null) {
                 onDone(false)
+                return
             }
+
+            val db = FirebaseFirestore.getInstance()
+            val batch = db.batch()
+
+            val topicRef = db.collection("topics").document(topicID)
+            val memberRef = topicRef.collection("members").document(userID)
+            val userTopicRef = db.collection("users")
+                .document(userID)
+                .collection("joinedTopics")
+                .document(topicID)
+
+            // Batch leave operations, update 3 firestore documents atomically
+            batch.delete(memberRef)
+            batch.delete(userTopicRef)
+            batch.update(topicRef, "memberCount", FieldValue.increment(-1))
+
+            batch.commit()
+                .addOnSuccessListener {
+                    println("User successfully left topic")
+                    onDone(true)
+                }
+                .addOnFailureListener { e ->
+                    println("Leave topic failed: ${e.message}")
+                    onDone(false)
+                }
+        }
     }
-
-
-
-    //Allows a User to leave a Topic/Community
-//    fun leaveTopic(
-//        topicID: String,
-//        onDone: (Boolean) -> Unit
-//    ) {
-//
-//        val userID = FirestoreAuthManager.currentUserId ?: return
-//
-//        //Open members subcollection and delete user by UserID in subcollection
-//        FirestoreDatabase.topics
-//            .document(topicID)
-//            .collection("members")
-//            .document(userID)
-//            .delete()
-//            .addOnSuccessListener {
-//
-//                FirestoreDatabase.topics
-//                    .document(topicID)
-//                    .update("memberCount", FieldValue.increment(-1))
-//                    .addOnSuccessListener { onDone(true) }
-//                    .addOnFailureListener { onDone(false) }
-//            }
-//            .addOnFailureListener {
-//                onDone(false)
-//            }
-//    }
+}
 
     //Topic Event functions
     /*
@@ -311,7 +347,3 @@ Create comments
 Load comments
 Like comment
  */
-
-
-
-}

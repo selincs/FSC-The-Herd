@@ -121,11 +121,18 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
 
         //Backend implementation for join button goes in here, at increment line
         holder.joinButton.setOnClickListener {
-            topic.incrementMembers()
-            holder.members.text = "${topic.memberCount} members"
-            holder.joinButton.text = "Joined"
-            Toast.makeText(holder.itemView.context,
-                "You joined ${topic.topicName}!", Toast.LENGTH_SHORT).show()
+            TopicRepository.joinTopic(topic.topicID) { success ->
+                if (success) {
+                    topic.incrementMembers()
+                    holder.members.text = "${topic.memberCount} members"
+                    holder.joinButton.text = "Joined"
+
+                    Toast.makeText(holder.itemView.context,
+                        "You joined ${topic.topicName}!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(holder.itemView.context, "Failed to join", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         holder.joinButton.setBackgroundColor(
