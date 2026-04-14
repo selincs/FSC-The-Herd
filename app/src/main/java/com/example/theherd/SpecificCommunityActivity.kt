@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import Model.Post
 
 class SpecificCommunityActivity : AppCompatActivity() {
 
@@ -22,18 +23,7 @@ class SpecificCommunityActivity : AppCompatActivity() {
 
     private val startCreatePost = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
-            val data = result.data
-            val title = data?.getStringExtra("POST_TITLE") ?: ""
-            val content = data?.getStringExtra("POST_CONTENT") ?: ""
-            val author = data?.getStringExtra("POST_AUTHOR") ?: PreferencesManager.getFullName(this)
-
-            val newPost = Post(title, content, author)
-            postsList.add(0, newPost)
-
-            postAdapter.notifyItemInserted(0)
-            findViewById<RecyclerView>(R.id.posts_recycler_view).scrollToPosition(0)
-
-            PreferencesManager.savePosts(this, communityName, postsList)
+           loadPostsFromFirestore()
         }
     }
 
@@ -103,16 +93,11 @@ class SpecificCommunityActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
 
         communityName = intent.getStringExtra("COMMUNITY_NAME") ?: "General"
+        //firestore path
+        val topicID = communityName.trim().lowercase()
         findViewById<TextView>(R.id.specificCommunityTitle).text = communityName
 
-        postsList.clear()
-        val savedPosts = PreferencesManager.loadPosts(this, communityName)
-        postsList.addAll(savedPosts)
 
-        if (postsList.isEmpty()) {
-            postsList.add(Post("Welcome!", "This is the start of the $communityName board.", "Admin"))
-            PreferencesManager.savePosts(this, communityName, postsList)
-        }
 
         val recyclerView: RecyclerView = findViewById(R.id.posts_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -120,9 +105,13 @@ class SpecificCommunityActivity : AppCompatActivity() {
         postAdapter = PostAdapter(postsList, communityName)
         recyclerView.adapter = postAdapter
 
+        loadPostsFromFirestore()
+
+
         findViewById<FloatingActionButton>(R.id.fabAddPost).setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             intent.putExtra("COMMUNITY_NAME", communityName)
+            intent.putExtra("TOPIC_ID", topicID)
             startCreatePost.launch(intent)
         }
         setupJoinLeaveSystem()
@@ -163,6 +152,20 @@ class SpecificCommunityActivity : AppCompatActivity() {
             Toast.makeText(this, "Left $communityName", Toast.LENGTH_SHORT).show()
 
             finish()
+        }
+
+
+    }
+    private fun loadPostsFromFirestore(){
+        postsList.clear()
+
+        val topicID = communityName.trim().lowercase()
+
+        PostRepository.getPosts(topicID){ posts ->
+            postsList.clear()
+            postsList.addAll(posts)
+            postAdapter.notifyDataSetChanged()
+
         }
     }
 }

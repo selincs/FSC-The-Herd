@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import Model.Post
 
 class PostAdapter(private val posts: List<Post>, private val communityName: String) :
     RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
@@ -24,15 +25,15 @@ class PostAdapter(private val posts: List<Post>, private val communityName: Stri
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = posts[position]
-        holder.title.text = post.title
-        holder.content.text = post.content
-        holder.user.text = "Posted by: ${post.author}"
+        holder.title.text = post.postTitle
+        holder.content.text = post.postContents
+        holder.user.text = "Posted by: ${post.postedByUID}"
 
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, PostDetailActivity::class.java)
 
-            intent.putExtra("SELECTED_POST", post)
+            intent.putExtra("POST_ID", post.postID)
             intent.putExtra("COMMUNITY_NAME", communityName)
 
             context.startActivity(intent)
