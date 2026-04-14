@@ -161,25 +161,12 @@ class TopicsActivity : AppCompatActivity() {
                                 createTopicInFirestore(name, desc, downloadUrl)
 
                                 //TODO: After creating a Topic, open its details page for the user
-                                //After creating a Topic, open its details page for the user
-//                                val intent = Intent(this@TopicsActivity, TopicDetailActivity::class.java)
-//                                intent.putExtra("topicName", name)
-//                                intent.putExtra("topicDesc", desc)
-//                                intent.putExtra("memberCount", 1)
-//                                intent.putExtra("topicID", name)
-//                                startActivity(intent)
                             },
                             onFailure = { exception ->
                                 Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT).show()
                                 createTopicInFirestore(name, desc, selectedImageUri!!.toString()) // Store locally
 
                                 //TODO: After creating a Topic, open its details page for the user
-                                val intent = Intent(this@TopicsActivity, TopicDetailActivity::class.java)
-//                                intent.putExtra("topicName", name)
-//                                intent.putExtra("topicDesc", desc)
-//                                intent.putExtra("memberCount", 1)
-                                intent.putExtra("topicID", name)
-                                startActivity(intent)
                             }
                         )
                     } else {
@@ -242,6 +229,14 @@ class TopicsActivity : AppCompatActivity() {
                 newTopic.isJoined = true
 
                 Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this, TopicDetailActivity::class.java)
+                intent.putExtra("topicID", name) // since name == ID in Firestore
+                intent.putExtra("topicName", name)
+                intent.putExtra("topicDesc", desc)
+                intent.putExtra("memberCount", 1)
+
+                startActivity(intent)
             },
             onFailure = { exception ->
                 Toast.makeText(this, exception.message ?: "Error: Failed to create topic", Toast.LENGTH_LONG).show()
