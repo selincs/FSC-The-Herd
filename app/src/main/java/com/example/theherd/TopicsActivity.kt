@@ -159,10 +159,27 @@ class TopicsActivity : AppCompatActivity() {
                             selectedImageUri!!,
                             onSuccess = { downloadUrl ->
                                 createTopicInFirestore(name, desc, downloadUrl)
+
+                                //TODO: After creating a Topic, open its details page for the user
+                                //After creating a Topic, open its details page for the user
+//                                val intent = Intent(this@TopicsActivity, TopicDetailActivity::class.java)
+//                                intent.putExtra("topicName", name)
+//                                intent.putExtra("topicDesc", desc)
+//                                intent.putExtra("memberCount", 1)
+//                                intent.putExtra("topicID", name)
+//                                startActivity(intent)
                             },
                             onFailure = { exception ->
                                 Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT).show()
                                 createTopicInFirestore(name, desc, selectedImageUri!!.toString()) // Store locally
+
+                                //TODO: After creating a Topic, open its details page for the user
+                                val intent = Intent(this@TopicsActivity, TopicDetailActivity::class.java)
+//                                intent.putExtra("topicName", name)
+//                                intent.putExtra("topicDesc", desc)
+//                                intent.putExtra("memberCount", 1)
+                                intent.putExtra("topicID", name)
+                                startActivity(intent)
                             }
                         )
                     } else {
@@ -222,8 +239,8 @@ class TopicsActivity : AppCompatActivity() {
             name,desc,Uri.parse(imageUrl),userID,
             onSuccess = { topicID ->
                 val newTopic = Topic(name, userID, desc, imageUrl)
-                topicsList.add(newTopic)
-                adapter.updateList(topicsList)
+                newTopic.isJoined = true
+
                 Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
             },
             onFailure = { exception ->

@@ -88,8 +88,7 @@ class TopicsAdapter(
         holder.description.text = topic.topicDesc
         holder.members.text = "${topic.memberCount} members"
 
-        //TODO: This is merged from AvSpr5, check if needed
-        //when a topic is clicked, open the it's details page
+        //when a topic is clicked, open its details page
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, TopicDetailActivity::class.java)

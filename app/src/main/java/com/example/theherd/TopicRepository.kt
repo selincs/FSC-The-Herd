@@ -15,15 +15,7 @@ object TopicRepository {
     private val auth: FirebaseAuth =
         FirebaseAuth.getInstance() //Call the singleton Firebase db instance
 
-    //TODO: Only createTopic() is properly implemented. Revisit all. joinTopic() must update 3 documents in Firestore in a BATCH
-    //TODO: WRITE, or else race conditions/write failures can be a problem. FS Docs for joinTopic update below
-    /*
-    topics/topicID/members/userID
-    users/userID/joinedTopics/topicID
-    topics/topicID/memberCount
-     */
-
-    //Create Topic atomically via batch
+    //Create Topic atomically via batch and upload batch to Firestore
     fun createTopic(
         topicName: String,
         topicDesc: String,
@@ -34,7 +26,7 @@ object TopicRepository {
     ) {
         val db = FirebaseFirestore.getInstance()
 
-        // Step 1: Prevent duplicate topic names
+        // Prevent duplicate topic names before creation
         db.collection("topics")
             .whereEqualTo("topicName", topicName.trim())
             .get()
@@ -169,7 +161,7 @@ object TopicRepository {
     }
 
     //This is "Broken" unless we decide to upgrade our Firebase plan.
-    //It works but it doesn't actually upload images--saves them as a string and loads them if found locally on the device
+    //It works but doesn't actually upload images--saves them as a string and loads them if found locally on the device
     fun uploadImage(
         context: Context,
         imageUri: Uri,
@@ -210,7 +202,7 @@ object TopicRepository {
     users/userID/joinedTopics/topicID -> Stores the Topic ID in the Users joined topics list
     topics/topicID/memberCount -> Updates member count in the Topic
     */
-    // Allows a User to join a Topic as a member of the Community
+    // Allows a User to join a Topic as a member of the Community in Firestore database
     fun joinTopic(//joinTopicPressed
         topicID: String,
         onDone: (Boolean) -> Unit
@@ -270,7 +262,7 @@ object TopicRepository {
         }
     }
 
-        //Allows a User to leave a Topic/Community
+        //Allows a User to leave a Topic/Community in Firestore db, update same 3 documents join references above
         fun leaveTopic(
             topicID: String,
             onDone: (Boolean) -> Unit
@@ -309,6 +301,7 @@ object TopicRepository {
                 }
         }
 
+    //Retrieves all the topics a user has joined from Firestore, and loads button state based off boolean state
     fun getUserJoinedTopicIDs(
         onSuccess: (Set<String>) -> Unit,
         onFailure: (Exception) -> Unit
@@ -366,7 +359,7 @@ object TopicRepository {
 /*
 Create a Topic X
 Load a Topic’s CommunityBoard X
-Join/leave a Topic
+Join/leave a Topic X
 //Event stuff in Topic needs thought
 
 Create Posts
