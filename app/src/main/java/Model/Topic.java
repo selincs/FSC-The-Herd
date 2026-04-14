@@ -1,6 +1,9 @@
 package Model;
 
+import com.example.theherd.R;
+
 import java.util.List;
+import java.util.UUID;
 
 /*  TODO: The Topic class is :
     -Searchable (by String topicName)
@@ -8,7 +11,7 @@ import java.util.List;
     -Can be created by a user if the Topic doesn't exist
     -Has posts in the community board -> Posts have likes and comments. Other things? Post class, member of Community Board?
     -Has members (memberIDs, memberCount for displaying these values)
-    TODO: Is a Topic *DIFFERENT* than a CommunityBoard? What is different? Do we need both classes?
+
     Searching Chess will display:
     -Relevant Community Board (Member count, active this week, new posts today)
     -Events (Next 0-3?)
@@ -21,17 +24,73 @@ import java.util.List;
 */
 
 public class Topic {
-    private String topicID;
+    private final String topicID;
+    private CommunityBoard communityBoard;
     private final String topicName;
     private String topicDesc;   //topic description
     private String creatorID;   //The user who created the Topic
     private int memberCount;
     private List<String> memberIDs; //IDs of all participating members
     //communityBoard - What is a community board? Just a list of Posts?
+    private int imageResId;     // <-- New field for topic image resource
+    private String imageUriString; // <-- New field for uploaded images
 
-    public Topic(String topicName) {
-        this.topicName = topicName;
+    //TODO: Fix these constructors to work with Uri Strings instead of int resId -> Remove unneeded constructors
+    //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
+    // Constructor for default drawable image
+    public Topic(String topicName, String creatorID, String topicDesc, int imageResId) {
+        this.topicName = topicName.trim();
+//        this.topicID = UUID.randomUUID().toString();
+        this.topicID = topicName.trim();
+        this.topicDesc = topicDesc;
+        this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
+        this.imageResId = imageResId;
+        this.imageUriString = null; // no uploaded image
+    }
+
+    // Constructor for uploaded image
+    public Topic(String topicName, String creatorID, String topicDesc, String imageUriString) {
+        this.topicName = topicName;
+        this.topicID = topicName.trim();
+        this.topicDesc = topicDesc;
+        this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
+        this.memberCount = 0;
+        this.imageResId = 0;       // no drawable
+        this.imageUriString = imageUriString;
+    }
+
+    //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
+    //Imageless constructor, currently sets to herd logo
+    public Topic(String topicName, String creatorID, String topicDesc) {
+        this.topicName = topicName;
+//        this.topicID = UUID.randomUUID().toString(); //Generate a random final ID for the new Topic
+        this.topicID = topicName.trim();
+        this.topicDesc = topicDesc;
+        // this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
+        this.memberCount = 0;
+        this.imageResId = R.drawable.marquee_logo;
+    }
+
+    // Test party merging constructor, clean these up once Firestore is working if we don't need all these fields, likely we do
+    public Topic(String topicID, String topicName, String creatorID, String topicDesc, String imageUriString) {
+        this.topicID = topicID;
+        this.topicName = topicName;
+        this.creatorID = creatorID;
+        this.topicDesc = topicDesc;
+        this.memberCount = 1;   //Creator is the only member
+        this.imageUriString = imageUriString;
+    }
+
+    //Constructor to load a Topic from Firestore
+    public Topic(String topicID, String topicName, String creatorID, String topicDesc, String imageUriString, int memberCount) {
+        this.topicID = topicID;
+        this.topicName = topicName;
+        this.creatorID = creatorID;
+        this.topicDesc = topicDesc;
+        this.memberCount = memberCount;
+        this.imageResId = 0;       // no drawable -> remove?
+        this.imageUriString = imageUriString;
     }
 
     public String getTopicName() {
@@ -51,4 +110,51 @@ public class Topic {
             memberCount--;
         }
     }
+
+    public String getTopicID() {
+        return topicID;
+    }
+
+    public String getTopicDesc() {
+        return topicDesc;
+    }
+
+    public void setTopicDesc(String topicDesc) {
+        this.topicDesc = topicDesc;
+    }
+
+    public String getCreatorID() {
+        return creatorID;
+    }
+
+    public void setCreatorID(String creatorID) {
+        this.creatorID = creatorID;
+    }
+
+    public CommunityBoard getCommunityBoard() {
+        return communityBoard;
+    }
+
+    public void setCommunityBoard(CommunityBoard communityBoard) {
+        this.communityBoard = communityBoard;
+    }
+
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
+    public List<String> getMemberIDs() {
+        return memberIDs;
+    }
+
+    public void setMemberIDs(List<String> memberIDs) {
+        this.memberIDs = memberIDs;
+    }
+    // New getter/setter for image
+    public int getImageResId() { return imageResId; }
+    public void setImageResId(int imageResId) { this.imageResId = imageResId; }
+
+    // New getters/setters for images
+    public String getImageUriString() { return imageUriString; }
+    public void setImageUriString(String imageUriString) { this.imageUriString = imageUriString; }
 }

@@ -8,9 +8,10 @@
 
     <!-- Settings menu -->
     <string name="logout_option">Logout</string>
+    <string name="account_settings">Account Settings</string>
 
     <!-- Sign Up Page -->
-    <string name="sign_up_title">Sign - Up</string>
+    <string name="sign_up_title">Sign Up</string>
     <string name="app_logo_desc">App Logo</string>
 
     <string name="first_name">First Name</string>
@@ -79,4 +80,8 @@
     <string name="clubs">Clubs</string>
     <string name="miscellaneous">Miscellaneous</string>
     <string name="health_and_wellness">Health and Wellness</string>
+    <string-array name="sort_options">
+        <item>Newest</item>
+        <item>Oldest</item>
+    </string-array>
 </resources>

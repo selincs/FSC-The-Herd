@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "889493188167",
+    "project_id": "the-herd-d615a",
+    "storage_bucket": "the-herd-d615a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:889493188167:android:a8402db36372d1a414cb62",
+        "android_client_info": {
+          "package_name": "com.example.theherd"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-EOG6ywhFHBVaUyA1KNXccAIiZiTQcig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

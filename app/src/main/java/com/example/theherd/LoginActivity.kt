@@ -12,10 +12,19 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //Auto Login Check before Login View is Set, commented out for now -> Broken, revisit when theres time
+//        if (FirestoreAuthManager.auth.currentUser != null) {
+//            println("User already logged in, skipping login screen")
+//            startActivity(Intent(this, MainActivity::class.java))
+//            finish()
+//            return
+//        }
+
         setContentView(R.layout.activity_login) // connects XML
 
         // text fields
-        val emailField = findViewById<EditText>(R.id.emailField)
+        val emailUsernameField  = findViewById<EditText>(R.id.emailUsernameField)
         val passwordField = findViewById<EditText>(R.id.passwordField)
 
         // buttons
@@ -27,46 +36,28 @@ class LoginActivity : AppCompatActivity() {
 
         // login button onclick listener
         loginButton.setOnClickListener {
-            val email = emailField.text.toString()
+            val emailUsername = emailUsernameField.text.toString()
             val password = passwordField.text.toString()
+
+            // build full FSC email
+            val email = "$emailUsername@farmingdale.edu"
 
             println("in loginButton event listener")
             when {
-                email.isEmpty() || password.isEmpty() -> {
+                emailUsername.isEmpty() || password.isEmpty() -> {
                     validationField.text = "Error: Please enter a username and password"
-                }
-                !validLogin(email, password) -> {
-                    validationField.text = "Error: Invalid username or password"
                 }
                 else -> {
                     validationField.text = ""
-                    Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
 
-                    //Selin Entry
-                    // > Get the user from FakeUserDatabase
-                    val user = FakeUserDatabase.findUserByEmail(email)
-                    println("User found in Login DB : " + user.toString())
-
-                    // > Get the user's profile using their userID
-                    val profile = user?.let {
-                        FakeUserDatabase.getProfileByUserId(it.getUserID())
+                    UserRepository.login(email, password) { success ->
+                        if (success) {
+                            Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this, MainActivity::class.java))
+                        } else {
+                            validationField.text = "Error: Invalid username or password"
+                        }
                     }
-                    println("Logging in to User profile : " + profile.toString())
-
-                    // > Only login if both profile and class exist, otherwise null issue somewhere
-                    if (user != null && profile != null) {
-                        SessionManager.login(user, profile)
-                        //Retrieving user info from Session Manager
-                        println("Logging in to : " + SessionManager.getUser().toString())
-                        println("Logged in User full name : " + SessionManager.getProfile().toString())
-                    }
-
-                    //End selin entry
-
-                    println("before creating intent:")
-                    val intent = Intent(this, MainActivity::class.java)
-                    println("before startActivity:")
-                    startActivity(intent)
                 }
             }
         }
@@ -79,14 +70,4 @@ class LoginActivity : AppCompatActivity() {
         }
 
     }
-
-    /**
-     * validEmail: checks if the user entered a valid email
-     */
-    fun validLogin(email: String, password: String): Boolean {
-        // if (email.isEmpty() || )
-//        return true
-        return FakeUserDatabase.validateLogin(email, password) //Selin entry- temp till Firestore integration
-    }
-
 }

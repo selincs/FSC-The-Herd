@@ -57,7 +57,8 @@
             android:contentDescription="@string/settings_desc"
             app:tint="@android:color/white"
             android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"/>
 
         <!-- Home button -->
         <ImageButton
@@ -69,7 +70,8 @@
             android:contentDescription="@string/home_desc"
             app:tint="@android:color/white"
             android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"/>
     </androidx.appcompat.widget.Toolbar>
     <!-- Footer -->
     <LinearLayout
@@ -158,17 +160,84 @@
                 android:autofillHints="familyName"
                 android:layout_marginBottom="12dp"/>
 
-            <!-- FSC email -->
-            <EditText
-                android:id="@+id/emailField"
+            <!-- FSC email input with fixed domain -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical">
+
+                <!-- Editable username part -->
+                <EditText
+                    android:id="@+id/emailUsernameField"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="Enter your FSC email"
+                    android:inputType="textEmailAddress"
+                    android:paddingHorizontal="8dp"/>
+
+                <!-- Fixed domain -->
+                <TextView
+                    android:id="@+id/emailDomain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="\@farmingdale.edu"
+                    android:gravity="center_vertical"
+                    android:paddingStart="4dp"
+                    android:textColor="#000"/>
+            </LinearLayout>
+
+            <!-- Graduation section with title -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:paddingVertical="12dp"
-                android:hint="@string/fsc_email"
-                android:inputType="textEmailAddress"
-                android:autofillHints="emailAddress"
-                android:layout_marginBottom="12dp"/>
+                android:orientation="vertical"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_horizontal">
+
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/graduationTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Expected  Graduation  Date"
+                    android:textSize="16sp"
+                    android:textColor="#2F442F"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center"/>
+
+                <!-- Spinners side by side -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:gravity="center_vertical">
+
+                    <!-- Season Spinner -->
+                    <Spinner
+                        android:id="@+id/graduationSeasonSpinner"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:spinnerMode="dropdown"
+                        android:padding="8dp"
+                        android:layout_marginEnd="8dp"/>
+
+                    <!-- Year Spinner -->
+                    <Spinner
+                        android:id="@+id/graduationYearSpinner"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:spinnerMode="dropdown"
+                        android:padding="8dp"
+                        android:layout_marginStart="8dp"/>
+                </LinearLayout>
+            </LinearLayout>
 
             <!-- Password -->
             <EditText
@@ -193,6 +262,16 @@
                 android:inputType="textPassword"
                 android:autofillHints="password"
                 android:layout_marginBottom="12dp"/>
+
+            <TextView
+                android:id="@+id/passwordHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Password must be at least 12 characters and include:\n• 1 uppercase letter\n• 1 lowercase letter\n• 1 digit\n• 1 special character"
+                android:textColor="#555555"
+                android:textSize="12sp"
+                android:lineSpacingExtra="2dp" />
 
             <!-- Validation message -->
             <TextView
@@ -221,12 +300,6 @@
                 android:text="Already have an account?"
                 android:layout_marginBottom="8dp"/>
 
-            <!-- Already have account -->
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Already have an account?"-->
-<!--                android:layout_marginBottom="8dp"/>-->
 
             <!-- Login btn -->
             <androidx.appcompat.widget.AppCompatButton

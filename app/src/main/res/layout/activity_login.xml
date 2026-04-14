@@ -57,7 +57,8 @@
             android:contentDescription="@string/settings_desc"
             app:tint="@android:color/white"
             android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"/>
 
         <!-- Home button -->
         <ImageButton
@@ -69,7 +70,8 @@
             android:contentDescription="@string/home_desc"
             app:tint="@android:color/white"
             android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"/>
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -121,17 +123,35 @@
                 android:contentDescription="@string/app_logo_desc"
                 android:layout_marginBottom="24dp"/>
 
-            <!-- Email -->
-            <EditText
-                android:id="@+id/emailField"
+            <!-- FSC email input with fixed domain -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:paddingVertical="12dp"
-                android:hint="@string/fsc_email"
-                android:inputType="textEmailAddress"
-                android:autofillHints="emailAddress"
-                android:layout_marginBottom="12dp"/>
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical">
+
+                <!-- Editable username part -->
+                <EditText
+                    android:id="@+id/emailUsernameField"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="Enter your FSC email"
+                    android:inputType="textEmailAddress"
+                    android:autofillHints="username"
+                    android:paddingHorizontal="8dp"/>
+
+                <!-- Fixed domain -->
+                <TextView
+                    android:id="@+id/emailDomain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="\@farmingdale.edu"
+                    android:gravity="center_vertical"
+                    android:paddingStart="4dp"
+                    android:textColor="#000"/>
+            </LinearLayout>
 
             <!-- Password -->
             <EditText
@@ -155,7 +175,7 @@
                 android:layout_marginBottom="24dp"/>
 
             <!-- Login Button -->
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/loginButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -172,7 +192,7 @@
                 android:layout_marginBottom="8dp"/>
 
             <!-- Sign Up Button -->
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/signUpButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
