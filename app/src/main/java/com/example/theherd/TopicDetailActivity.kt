@@ -11,6 +11,7 @@ import android.widget.ImageButton
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import com.google.firebase.firestore.FirebaseFirestore
 
 class TopicDetailActivity : AppCompatActivity() {
     private var currentMonth: YearMonth = YearMonth.now()
@@ -23,19 +24,60 @@ class TopicDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_topic_detail)
 
-        val name = intent.getStringExtra("topicName")
         val joinButton = findViewById<Button>(R.id.joinButton)
-        val desc = intent.getStringExtra("topicDesc")
-        val members = intent.getIntExtra("memberCount", 0)
+//        val name = intent.getStringExtra("topicName")
+//        val desc = intent.getStringExtra("topicDesc")
+//        val members = intent.getIntExtra("memberCount", 0)
+
+        val topicID = intent.getStringExtra("topicID") ?: return
+//        val name = intent.getStringExtra("topicName") ?: return
+//        val topicDesc = intent.getStringExtra("topicDesc") ?: return
+//        val memberCount = intent.getStringExtra("memberCount") ?: return
+
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("topics")
+            .document(topicID)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    //If document exists, load the needed fields from Firestore
+                    val name = document.getString("topicName") ?: ""
+                    val desc = document.getString("topicDesc") ?: ""
+                    val memberCount = document.getLong("memberCount")?.toInt() ?: 0
+                    val timestamp = document.getTimestamp("createdAt")
+
+                    //TODO:Revisit if Joined (btn state) logic needs to come in here as well
+
+                    // Convert Firestore timestamp into a readable string
+                    val formattedDate = if (timestamp != null) {
+                        val sdf = java.text.SimpleDateFormat("MMM dd, yyyy hh:mm a", java.util.Locale.getDefault())
+                        sdf.format(timestamp.toDate())
+                    } else {
+                        "Unknown"
+                    }
+
+                    // Update TopicDetails GUI
+                    findViewById<TextView>(R.id.detailTopicName).text = name
+                    findViewById<TextView>(R.id.detailDescription).text = desc
+                    findViewById<TextView>(R.id.detailMembers).text = "$memberCount members"
+                    findViewById<TextView>(R.id.detailCreatedAt).text = formattedDate
+                    println("TopicDetails success in listener, Document FOUND: ${document.id}")
+                }
+            }
+            .addOnFailureListener {
+                println("TopicDetailsActivity listener failure for $topicID")
+                Toast.makeText(this, "Failed to load topic", Toast.LENGTH_SHORT).show()
+            }
 
         //TODO in FIRESTORE this is the creation date of when the topic was created
-        val createdAt = intent.getStringExtra("createdAt")
-        findViewById<TextView>(R.id.detailCreatedAt).text =
-            "$createdAt"
-
-        findViewById<TextView>(R.id.detailTopicName).text = name
-        findViewById<TextView>(R.id.detailDescription).text = desc
-        findViewById<TextView>(R.id.detailMembers).text = "$members members"
+//        val createdAt = intent.getStringExtra("createdAt")
+//        findViewById<TextView>(R.id.detailCreatedAt).text =
+//            "$createdAt"
+//
+//        findViewById<TextView>(R.id.detailTopicName).text = name
+//        findViewById<TextView>(R.id.detailDescription).text = desc
+//        findViewById<TextView>(R.id.detailMembers).text = "$members members"
 
         grid = findViewById(R.id.calendarGrid)
         monthTitle = findViewById(R.id.monthTitle)
@@ -52,6 +94,7 @@ class TopicDetailActivity : AppCompatActivity() {
 
         updateCalendar()
 
+        //TODO: Fix join button logic to match list logic
         //join button logic
         updateJoinUI(joinButton, isJoined)
         joinButton.setOnClickListener {
@@ -62,10 +105,10 @@ class TopicDetailActivity : AppCompatActivity() {
 
             if (isJoined) {
                 membersText.text = "${currentText + 1} members"
-                Toast.makeText(this, "You joined $name!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "You joined $topicID!", Toast.LENGTH_SHORT).show()
             } else {
                 membersText.text = "${currentText - 1} members"
-                Toast.makeText(this, "You left $name!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "You left $topicID!", Toast.LENGTH_SHORT).show()
             }
 
             updateJoinUI(joinButton, isJoined)

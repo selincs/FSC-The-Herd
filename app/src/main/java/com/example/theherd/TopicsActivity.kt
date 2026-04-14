@@ -158,20 +158,19 @@ class TopicsActivity : AppCompatActivity() {
                             this, // pass activity context to uploadImage in TopicRepository
                             selectedImageUri!!,
                             onSuccess = { downloadUrl ->
+                                //Create the Topic and open its details page
                                 createTopicInFirestore(name, desc, downloadUrl)
-
-                                //TODO: After creating a Topic, open its details page for the user
                             },
                             onFailure = { exception ->
                                 Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT).show()
+                                //Create the Topic and open its details page
                                 createTopicInFirestore(name, desc, selectedImageUri!!.toString()) // Store locally
-
-                                //TODO: After creating a Topic, open its details page for the user
                             }
                         )
                     } else {
                         // No image selected -> use default
                         println("No image selected, using default, Topic created in FS")
+                        //Create the Topic and open its details page
                         createTopicInFirestore(name, desc, "default")
                     }
                 }
@@ -231,7 +230,8 @@ class TopicsActivity : AppCompatActivity() {
                 Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
 
                 val intent = Intent(this, TopicDetailActivity::class.java)
-                intent.putExtra("topicID", name) // since name == ID in Firestore
+                //TODO: Review, should I just pass the firestore fields here as a extra in the intent?
+                intent.putExtra("topicID", topicID)
                 intent.putExtra("topicName", name)
                 intent.putExtra("topicDesc", desc)
                 intent.putExtra("memberCount", 1)

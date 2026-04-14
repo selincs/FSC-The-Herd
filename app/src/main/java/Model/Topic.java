@@ -41,9 +41,8 @@ public class Topic {
     //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
     // Constructor for default drawable image
     public Topic(String topicName, String creatorID, String topicDesc, int imageResId) {
-        this.topicName = topicName.trim();
-//        this.topicID = UUID.randomUUID().toString();
-        this.topicID = topicName.trim();
+        this.topicName = topicName.trim().toLowerCase();
+        this.topicID = topicName.trim().toLowerCase();
         this.topicDesc = topicDesc;
         this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
@@ -53,8 +52,8 @@ public class Topic {
 
     // Constructor for uploaded image
     public Topic(String topicName, String creatorID, String topicDesc, String imageUriString) {
-        this.topicName = topicName;
-        this.topicID = topicName.trim();
+        this.topicName = topicName.trim().toLowerCase();
+        this.topicID = topicName.trim().toLowerCase();
         this.topicDesc = topicDesc;
         this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
@@ -66,9 +65,8 @@ public class Topic {
 
     //Imageless constructor, currently sets to herd logo
     public Topic(String topicName, String creatorID, String topicDesc) {
-        this.topicName = topicName;
-//        this.topicID = UUID.randomUUID().toString(); //Generate a random final ID for the new Topic
-        this.topicID = topicName.trim();
+        this.topicName = topicName.trim().toLowerCase();
+        this.topicID = topicName.trim().toLowerCase();
         this.topicDesc = topicDesc;
         // this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
         this.memberCount = 0;
@@ -77,8 +75,8 @@ public class Topic {
 
     // Test party merging constructor, clean these up once Firestore is working if we don't need all these fields, likely we do
     public Topic(String topicID, String topicName, String creatorID, String topicDesc, String imageUriString) {
-        this.topicID = topicID;
-        this.topicName = topicName;
+        this.topicID = topicID.trim().toLowerCase();
+        this.topicName = topicName.trim().toLowerCase();
         this.creatorID = creatorID;
         this.topicDesc = topicDesc;
         this.memberCount = 1;   //Creator is the only member
@@ -87,8 +85,8 @@ public class Topic {
 
     //Constructor to load a Topic from Firestore
     public Topic(String topicID, String topicName, String topicDesc, String imageUriString, int memberCount) {
-        this.topicID = topicID;
-        this.topicName = topicName;
+        this.topicID = topicID.trim().toLowerCase();
+        this.topicName = topicName.trim().toLowerCase();
         this.topicDesc = topicDesc;
         this.memberCount = memberCount;
         this.imageUriString = imageUriString;

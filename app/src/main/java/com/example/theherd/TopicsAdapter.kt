@@ -93,7 +93,9 @@ class TopicsAdapter(
             val context = holder.itemView.context
             val intent = Intent(context, TopicDetailActivity::class.java)
 
-            // Pass topic data
+            //TODO:Integrate backend here
+            // Pass topic data to details page
+            intent.putExtra("topicID", topic.topicID)
             intent.putExtra("topicName", topic.topicName)
             intent.putExtra("topicDesc", topic.topicDesc)
             intent.putExtra("memberCount", topic.memberCount)
@@ -140,19 +142,11 @@ class TopicsAdapter(
         // ---------------- JOIN / UNJOIN ----------------
         fun updateButtonUI() {
             if (topic.isJoined) {
-//                holder.joinButton.text = "Joined"
-//                holder.joinButton.setBackgroundColor(
-//                    android.graphics.Color.parseColor("#2F442F")
-//                )
                 holder.joinButton.text = "Leave"
                 holder.joinButton.setBackgroundColor(
                     android.graphics.Color.GRAY
                 )
             } else {
-//                holder.joinButton.text = "Join"
-//                holder.joinButton.setBackgroundColor(
-//                    android.graphics.Color.GRAY
-//                )
                 holder.joinButton.text = "Join"
                 holder.joinButton.setBackgroundColor(
                     android.graphics.Color.parseColor("#2F442F")
