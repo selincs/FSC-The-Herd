@@ -46,7 +46,10 @@ class TopicsActivity : AppCompatActivity() {
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
 
         // toolbar
-        val toolbar: Toolbar = findViewById(R.id.topToolbar)
+        val toolbar = findViewById<Toolbar>(R.id.includedToolbar)
+//        val toolbar: Toolbar = findViewById(R.id.topToolbar)
+
+        setSupportActionBar(toolbar)
         val homeButton: ImageButton = findViewById(R.id.homeButton)
         setSupportActionBar(toolbar)
 
