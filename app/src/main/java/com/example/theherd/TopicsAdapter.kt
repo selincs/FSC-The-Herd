@@ -89,7 +89,7 @@ class TopicsAdapter(
         holder.members.text = "${topic.memberCount} members"
 
         //TODO: This is merged from AvSpr5, check if needed
-        //when a topic is clicked
+        //when a topic is clicked, open the it's details page
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, TopicDetailActivity::class.java)
@@ -141,14 +141,22 @@ class TopicsAdapter(
         // ---------------- JOIN / UNJOIN ----------------
         fun updateButtonUI() {
             if (topic.isJoined) {
-                holder.joinButton.text = "Joined"
-                holder.joinButton.setBackgroundColor(
-                    android.graphics.Color.parseColor("#2F442F")
-                )
-            } else {
-                holder.joinButton.text = "Join"
+//                holder.joinButton.text = "Joined"
+//                holder.joinButton.setBackgroundColor(
+//                    android.graphics.Color.parseColor("#2F442F")
+//                )
+                holder.joinButton.text = "Leave"
                 holder.joinButton.setBackgroundColor(
                     android.graphics.Color.GRAY
+                )
+            } else {
+//                holder.joinButton.text = "Join"
+//                holder.joinButton.setBackgroundColor(
+//                    android.graphics.Color.GRAY
+//                )
+                holder.joinButton.text = "Join"
+                holder.joinButton.setBackgroundColor(
+                    android.graphics.Color.parseColor("#2F442F")
                 )
             }
             holder.joinButton.setTextColor(android.graphics.Color.WHITE)
@@ -156,7 +164,7 @@ class TopicsAdapter(
 
         // Set initial UI state & button state based on whether a user has joined a topic
         topic.isJoined = joinedTopicIDs.contains(topic.topicID) //button state from joinedList
-        updateButtonUI()    //update UI
+        updateButtonUI()    //update UI & set initial state after loading joined state
 
         //Action a user states on joinButton press -> If Join->Join topic, if Joined->Leave Topic
         holder.joinButton.setOnClickListener {
@@ -208,8 +216,6 @@ class TopicsAdapter(
             }
         }
     }
-
-
 
         override fun getItemCount(): Int = topics.size
 
