@@ -197,7 +197,7 @@
                         android:gravity="center"
                         android:lineSpacingExtra="4dp"
                         android:padding="24dp"
-                        android:text="How wonderful it is that nobody need wait a single moment before starting to improve the world \n- Anne Frank"
+                        android:text="How wonderful it is that nobody need wait a single moment before starting to improve the world \n\n\n- Anne Frank"
                         android:textAlignment="center"
                         android:textColor="#FCF5FD"
                         android:textSize="20sp"
@@ -221,7 +221,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:padding="24dp"
-                    android:text="Nothing is impossible, the word itself says 'I'm possible!' \n- Audrey Hepburn"
+                    android:text="Nothing is impossible, the word itself says 'I'm possible!' \n\n\n- Audrey Hepburn"
                     android:textSize="16sp"
                     android:textColor="#FCF5FD"
                     android:textStyle="bold"
@@ -232,7 +232,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:padding="24dp"
-                    android:text="If you can dream it, you can do it. \n- Walt Disney"
+                    android:text="If you can dream it, you can do it. \n\n\n- Walt Disney"
                     android:textSize="16sp"
                     android:textColor="#FCF5FD"
                     android:textStyle="bold"
@@ -278,7 +278,7 @@
                             android:layout_height="75dp"
                             android:layout_marginEnd="12dp"
                             app:cardCornerRadius="12dp"
-                            app:cardElevation="4dp"
+                            app:cardElevation="0dp"
                             app:strokeWidth="2dp"
                             app:strokeColor="#CCCCCC">
 
@@ -311,7 +311,7 @@
                             android:layout_height="75dp"
                             android:layout_marginEnd="12dp"
                             app:cardCornerRadius="12dp"
-                            app:cardElevation="3dp"
+                            app:cardElevation="0dp"
                             app:cardBackgroundColor="#F8F9FA">
 
                             <LinearLayout
