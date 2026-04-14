@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/motivationLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EAF1EA"
+    tools:context=".MotivationActivity">
+
+    <!-- Top bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/topToolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#2F442F"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@mipmap/ic_launcher"
+            android:contentDescription="@string/logo_desc"
+            android:layout_marginStart="8dp"
+            android:layout_gravity="start|center_vertical" />
+
+        <TextView
+            android:id="@+id/guides_main_page_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/toolbar_title"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:layout_marginStart="8dp"
+            android:layout_gravity="start|center_vertical" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_settings"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/settings_desc"
+            app:tint="@android:color/white"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"/>
+
+        <ImageButton
+            android:id="@+id/homeButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_home"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/home_desc"
+            app:tint="@android:color/white"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"/>
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_page_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="117dp"
+        android:background="#2F442F"
+        android:paddingBottom="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topToolbar" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_row1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:constraint_referenced_ids="profile_button,friends_button,events_button,guide_button"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalGap="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/main_page_toolbar" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_row2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:constraint_referenced_ids="community_button,interests_button,motivation_button"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalGap="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/main_page_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/main_page_toolbar"
+        app:layout_constraintTop_toBottomOf="@id/flow_row1" />
+
+    <Button style="@style/PillButton" android:id="@+id/profile_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/profile_button" />
+    <Button style="@style/PillButton" android:id="@+id/friends_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/friends_button" />
+    <Button style="@style/PillButton" android:id="@+id/events_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/events_button" />
+    <Button style="@style/PillButton" android:id="@+id/guide_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/guide_button" />
+    <Button style="@style/PillButton" android:id="@+id/community_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/community_button" />
+    <Button style="@style/PillButton" android:id="@+id/interests_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/interests_button" />
+    <Button style="@style/PillButton" android:id="@+id/motivation_button"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/motivation_button" />
+
+    <!--Body-->
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#EAF1EA"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/main_page_toolbar"
+        app:layout_constraintBottom_toTopOf="@id/footerLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Motivation"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#2F442F"
+                android:layout_gravity="center"
+                app:fontFamily="@font/merriweather"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="We rise with purpose, stand with power, and move with the unstoppable force of a ram."
+                android:textSize="18sp"
+                android:textColor="#2F442F"
+                android:textStyle="italic"
+                android:paddingTop="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_gravity="start"/>
+
+
+            <!--Quote Section-->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:layout_margin="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/motivation_image"
+                    android:contentDescription="motivation_ImageView"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#66000000"/>
+
+                <ViewFlipper
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoStart="true"
+                    android:flipInterval="5000"
+                    android:inAnimation="@android:anim/fade_in"
+                    android:outAnimation="@android:anim/fade_out">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/merriweather"
+                        android:gravity="center"
+                        android:lineSpacingExtra="4dp"
+                        android:padding="24dp"
+                        android:text="How wonderful it is that nobody need wait a single moment before starting to improve the world \n- Anne Frank"
+                        android:textAlignment="center"
+                        android:textColor="#FCF5FD"
+                        android:textSize="20sp"
+                        android:textStyle="italic"
+                        app:fontFamily="@font/merriweather" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="24dp"
+                    android:text="The question isn't who is going to let me; it's who is going to stop me. \n\n\n- Ayn Rand"
+                    android:textColor="#FCF5FD"
+                    android:textAlignment="center"
+                    android:textSize="20sp"
+                    android:textStyle="italic"
+                    app:fontFamily="@font/merriweather"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="24dp"
+                    android:text="Nothing is impossible, the word itself says 'I'm possible!' \n- Audrey Hepburn"
+                    android:textSize="16sp"
+                    android:textColor="#FCF5FD"
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="24dp"
+                    android:text="If you can dream it, you can do it. \n- Walt Disney"
+                    android:textSize="16sp"
+                    android:textColor="#FCF5FD"
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
+
+                </ViewFlipper>
+
+            </FrameLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="My Mentorships"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="16dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="8dp">
+
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="130dp"
+                            android:layout_height="75dp"
+                            android:layout_marginEnd="12dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="4dp"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="#CCCCCC">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="+"
+                                    android:textSize="24sp"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Find a Mentor"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"/>
+
+                            </LinearLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="130dp"
+                            android:layout_height="75dp"
+                            android:layout_marginEnd="12dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="3dp"
+                            app:cardBackgroundColor="#F8F9FA">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center_vertical"
+                                android:padding="12dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Rachel Green"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@android:color/black"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Mentor"
+                                    android:textSize="12sp"
+                                    android:layout_marginTop="4dp"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"/>
+
+
+
+
+                            </LinearLayout>
+
+
+
+
+
+                        </com.google.android.material.card.MaterialCardView>
+
+
+
+
+
+
+                    </LinearLayout>
+
+
+                </HorizontalScrollView>
+            </LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+    <!--Footer-->
+
+    <LinearLayout
+        android:id="@+id/footerLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#2F442F"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/footerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/footer_text"
+            android:textColor="#FCF5FD"
+            android:textSize="12sp" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

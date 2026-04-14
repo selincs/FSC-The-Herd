@@ -2,5 +2,7 @@
 <resources>
     <array name="preloaded_fonts" translatable="false">
         <item>@font/irish_grover</item>
+        <item>@font/merriweather</item>
+        <item>@font/merriweather_italic</item>
     </array>
 </resources>
