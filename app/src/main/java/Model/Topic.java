@@ -35,6 +35,8 @@ public class Topic {
     private int imageResId;     // <-- New field for topic image resource
     private String imageUriString; // <-- New field for uploaded images
 
+    private boolean isJoined = false;
+
     //TODO: Fix these constructors to work with Uri Strings instead of int resId -> Remove unneeded constructors
     //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
     // Constructor for default drawable image
@@ -109,6 +111,13 @@ public class Topic {
         if (memberCount > 0) {
             memberCount--;
         }
+    }
+    public boolean isJoined() {
+        return isJoined;
+    }
+
+    public void setJoined(boolean joined) {
+        isJoined = joined;
     }
 
     public String getTopicID() {
