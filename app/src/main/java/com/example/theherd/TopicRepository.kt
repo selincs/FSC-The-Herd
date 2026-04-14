@@ -205,12 +205,10 @@ object TopicRepository {
         }
     }
 
-    //TODO: joinTopic() must update 3 documents in Firestore in a BATCH
-    //TODO: WRITE, or else race conditions/write failures can be a problem. FS Docs for joinTopic update below
-    /*
-    topics/topicID/members/userID
-    users/userID/joinedTopics/topicID
-    topics/topicID/memberCount
+    /* Joining a Topic updates these 3 Firestore Documents:
+    topics/topicID/members/userID -> Stores userID in the Topic
+    users/userID/joinedTopics/topicID -> Stores the Topic ID in the Users joined topics list
+    topics/topicID/memberCount -> Updates member count in the Topic
     */
     // Allows a User to join a Topic as a member of the Community
     fun joinTopic(//joinTopicPressed
@@ -218,13 +216,14 @@ object TopicRepository {
         onDone: (Boolean) -> Unit
     ) {
         val userID = FirestoreAuthManager.currentUserId ?: return
-        //Validate user is not already a member here
+        //Get Firestore current user id and authenticate
         if (userID == null) {
             println("Used ID auth failure in joinTopic->TopicRepo")
             onDone(false)
             return
         }
 
+        //load firestore db instance and batch all 3 updates together
         val db = FirebaseFirestore.getInstance()
         val batch = db.batch()
 
@@ -269,22 +268,21 @@ object TopicRepository {
                     }
             }
         }
-
-        //Helper for join Topic--needs topicID passed, userID accessible from
-        //val userId = FirestoreAuthManager.currentUserId ?: return
-
+    }
 
         //Allows a User to leave a Topic/Community
         fun leaveTopic(
             topicID: String,
             onDone: (Boolean) -> Unit
         ) {
+            //Get Firestore current user id
             val userID = FirestoreAuthManager.currentUserId
             if (userID == null) {
                 onDone(false)
                 return
             }
 
+            //load firestore db instance and batch all 3 updates together
             val db = FirebaseFirestore.getInstance()
             val batch = db.batch()
 
@@ -306,12 +304,45 @@ object TopicRepository {
                     onDone(true)
                 }
                 .addOnFailureListener { e ->
-                    println("Leave topic failed: ${e.message}")
+                    println("Leave topic failed in TopicRepo: ${e.message}")
                     onDone(false)
                 }
         }
+
+    fun getUserJoinedTopicIDs(
+        onSuccess: (Set<String>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        //Get Firestore current user id and make sure its not null
+        val userID = FirestoreAuthManager.currentUserId
+        if (userID == null) {
+            onSuccess(emptySet())   //If user ID invalid, return a empty set of Topic Strings
+            println("Empty list returned in Topic List display")
+            return
+        }
+
+        val db = FirebaseFirestore.getInstance()
+
+        //Search user by userID and get all joinedTopics in a mutable set, return this set.
+        db.collection("users")
+            .document(userID)
+            .collection("joinedTopics")
+            .get()
+            .addOnSuccessListener { documents ->
+                val joinedIDs = mutableSetOf<String>()
+
+                for (doc in documents) {
+                    joinedIDs.add(doc.id)
+                }
+
+                onSuccess(joinedIDs)
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception)
+            }
     }
-}
+
+    }
 
     //Topic Event functions
     /*

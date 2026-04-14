@@ -71,14 +71,35 @@ class TopicsActivity : AppCompatActivity() {
 //            Topic("Hiking Lovers", "user789", "Explore trails together", R.drawable.hiking.toString()),
 //            Topic("Foodies", "user321", "Share recipes and restaurants", R.drawable.food.toString())
 //        )
-        topicsList = mutableListOf()
+//        topicsList = mutableListOf()
+//
+//        //Adapter with sample topics
+//        adapter = TopicsAdapter(topicsList)
+//        recyclerView.adapter = adapter
+//
+//        //Call loadTopics helper in TopicsActivity to load Firestore Topics
+//        loadTopics()
+        //Get the list of topics a user has joined from Firestore as joinedIDs
+        TopicRepository.getUserJoinedTopicIDs(
+            onSuccess = { joinedIDs ->
+                TopicRepository.loadTopics( //Load all topics from Firestore into topicsList next
+                    onSuccess = { topicsList ->
+                        val adapter = TopicsAdapter(    //Pass both lists to the Adapter
+                            topicsList,
+                            joinedIDs.toMutableSet()
+                        )
+                        recyclerView.adapter = adapter
 
-        //Adapter with sample topics
-        adapter = TopicsAdapter(topicsList)
-        recyclerView.adapter = adapter
-
-        //Call loadTopics helper in TopicsActivity to load Firestore Topics
-        loadTopics()
+                    },
+                    onFailure = {
+                        println("Failed to load topics: ${it.message}")
+                    }
+                )
+            },
+            onFailure = {
+                println("Failed to load the user's joined topics: ${it.message}")
+            }
+        )
 
         // Search filter
         searchBar.addTextChangedListener(object : TextWatcher {
@@ -191,6 +212,7 @@ class TopicsActivity : AppCompatActivity() {
         }
     }
 
+    //Topic currently does not update on createTopic()
     //Helper function to create a topic in Firestore via TopicRepository, then creates the new topic and updates the list
     private fun createTopicInFirestore(name: String, desc: String, imageUrl: String) {
         val userID = SessionManager.getUser()?.userID ?: return
@@ -210,27 +232,6 @@ class TopicsActivity : AppCompatActivity() {
         )
     }
 
-    //Helper fnc calls loadTopics() in TopicRepository to populate the Topic List
-    private fun loadTopics() {
-        TopicRepository.loadTopics(
-            onSuccess = { topics ->
-
-//                topicsList.clear()
-                topicsList.addAll(topics)
-                adapter.updateList(topicsList)
-            },
-
-            onFailure = { exception ->
-                Toast.makeText(
-                    this,
-                    exception.message ?: "Failed to load topics - TopicsAct Helper",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        )
-        println("Topics from FS loaded from TopicsAct helper!")
-    }
-
     // Handle image picker result
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -240,8 +241,6 @@ class TopicsActivity : AppCompatActivity() {
             data?.data?.let { uri ->
                 // Persist permission so it works after restart
                 contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//                val takeFlags = data.flags and
-//                        (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
                 selectedImageUri = uri
                 println("Persisted permission for URI: $uri")
