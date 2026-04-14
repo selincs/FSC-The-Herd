@@ -28,11 +28,14 @@ object CommentRepository{
 
         val commentID = UUID.randomUUID().toString()
 
+        val email = auth.currentUser?.email ?: "unknown"
+
         //comment data map
 
         val commentData = hashMapOf(
             "commentID" to commentID,
             "commentedByUID"  to userID,
+            "commentedByEmail" to email,
             "commContents" to commmContents,
             "parentCommentID" to "", // not every comment is a reply,
             "likeCt" to 0,
@@ -96,11 +99,18 @@ object CommentRepository{
                     val commentID = doc.getString("commentID") ?: continue
                     val commmContents = doc.getString("commContents") ?: ""
                     val commentedByUUID = doc.getString("commentedByUID") ?: continue
+                    val email = doc.getString("commentedByEmail") ?: ""
                     val parentCommentID = doc.getString("parentCommentID") ?: ""
                     val likeCt = doc.getLong("likeCt")?.toInt() ?: 0
+                    val displayName = if (email.contains("@")) {
+                        email.substringBefore("@")
+                    } else {
+                        commentedByUUID
+                    }
+
                     val comment = Comment(
                         commentID,
-                        commentedByUUID,
+                        displayName,
                         commmContents,
                         likeCt,
                         parentCommentID

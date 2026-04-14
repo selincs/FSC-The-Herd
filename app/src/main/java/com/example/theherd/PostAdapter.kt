@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import Model.Post
 
-class PostAdapter(private val posts: List<Post>, private val communityName: String) :
+class PostAdapter(private val posts: List<Post>, private val communityName: String, private val topicID: String) :
     RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     class PostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -34,8 +34,8 @@ class PostAdapter(private val posts: List<Post>, private val communityName: Stri
             val intent = Intent(context, PostDetailActivity::class.java)
 
             intent.putExtra("POST_ID", post.postID)
+            intent.putExtra("TOPIC_ID", topicID)
             intent.putExtra("COMMUNITY_NAME", communityName)
-
             context.startActivity(intent)
         }
     }

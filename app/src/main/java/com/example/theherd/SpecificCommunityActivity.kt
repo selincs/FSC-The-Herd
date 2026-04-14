@@ -102,7 +102,7 @@ class SpecificCommunityActivity : AppCompatActivity() {
         val recyclerView: RecyclerView = findViewById(R.id.posts_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        postAdapter = PostAdapter(postsList, communityName)
+        postAdapter = PostAdapter(postsList, communityName, topicID)
         recyclerView.adapter = postAdapter
 
         loadPostsFromFirestore()
