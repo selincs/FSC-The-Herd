@@ -259,6 +259,13 @@
                 android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_media_next"/>
+
+            <ImageButton
+                android:id="@+id/addEventBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_input_add"/>
         </LinearLayout>
 
         <GridView
@@ -268,7 +275,10 @@
             android:numColumns="7"
             android:horizontalSpacing="8dp"
             android:verticalSpacing="8dp"
-            android:stretchMode="columnWidth"/>
+            android:stretchMode="columnWidth"
+            android:nestedScrollingEnabled="false"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <!-- Enter Community -->
         <TextView

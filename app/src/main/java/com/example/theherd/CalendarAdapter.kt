@@ -7,10 +7,13 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import java.time.LocalDate
+import java.time.YearMonth
 
 class CalendarAdapter(
     private val context: Context,
-    private val days: List<String>
+    private val days: List<String>,
+    private val eventsMap: Map<String, MutableList<String>>,
+    private val currentMonth: YearMonth
 ) : BaseAdapter() {
 
     private var selectedPosition = -1
@@ -27,22 +30,36 @@ class CalendarAdapter(
             .inflate(R.layout.item_day, parent, false)
 
         val text = view.findViewById<TextView>(R.id.dayText)
-        text.text = days[position]
+        val dot = view.findViewById<View>(R.id.eventDot)
+
+        val dayStr = days[position]
+
+        text.text = dayStr
+
+        if (dayStr.isNotEmpty()) {
+
+            val key = "${currentMonth.year}-${currentMonth.monthValue}-%02d"
+                .format(dayStr.toInt())
+
+            val hasEvent = !eventsMap[key].isNullOrEmpty()
+
+            dot.visibility = if (hasEvent) View.VISIBLE else View.GONE
+        } else {
+            dot.visibility = View.GONE
+        }
 
         // highlight selected day
         if (position == selectedPosition) {
-            text.setBackgroundColor(android.graphics.Color.BLUE)
-            text.setTextColor(android.graphics.Color.WHITE)
+            view.setBackgroundColor(android.graphics.Color.BLUE)
         } else {
-            text.setBackgroundColor(android.graphics.Color.LTGRAY)
-            text.setTextColor(android.graphics.Color.BLACK)
-        }
-
-        view.setOnClickListener {
-            selectedPosition = position
-            notifyDataSetChanged()
+            view.setBackgroundColor(android.graphics.Color.TRANSPARENT)
         }
 
         return view
+    }
+
+    fun setSelectedPosition(position: Int) {
+        selectedPosition = position
+        notifyDataSetChanged()
     }
 }

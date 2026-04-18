@@ -18,11 +18,19 @@ class TopicDetailActivity : AppCompatActivity() {
     private lateinit var grid: GridView
     private lateinit var monthTitle: TextView
 
+    private val eventsMap = mutableMapOf<String, MutableList<String>>()
+
+    private var selectedDay: Int? = null
+
     private var isJoined = false
+
+    private var days = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_topic_detail)
+
+        val addEventBtn = findViewById<ImageButton>(R.id.addEventBtn)
 
         val joinButton = findViewById<Button>(R.id.joinButton)
 //        val name = intent.getStringExtra("topicName")
@@ -92,7 +100,32 @@ class TopicDetailActivity : AppCompatActivity() {
             updateCalendar()
         }
 
+        addEventBtn.setOnClickListener {
+            if (selectedDay == null) {
+                Toast.makeText(this, "Select a day first", Toast.LENGTH_SHORT).show()
+            } else {
+                showEventDialog(selectedDay!!)
+            }
+        }
+
         updateCalendar()
+        updateUpcomingEvents()
+
+        grid.setOnItemClickListener { _, _, position, _ ->
+            val dayStr = days[position]
+
+            if (dayStr.isNotEmpty()) {
+                val day = dayStr.toInt()
+                selectedDay = day
+
+                val adapter = grid.adapter as CalendarAdapter
+                adapter.setSelectedPosition(position)
+
+                updateUpcomingEvents()
+
+                Toast.makeText(this, "Selected day: $day", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         //TODO: Fix join button logic to match list logic
         //join button logic
@@ -171,7 +204,7 @@ class TopicDetailActivity : AppCompatActivity() {
     }
     private fun updateCalendar() {
 
-        val days = mutableListOf<String>()
+        days.clear()
 
         val firstDay = currentMonth.atDay(1)
         val totalDays = currentMonth.lengthOfMonth()
@@ -191,7 +224,69 @@ class TopicDetailActivity : AppCompatActivity() {
             days.add(day.toString())
         }
 
-        grid.adapter = CalendarAdapter(this, days)
+        grid.adapter = CalendarAdapter(this, days, eventsMap, currentMonth)
+    }
+
+    private fun showEventDialog(day: Int) {
+        val editText = android.widget.EditText(this)
+        editText.hint = "Enter event name"
+
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Create Event on $day")
+            .setView(editText)
+            .setPositiveButton("Save") { _, _ ->
+                val eventText = editText.text.toString()
+                if (eventText.isNotEmpty()) {
+                    saveEvent(day, eventText)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun getDateKey(day: Int): String {
+        return "${currentMonth.year}-${currentMonth.monthValue}-%02d".format(day)
+    }
+
+    private fun saveEvent(day: Int, event: String) {
+        val key = getDateKey(day)
+
+        if (!eventsMap.containsKey(key)) {
+            eventsMap[key] = mutableListOf()
+        }
+
+        eventsMap[key]?.add(event)
+
+        updateUpcomingEvents()
+    }
+
+    private fun updateUpcomingEvents() {
+        val event1 = findViewById<TextView>(R.id.event1)
+        val event2 = findViewById<TextView>(R.id.event2)
+        val event3 = findViewById<TextView>(R.id.event3)
+
+        val day = selectedDay
+
+        if (day == null) {
+            event1.text = "None"
+            event2.text = ""
+            event3.text = ""
+            return
+        }
+
+        val key = getDateKey(day)
+        val events = eventsMap[key]
+
+        if (events.isNullOrEmpty()) {
+            event1.text = "None"
+            event2.text = ""
+            event3.text = ""
+            return
+        }
+
+        event1.text = events.getOrNull(0) ?: ""
+        event2.text = events.getOrNull(1) ?: ""
+        event3.text = events.getOrNull(2) ?: ""
     }
 
     private fun updateJoinUI(button: Button, isJoined: Boolean) {
