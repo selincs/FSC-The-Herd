@@ -23,6 +23,7 @@ class TopicDetailActivity : AppCompatActivity() {
     private var selectedDay: Int? = null
 
     private var isJoined = false
+    private var memberCount: Int = 0
 
     private var days = mutableListOf<String>()
 
@@ -38,13 +39,10 @@ class TopicDetailActivity : AppCompatActivity() {
 //        val members = intent.getIntExtra("memberCount", 0)
 
         val topicID = intent.getStringExtra("topicID") ?: return
-        //TODO: isJoined intent here, or in database query where everything else is set?
-        //Use the isJoined status from the query in TopicsAdapter, default==false
+
+        //Use the isJoined status from the query in TopicsAdapter, else default==false
         isJoined = intent.getBooleanExtra("isJoined", false)
         updateJoinUI(joinButton, isJoined)
-//        val name = intent.getStringExtra("topicName") ?: return
-//        val topicDesc = intent.getStringExtra("topicDesc") ?: return
-//        val memberCount = intent.getStringExtra("memberCount") ?: return
 
         val db = FirebaseFirestore.getInstance()
 
@@ -56,13 +54,10 @@ class TopicDetailActivity : AppCompatActivity() {
                     //If document exists for this topicID, load the needed fields from Firestore
                     val name = document.getString("topicName") ?: ""
                     val desc = document.getString("topicDesc") ?: ""
-                    val memberCount = document.getLong("memberCount")?.toInt() ?: 0
+                    memberCount = document.getLong("memberCount")?.toInt() ?: 0
                     val timestamp = document.getTimestamp("createdAt")
-                    //load user membership
 
-                    //TODO:Revisit if Joined (btn state) logic needs to come in here as well
-
-                    // Convert Firestore timestamp into a readable string
+                    // Convert Firestore timestamp into a readable string for creation date field
                     val formattedDate = if (timestamp != null) {
                         val sdf = java.text.SimpleDateFormat("MMM dd, yyyy hh:mm a", java.util.Locale.getDefault())
                         sdf.format(timestamp.toDate())
@@ -76,22 +71,13 @@ class TopicDetailActivity : AppCompatActivity() {
                     findViewById<TextView>(R.id.detailMembers).text = "$memberCount members"
                     findViewById<TextView>(R.id.detailCreatedAt).text = formattedDate
                     println("TopicDetails success in listener, Document FOUND: ${document.id}")
-                    //call join button ui update here
+                    //join button GUI updates called in the listener for the button
                 }
             }
             .addOnFailureListener {
                 println("TopicDetailsActivity listener failure for $topicID")
                 Toast.makeText(this, "Failed to load topic", Toast.LENGTH_SHORT).show()
             }
-
-        //TODO in FIRESTORE this is the creation date of when the topic was created
-//        val createdAt = intent.getStringExtra("createdAt")
-//        findViewById<TextView>(R.id.detailCreatedAt).text =
-//            "$createdAt"
-//
-//        findViewById<TextView>(R.id.detailTopicName).text = name
-//        findViewById<TextView>(R.id.detailDescription).text = desc
-//        findViewById<TextView>(R.id.detailMembers).text = "$members members"
 
         grid = findViewById(R.id.calendarGrid)
         monthTitle = findViewById(R.id.monthTitle)
@@ -133,16 +119,18 @@ class TopicDetailActivity : AppCompatActivity() {
             }
         }
 
-        //TODO: Fix join button logic to match list logic
         //join button logic, initial state set near top of onCreate
         joinButton.setOnClickListener {
                 //on join button click
-                if (!isJoined) {   //&& user is !joined on this Topic, call join Topic in Firestore
+                if (!isJoined) {   //&& user is !joined on this Topic, call join Topic in Firestore to add them
                     TopicRepository.joinTopic(topicID) { success ->
-                        //If joinTopic==success, set isJoined==true and change button UI state
+                        //If joinTopic==success, set isJoined==true and change button UI state, increment memberCt
                         if (success) {
                             //need to update member count probably
                             isJoined = true
+                            memberCount += 1    //increment and update member count
+                            findViewById<TextView>(R.id.detailMembers).text = "$memberCount members"
+
                             updateJoinUI(joinButton, isJoined)
                             Toast.makeText(this, "You joined $topicID!", Toast.LENGTH_SHORT).show()
                         } else { //If join fails for some reason
@@ -154,8 +142,11 @@ class TopicDetailActivity : AppCompatActivity() {
                 } else {    //set isJoined = false,
                     TopicRepository.leaveTopic(topicID) { success ->
                         if (success) {  //If user leaves topic successfully, set isJoined==false and update button UI
-                            //need to update member count probably
+                            //decrement memberCt
                             isJoined = false
+                            memberCount -= 1    //decrement and update member count
+                            findViewById<TextView>(R.id.detailMembers).text = "$memberCount members"
+
                             updateJoinUI(joinButton, isJoined)
                             Toast.makeText(this, "You left $topicID!", Toast.LENGTH_SHORT).show()
                         } else {
@@ -164,21 +155,6 @@ class TopicDetailActivity : AppCompatActivity() {
                         }
                     }
                 }
-
-//            isJoined = !isJoined
-
-//            val membersText = findViewById<TextView>(R.id.detailMembers)
-//            val currentText = membersText.text.toString().split(" ")[0].toInt()
-
-//            if (isJoined) {
-//                membersText.text = "${currentText + 1} members"
-//                Toast.makeText(this, "You joined $topicID!", Toast.LENGTH_SHORT).show()
-//            } else {
-//                membersText.text = "${currentText - 1} members"
-//                Toast.makeText(this, "You left $topicID!", Toast.LENGTH_SHORT).show()
-//            }
-
-//            updateJoinUI(joinButton, isJoined)
         }
 
         // buttons
@@ -326,11 +302,9 @@ class TopicDetailActivity : AppCompatActivity() {
     private fun updateJoinUI(button: Button, isJoined: Boolean) {
         if (isJoined) {
             button.text = "Leave"
-//            button.setBackgroundColor(android.graphics.Color.parseColor("#2F442F"))
             button.setBackgroundColor(android.graphics.Color.GRAY)
         } else {
             button.text = "Join"
-//            button.setBackgroundColor(android.graphics.Color.GRAY)
             button.setBackgroundColor(android.graphics.Color.parseColor("#2F442F"))
         }
         //set text color to white regardless of join button status
