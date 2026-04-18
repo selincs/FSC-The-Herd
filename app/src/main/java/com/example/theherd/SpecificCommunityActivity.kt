@@ -94,7 +94,7 @@ class SpecificCommunityActivity : AppCompatActivity() {
 
         communityName = intent.getStringExtra("COMMUNITY_NAME") ?: "General"
         //firestore path
-        val topicID = communityName.trim().lowercase()
+        val topicID = intent.getStringExtra("TOPIC_ID") ?: return
         findViewById<TextView>(R.id.specificCommunityTitle).text = communityName
 
 
@@ -159,7 +159,7 @@ class SpecificCommunityActivity : AppCompatActivity() {
     private fun loadPostsFromFirestore(){
         postsList.clear()
 
-        val topicID = communityName.trim().lowercase()
+        val topicID = intent.getStringExtra("TOPIC_ID") ?: return
 
         PostRepository.getPosts(topicID){ posts ->
             postsList.clear()

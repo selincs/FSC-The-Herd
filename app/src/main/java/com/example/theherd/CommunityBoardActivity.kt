@@ -38,10 +38,19 @@ class CommunityBoardActivity : AppCompatActivity() {
             .addOnSuccessListener{
                 result ->
                 for( doc in result){
+                    val topicID = doc.id
                     val name = doc.getString("topicName") ?: ""
                     val desc = doc.getString("topicDesc") ?: ""
+                    val memberCount = doc.getLong("memberCount")?.toInt() ?: 0
 
-                    val community = Community(name, desc)
+
+                    val community = Community(
+                        topicID = topicID,
+                        name = name,
+                        description = desc,
+                        memberCount = memberCount,
+                        isJoined = false
+                    )
                     allCommunities.add(community)
                 }
                 filterList(searchView.query.toString())
@@ -130,11 +139,17 @@ class CommunityBoardActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.community_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = CommunityAdapter(displayList) { community ->
-            val intent = Intent(this, SpecificCommunityActivity::class.java)
-            intent.putExtra("COMMUNITY_NAME", community.name)
-            startActivity(intent)
-        }
+        adapter = CommunityAdapter(
+            displayList,  onCommunityClick  = { community ->
+                val intent = Intent(this, SpecificCommunityActivity::class.java)
+                intent.putExtra("COMMMUNITY_NAME", community.name)
+                intent.putExtra("TOPIC_ID", community.topicID)
+                startActivity(intent)
+            },
+            onJoinCLick =  { community ->
+                toggleJoinState(community)
+            }
+        )
         recyclerView.adapter = adapter
 
 
@@ -180,6 +195,38 @@ class CommunityBoardActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.guide_button).setOnClickListener {
             startActivity(Intent(this, GuidesActivity::class.java))
+        }
+    }
+
+    private fun toggleJoinState(community: Community) {
+        if (!community.isJoined) {
+            TopicRepository.joinTopic(community.topicID) { success ->
+                runOnUiThread {
+                    if (success) {
+                        community.isJoined = true
+                        community.memberCount += 1
+                        adapter.notifyDataSetChanged()
+                        Toast.makeText(this, "Joined ${community.name}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Failed to join ${community.name}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } else {
+            TopicRepository.leaveTopic(community.topicID) { success ->
+                runOnUiThread {
+                    if (success) {
+                        community.isJoined = false
+                        if (community.memberCount > 0) {
+                            community.memberCount -= 1
+                        }
+                        adapter.notifyDataSetChanged()
+                        Toast.makeText(this, "Left ${community.name}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Failed to leave ${community.name}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
     }
 
