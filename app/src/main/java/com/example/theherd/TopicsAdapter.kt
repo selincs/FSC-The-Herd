@@ -99,6 +99,8 @@ class TopicsAdapter(
             intent.putExtra("topicName", topic.topicName)
             intent.putExtra("topicDesc", topic.topicDesc)
             intent.putExtra("memberCount", topic.memberCount)
+            //Used for Joined button state, is user a member of this topic
+            intent.putExtra("isJoined", topic.isJoined)
 
             context.startActivity(intent)
         }

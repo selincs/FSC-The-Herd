@@ -38,6 +38,10 @@ class TopicDetailActivity : AppCompatActivity() {
 //        val members = intent.getIntExtra("memberCount", 0)
 
         val topicID = intent.getStringExtra("topicID") ?: return
+        //TODO: isJoined intent here, or in database query where everything else is set?
+        //Use the isJoined status from the query in TopicsAdapter, default==false
+        isJoined = intent.getBooleanExtra("isJoined", false)
+        updateJoinUI(joinButton, isJoined)
 //        val name = intent.getStringExtra("topicName") ?: return
 //        val topicDesc = intent.getStringExtra("topicDesc") ?: return
 //        val memberCount = intent.getStringExtra("memberCount") ?: return
@@ -49,11 +53,12 @@ class TopicDetailActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    //If document exists, load the needed fields from Firestore
+                    //If document exists for this topicID, load the needed fields from Firestore
                     val name = document.getString("topicName") ?: ""
                     val desc = document.getString("topicDesc") ?: ""
                     val memberCount = document.getLong("memberCount")?.toInt() ?: 0
                     val timestamp = document.getTimestamp("createdAt")
+                    //load user membership
 
                     //TODO:Revisit if Joined (btn state) logic needs to come in here as well
 
@@ -71,6 +76,7 @@ class TopicDetailActivity : AppCompatActivity() {
                     findViewById<TextView>(R.id.detailMembers).text = "$memberCount members"
                     findViewById<TextView>(R.id.detailCreatedAt).text = formattedDate
                     println("TopicDetails success in listener, Document FOUND: ${document.id}")
+                    //call join button ui update here
                 }
             }
             .addOnFailureListener {
@@ -128,23 +134,51 @@ class TopicDetailActivity : AppCompatActivity() {
         }
 
         //TODO: Fix join button logic to match list logic
-        //join button logic
-        updateJoinUI(joinButton, isJoined)
+        //join button logic, initial state set near top of onCreate
         joinButton.setOnClickListener {
-            isJoined = !isJoined
+                //on join button click
+                if (!isJoined) {   //&& user is !joined on this Topic, call join Topic in Firestore
+                    TopicRepository.joinTopic(topicID) { success ->
+                        //If joinTopic==success, set isJoined==true and change button UI state
+                        if (success) {
+                            //need to update member count probably
+                            isJoined = true
+                            updateJoinUI(joinButton, isJoined)
+                            Toast.makeText(this, "You joined $topicID!", Toast.LENGTH_SHORT).show()
+                        } else { //If join fails for some reason
+                            Toast.makeText(this, "Failed to join", Toast.LENGTH_SHORT).show()
+                            println("join failed in Join btn press on success")
+                        }
+                    }
+                    //If user has already joined this Topic, call leaveTopic in Firestore
+                } else {    //set isJoined = false,
+                    TopicRepository.leaveTopic(topicID) { success ->
+                        if (success) {  //If user leaves topic successfully, set isJoined==false and update button UI
+                            //need to update member count probably
+                            isJoined = false
+                            updateJoinUI(joinButton, isJoined)
+                            Toast.makeText(this, "You left $topicID!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this, "Failed to leave", Toast.LENGTH_SHORT).show()
+                            println("leave failed in Join btn press on success")
+                        }
+                    }
+                }
 
-            val membersText = findViewById<TextView>(R.id.detailMembers)
-            val currentText = membersText.text.toString().split(" ")[0].toInt()
+//            isJoined = !isJoined
 
-            if (isJoined) {
-                membersText.text = "${currentText + 1} members"
-                Toast.makeText(this, "You joined $topicID!", Toast.LENGTH_SHORT).show()
-            } else {
-                membersText.text = "${currentText - 1} members"
-                Toast.makeText(this, "You left $topicID!", Toast.LENGTH_SHORT).show()
-            }
+//            val membersText = findViewById<TextView>(R.id.detailMembers)
+//            val currentText = membersText.text.toString().split(" ")[0].toInt()
 
-            updateJoinUI(joinButton, isJoined)
+//            if (isJoined) {
+//                membersText.text = "${currentText + 1} members"
+//                Toast.makeText(this, "You joined $topicID!", Toast.LENGTH_SHORT).show()
+//            } else {
+//                membersText.text = "${currentText - 1} members"
+//                Toast.makeText(this, "You left $topicID!", Toast.LENGTH_SHORT).show()
+//            }
+
+//            updateJoinUI(joinButton, isJoined)
         }
 
         // buttons
@@ -291,12 +325,15 @@ class TopicDetailActivity : AppCompatActivity() {
 
     private fun updateJoinUI(button: Button, isJoined: Boolean) {
         if (isJoined) {
-            button.text = "Joined"
-            button.setBackgroundColor(android.graphics.Color.parseColor("#2F442F"))
+            button.text = "Leave"
+//            button.setBackgroundColor(android.graphics.Color.parseColor("#2F442F"))
+            button.setBackgroundColor(android.graphics.Color.GRAY)
         } else {
             button.text = "Join"
-            button.setBackgroundColor(android.graphics.Color.GRAY)
+//            button.setBackgroundColor(android.graphics.Color.GRAY)
+            button.setBackgroundColor(android.graphics.Color.parseColor("#2F442F"))
         }
+        //set text color to white regardless of join button status
         button.setTextColor(android.graphics.Color.WHITE)
     }
 
