@@ -6,6 +6,8 @@ import android.widget.Button
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import android.view.View
 
@@ -68,8 +70,7 @@ class GuidesActivity : AppCompatActivity() {
         }
 
         guideButton.setOnClickListener {
-            val intent = Intent(this, GuidesActivity::class.java)
-            startActivity(intent)
+            Toast.makeText(this, "You are already on the Guides page!", Toast.LENGTH_SHORT).show()
         }
 
         createGuideButton.setOnClickListener {
@@ -90,6 +91,23 @@ class GuidesActivity : AppCompatActivity() {
         homeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+        }
+
+        setupCategoryClick(R.id.navigation_guide, "Navigation")
+        setupCategoryClick(R.id.travel_guide, "Travel")
+        setupCategoryClick(R.id.academic_guide, "Academic")
+        setupCategoryClick(R.id.financial_aid_guid, "Financial Aid")
+        setupCategoryClick(R.id.housing_guides, "Housing")
+        setupCategoryClick(R.id.clubs_guide, "Clubs")
+        setupCategoryClick(R.id.health_wellness_guide, "Health & Wellness")
+        setupCategoryClick(R.id.miscellaneous_guides, "Miscellaneous")
+    }
+
+    private fun setupCategoryClick(viewId: Int, categoryName: String) {
+        findViewById<TextView>(viewId).setOnClickListener {
+            val intent = Intent(this, GuideMainPageActivity::class.java)
+            intent.putExtra("CATEGORY_NAME", categoryName)
             startActivity(intent)
         }
     }
