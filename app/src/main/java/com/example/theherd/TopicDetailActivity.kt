@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import com.google.firebase.firestore.FirebaseFirestore
+import android.widget.LinearLayout
 
 class TopicDetailActivity : AppCompatActivity() {
     private var currentMonth: YearMonth = YearMonth.now()
@@ -30,6 +31,29 @@ class TopicDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_topic_detail)
+
+        // Event TextViews
+        val event1 = findViewById<TextView>(R.id.event1)
+        val event2 = findViewById<TextView>(R.id.event2)
+        val event3 = findViewById<TextView>(R.id.event3)
+
+// Buttons
+        val edit1 = findViewById<ImageButton>(R.id.editEvent1)
+        val rsvp1 = findViewById<ImageButton>(R.id.rsvpEvent1)
+        val send1 = findViewById<ImageButton>(R.id.sendEvent1)
+
+        val edit2 = findViewById<ImageButton>(R.id.editEvent2)
+        val rsvp2 = findViewById<ImageButton>(R.id.rsvpEvent2)
+        val send2 = findViewById<ImageButton>(R.id.sendEvent2)
+
+        val edit3 = findViewById<ImageButton>(R.id.editEvent3)
+        val rsvp3 = findViewById<ImageButton>(R.id.rsvpEvent3)
+        val send3 = findViewById<ImageButton>(R.id.sendEvent3)
+
+// Hook listeners ONCE
+        setupEventButtons(edit1, rsvp1, send1) { event1.text.toString() }
+        setupEventButtons(edit2, rsvp2, send2) { event2.text.toString() }
+        setupEventButtons(edit3, rsvp3, send3) { event3.text.toString() }
 
         val addEventBtn = findViewById<ImageButton>(R.id.addEventBtn)
 
@@ -275,12 +299,28 @@ class TopicDetailActivity : AppCompatActivity() {
         val event2 = findViewById<TextView>(R.id.event2)
         val event3 = findViewById<TextView>(R.id.event3)
 
+        val edit1 = findViewById<ImageButton>(R.id.editEvent1)
+        val rsvp1 = findViewById<ImageButton>(R.id.rsvpEvent1)
+        val send1 = findViewById<ImageButton>(R.id.sendEvent1)
+
+        val edit2 = findViewById<ImageButton>(R.id.editEvent2)
+        val rsvp2 = findViewById<ImageButton>(R.id.rsvpEvent2)
+        val send2 = findViewById<ImageButton>(R.id.sendEvent2)
+
+        val edit3 = findViewById<ImageButton>(R.id.editEvent3)
+        val rsvp3 = findViewById<ImageButton>(R.id.rsvpEvent3)
+        val send3 = findViewById<ImageButton>(R.id.sendEvent3)
+
         val day = selectedDay
 
         if (day == null) {
             event1.text = "None"
             event2.text = ""
             event3.text = ""
+
+            toggleEventButtons("", edit1, rsvp1, send1)
+            toggleEventButtons("", edit2, rsvp2, send2)
+            toggleEventButtons("", edit3, rsvp3, send3)
             return
         }
 
@@ -291,12 +331,114 @@ class TopicDetailActivity : AppCompatActivity() {
             event1.text = "None"
             event2.text = ""
             event3.text = ""
+
+            toggleEventButtons("", edit1, rsvp1, send1)
+            toggleEventButtons("", edit2, rsvp2, send2)
+            toggleEventButtons("", edit3, rsvp3, send3)
             return
         }
 
-        event1.text = events.getOrNull(0) ?: ""
-        event2.text = events.getOrNull(1) ?: ""
-        event3.text = events.getOrNull(2) ?: ""
+        val e1 = events.getOrNull(0) ?: ""
+        val e2 = events.getOrNull(1) ?: ""
+        val e3 = events.getOrNull(2) ?: ""
+
+        event1.text = e1
+        event2.text = e2
+        event3.text = e3
+
+        toggleEventButtons(e1, edit1, rsvp1, send1)
+        toggleEventButtons(e2, edit2, rsvp2, send2)
+        toggleEventButtons(e3, edit3, rsvp3, send3)
+    }
+
+    private fun toggleEventButtons(
+        eventText: String,
+        edit: ImageButton,
+        rsvp: ImageButton,
+        send: ImageButton
+    ) {
+        val hasEvent = eventText.isNotBlank() && eventText != "None"
+
+        val visibility = if (hasEvent) {
+            android.view.View.VISIBLE
+        } else {
+            android.view.View.GONE
+        }
+
+        edit.visibility = visibility
+        rsvp.visibility = visibility
+        send.visibility = visibility
+    }
+
+    private fun setupEventButtons(
+        editBtn: ImageButton,
+        rsvpBtn: ImageButton,
+        sendBtn: ImageButton,
+        getEventText: () -> String
+    ) {
+        editBtn.setOnClickListener {
+            val oldEvent = getEventText()
+            if (oldEvent.isBlank()) {
+                Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val input = android.widget.EditText(this)
+            input.setText(oldEvent)
+
+            android.app.AlertDialog.Builder(this)
+                .setTitle("Edit Event")
+                .setView(input)
+                .setPositiveButton("Save") { _, _ ->
+                    val newText = input.text.toString()
+
+                    if (newText.isNotBlank()) {
+                        updateEvent(oldEvent, newText)
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
+        rsvpBtn.setOnClickListener {
+            val event = getEventText()
+            if (event.isBlank() || event == "None") {
+                Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            Toast.makeText(this, "RSVP'd to: $event", Toast.LENGTH_SHORT).show()
+        }
+
+        sendBtn.setOnClickListener {
+            val event = getEventText()
+            if (event.isBlank() || event == "None") {
+                Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            //TODO Add logic to send event to a friend
+            Toast.makeText(this, "Sent Friend request for: $event", Toast.LENGTH_SHORT).show()
+
+            /*val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/plain"
+            intent.putExtra(Intent.EXTRA_TEXT, "Check out this event: $event")
+            startActivity(Intent.createChooser(intent, "Send via"))
+             */
+        }
+    }
+
+    private fun updateEvent(oldValue: String, newValue: String) {
+        val day = selectedDay ?: return
+        val key = getDateKey(day)
+
+        val list = eventsMap[key] ?: return
+        val index = list.indexOf(oldValue)
+
+        if (index != -1) {
+            list[index] = newValue
+            updateUpcomingEvents()
+        }
     }
 
     private fun updateJoinUI(button: Button, isJoined: Boolean) {
