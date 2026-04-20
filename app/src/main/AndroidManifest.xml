@@ -62,6 +62,12 @@
         <activity
             android:name=".PostDetailActivity"
             android:exported="false" />
+
+        <activity android:name=".GuideMainPageActivity"
+            android:exported="false"/>
+
+        <activity android:name=".GuideTemplateActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>
