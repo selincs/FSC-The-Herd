@@ -186,7 +186,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:autoStart="true"
-                    android:flipInterval="5000"
+                    android:flipInterval="20000"
                     android:inAnimation="@android:anim/fade_in"
                     android:outAnimation="@android:anim/fade_out">
 
@@ -222,10 +222,23 @@
                     android:gravity="center"
                     android:padding="24dp"
                     android:text="Nothing is impossible, the word itself says 'I'm possible!' \n\n\n- Audrey Hepburn"
-                    android:textSize="16sp"
                     android:textColor="#FCF5FD"
-                    android:textStyle="bold"
-                    android:textAlignment="center"/>
+                    android:textAlignment="center"
+                    android:textSize="20sp"
+                    android:textStyle="italic"
+                    app:fontFamily="@font/merriweather"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:padding="24dp"
+                        android:text="I've missed more than 9,000 shots in my career. I've lost almost 300 games. 26 times I've been trusted to take the game winning shot and missed. I've failed over and over and over again in my life. And that is why I succeed. \n\n\n–Michael Jordan"
+                        android:textColor="#FCF5FD"
+                        android:textAlignment="center"
+                        android:textSize="20sp"
+                        android:textStyle="italic"
+                        app:fontFamily="@font/merriweather"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -233,10 +246,11 @@
                     android:gravity="center"
                     android:padding="24dp"
                     android:text="If you can dream it, you can do it. \n\n\n- Walt Disney"
-                    android:textSize="16sp"
                     android:textColor="#FCF5FD"
-                    android:textStyle="bold"
-                    android:textAlignment="center"/>
+                    android:textAlignment="center"
+                    android:textSize="20sp"
+                    android:textStyle="italic"
+                    app:fontFamily="@font/merriweather"/>
 
                 </ViewFlipper>
 
@@ -244,6 +258,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!--Mentorship Section-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -254,119 +269,200 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="My Mentorships"
-                    android:textSize="18sp"
+                    android:textSize="24sp"
                     android:textStyle="bold"
                     android:layout_marginStart="16dp"
-                    android:layout_marginBottom="8dp"/>
+                    android:layout_marginBottom="20dp"/>
 
-                <HorizontalScrollView
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scrollbars="none"
+                    android:text="We could make a silly little RAM or shepherd pun here, but honestly…\n\n
+
+We’re all people out here just trying our best. We hope you can find something or someone that helps you be your best too. If you’re feeling lost, here is where you can try one of many ways to reach out for help.
+"
+                    android:textSize="16sp"
+                    android:textColor="#2F442F"
+                    android:textStyle="italic"
+                    android:layout_marginBottom="20dp"/>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp">
+
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="130dp"
+                        android:layout_height="75dp"
+                        android:layout_marginEnd="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="2dp"
+                        app:strokeColor="#CCCCCC">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            app:cardElevation="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🔍"
+                                android:textSize="24sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Find a Mentor"
+                                android:textSize="12sp"
+                                android:textColor="@color/black"
+                                android:textStyle="bold"/>
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="130dp"
+                        android:layout_height="75dp"
+                        android:layout_gravity="center"
+                        app:cardBackgroundColor="#779A77"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="2dp"
+                        app:strokeColor="#CCCCCC">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            app:cardElevation="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🤝"
+                                android:textColor="@color/black"
+                                android:textSize="24sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Become a Mentor"
+                                android:textColor="@color/black"
+                                android:textSize="12sp"
+                                android:textStyle="bold"/>
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/mentorsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:clipToPadding="false"
-                    android:paddingHorizontal="16dp">
+                    android:paddingHorizontal="16dp"
+                    android:layout_marginBottom="24dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="horizontal"
+                    tools:listitem="@layout/item_mentor_card" />
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="8dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="A lot of us have been where you were once too. This might take some time, but we’ll put some feelers out there for you. We hope that maybe this can be a place where someone who’s made those scary leaps in life can help you learn to navigate life at Farmingdale."
+                    android:textSize="16sp"
+                    android:textColor="#2F442F"
+                    android:textStyle="italic"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"/>
 
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="130dp"
-                            android:layout_height="75dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="0dp"
-                            app:strokeWidth="2dp"
-                            app:strokeColor="#CCCCCC">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="+"
-                                    android:textSize="24sp"
-                                    android:textStyle="bold"/>
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Find a Mentor"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold"/>
-
-                            </LinearLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="130dp"
-                            android:layout_height="75dp"
-                            android:layout_marginEnd="12dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="0dp"
-                            app:cardBackgroundColor="#F8F9FA">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:gravity="center_vertical"
-                                android:padding="12dp"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Rachel Green"
-                                    android:textSize="15sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@android:color/black"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Mentor"
-                                    android:textSize="12sp"
-                                    android:layout_marginTop="4dp"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="One step at a time\n-The 7th Hour"
+                    android:textSize="16sp"
+                    android:textColor="#2F442F"
+                    android:textStyle="italic"
+                    android:layout_marginBottom="20dp"/>
 
 
-
-
-                            </LinearLayout>
-
-
-
-
-
-                        </com.google.android.material.card.MaterialCardView>
-
-
-
-
-
-
-                    </LinearLayout>
-
-
-                </HorizontalScrollView>
             </LinearLayout>
 
+            <!--End of Mentorship Section-->
 
 
+            <!--Commitments Section-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="My Commitments"
+                    android:textSize="24sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="When people commit to each other’s success, momentum compounds, obstacles fall away, and what once seemed impossible becomes inevitable."
+                    android:textSize="18sp"
+                    android:textColor="#2F442F"
+                    android:textStyle="italic"
+                    android:paddingTop="16dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_gravity="start"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="12dp"
+                    android:text="Current Commitments"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/commitmentsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="16dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="horizontal"
+                    tools:listitem="@layout/item_commitment_card" />
 
 
-
+            </LinearLayout>
 
 
 
@@ -384,6 +480,7 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+    <!--End of Body-->
 
 
     <!--Footer-->
