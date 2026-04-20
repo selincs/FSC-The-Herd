@@ -12,6 +12,8 @@ import Model.User
 import Model.Profile
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import androidx.core.content.ContextCompat
+
 class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +23,15 @@ class SignUpActivity : AppCompatActivity() {
         findViewById<ConstraintLayout>(R.id.signUpLayout).setOnClickListener {
             println("The BACKGROUND was clicked")
         }
+
+        val reqLength = findViewById<TextView>(R.id.reqLength)
+        val reqUpper = findViewById<TextView>(R.id.reqUpper)
+        val reqLower = findViewById<TextView>(R.id.reqLower)
+        val reqDigit = findViewById<TextView>(R.id.reqDigit)
+        val reqMatch = findViewById<TextView>(R.id.reqMatch)
+
+        val green = ContextCompat.getColor(this, android.R.color.holo_green_dark)
+        val gray = ContextCompat.getColor(this, android.R.color.darker_gray)
 
         // text fields
         val firstNameField = findViewById<EditText>(R.id.firstNameField)
@@ -54,6 +65,37 @@ class SignUpActivity : AppCompatActivity() {
         // validation message
         val validationMessage: TextView = findViewById(R.id.validationMessage)
 
+        fun updateChecklist() {
+            val pass = passwordField.text.toString()
+            val confirm = confirmedPasswordField.text.toString()
+
+            // Length check
+            reqLength.setTextColor(if (pass.length >= 8) green else gray)
+
+            // Uppercase check
+            reqUpper.setTextColor(if (pass.any { it.isUpperCase() }) green else gray)
+
+            // Lowercase check
+            reqLower.setTextColor(if (pass.any { it.isLowerCase() }) green else gray)
+
+            // Digit check
+            reqDigit.setTextColor(if (pass.any { it.isDigit() }) green else gray)
+
+            // Match check
+            reqMatch.setTextColor(if (pass.isNotEmpty() && pass == confirm) green else gray)
+        }
+
+        val passwordWatcher = object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                updateChecklist()
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        }
+
+        passwordField.addTextChangedListener(passwordWatcher)
+        confirmedPasswordField.addTextChangedListener(passwordWatcher)
+
         // create account button onclick listener
         createAccountButton.setOnClickListener {
             println("in create account button onclick listener")
@@ -78,8 +120,8 @@ class SignUpActivity : AppCompatActivity() {
                     validationMessage.text = "Email is not valid. Please enter your Farmingdale email username."
                 }
                 // if password is not valid, notify user
-                validPass != null-> {
-                    validationMessage.text = validPass
+                !validPass-> {
+                    validationMessage.text = "Password is invalid."
                 }
                 //If season placeholder selected
                 selectedSeason == "Season" -> {
@@ -149,20 +191,12 @@ class SignUpActivity : AppCompatActivity() {
     /**
      * valid password: checks if password is valid or not
      */
-    fun validPassword(pass: String, confirm: String): String? {
-        if (pass != confirm) // if passwords are different
-            return "Passwords do not match."
-        if (pass.length < 12)  // if password length is shorter than 12 characters
-            return "Password must be at least 12 characters long."
-        if (!hasUpperCase(pass))  // if there are no uppercase characters in password
-            return "Password must contain at least 1 uppercase letter."
-        if (!hasLowerCase(pass))  // if there are no lowercase characters  in password
-            return "Password must contain at least 1 lowercase letter."
-        if (!hasDigit(pass))    // if there are no digits in password
-            return "Password must contain a digit."
-        if (!hasSpecialChar(pass)) // if there are no special characters
-            return "Password must contain at least 1 special character."
-        return null
+    fun validPassword(pass: String, confirm: String): Boolean {
+        return pass.length >= 8 &&
+                pass.any { it.isUpperCase() } &&
+                pass.any { it.isLowerCase() } &&
+                pass.any { it.isDigit() } &&
+                pass == confirm
     }
 
     /**
