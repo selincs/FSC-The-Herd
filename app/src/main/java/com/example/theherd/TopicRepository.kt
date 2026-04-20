@@ -79,17 +79,22 @@ object TopicRepository {
                 // Default Rules Post - "system - Community Rules : 1, 2, 3"
                 // ------------------------
                 val rulesPostData = hashMapOf(
+                    //add postID
+                    "postID" to postID,
                     "topicID" to topicID,
-                    "posterID" to "Ram-Bo",
+//                    "posterID" to "Ram-Bo",     //postedByUID
+                    "postedByUID" to "Ram-Bo",     //postedByUID
                     "postTitle" to "Community Rules",
-                    "postText" to """
+                    //postText -> postContents
+                    "postContents" to """       
                     1. Be respectful
                     2. Stay on topic
                     3. No harassment
                 """.trimIndent(),
-                    "likeCount" to 1,
+                    "likeCount" to 0,
                     "commentCount" to 1,
-                    "postedAt" to FieldValue.serverTimestamp(),
+//                    "postedAt" to FieldValue.serverTimestamp(), //postDateTime
+                    "postDateTime" to FieldValue.serverTimestamp(), //postDateTime
                     "isPinned" to true
                 )
                 batch.set(rulesPostRef, rulesPostData)
@@ -97,12 +102,16 @@ object TopicRepository {
                 // Default Rules Comment Creation - "System - Have fun!"
                 // ------------------------
                 val rulesCommentData = hashMapOf(
+                    "commentID" to UUID.randomUUID().toString(), //commentID
+                    "commentedByEmail" to "Ram-Bo", //commentedByEmail -> Ram-Bo
                     "topicID" to topicID,
                     "postID" to postID,
-                    "commenterID" to "Ram-Bo",
-                    "commentText" to "Have fun!",
-                    "parentCommentID" to null,
-                    "likeCount" to 1,
+//                    "commenterID" to "Ram-Bo",  //commentedByUID
+                    "commentedByUID" to "Ram-Bo",  //commentedByUID
+//                    "commentText" to "Have fun!",   //commContents
+                    "commContents" to "Have fun!",   //commContents
+                    "parentCommentID" to null,  //not every comment is a reply
+                    "likeCt" to 0,   //like count changed to 0 from 1 for uniformity over program
                     "createdAt" to FieldValue.serverTimestamp()
                 )
                 batch.set(rulesCommentRef, rulesCommentData)
@@ -335,7 +344,7 @@ object TopicRepository {
             }
     }
 
-    }
+}
 
     //Topic Event functions
     /*

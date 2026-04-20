@@ -40,17 +40,17 @@ public class Topic {
     //TODO: Fix these constructors to work with Uri Strings instead of int resId -> Remove unneeded constructors
     //To create a Topic, a User must provide : the name & description (Plus their ID is recorded)
     // Constructor for default drawable image
-    public Topic(String topicName, String creatorID, String topicDesc, int imageResId) {
-        this.topicName = topicName.trim().toLowerCase();
-        this.topicID = topicName.trim().toLowerCase();
-        this.topicDesc = topicDesc;
-        this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
-        this.memberCount = 0;
-        this.imageResId = imageResId;
-        this.imageUriString = null; // no uploaded image
-    }
+//    public Topic(String topicName, String creatorID, String topicDesc, int imageResId) {
+//        this.topicName = topicName.trim().toLowerCase();
+//        this.topicID = topicName.trim().toLowerCase();
+//        this.topicDesc = topicDesc;
+//        this.communityBoard = new CommunityBoard(topicName, creatorID, topicID);
+//        this.memberCount = 0;
+//        this.imageResId = imageResId;
+//        this.imageUriString = null; // no uploaded image
+//    }
 
-    // Constructor for uploaded image
+//    // Constructor for uploaded image
     public Topic(String topicName, String creatorID, String topicDesc, String imageUriString) {
         this.topicName = topicName.trim().toLowerCase();
         this.topicID = topicName.trim().toLowerCase();
