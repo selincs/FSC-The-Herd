@@ -107,7 +107,7 @@ class ProfileActivity : AppCompatActivity() {
 
             if (isEditing) {
                 setEditMode(true)
-                adapter.setEditMode(true)
+//                adapter.setEditMode(true)
                 editProfileButton.text = "Save Changes"
             } else {
                 saveAll(
@@ -116,7 +116,7 @@ class ProfileActivity : AppCompatActivity() {
                     bioInput,
                 )
                 setEditMode(false)
-                adapter.setEditMode(false)
+//                adapter.setEditMode(false)
                 editProfileButton.text = "Edit Profile"
             }
         }
