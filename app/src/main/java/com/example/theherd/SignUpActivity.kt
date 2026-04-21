@@ -168,7 +168,7 @@ class SignUpActivity : AppCompatActivity() {
         // login button event listener
         loginButton.setOnClickListener {
             println("in login button event listener")
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
     }

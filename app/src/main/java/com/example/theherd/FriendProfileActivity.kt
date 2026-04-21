@@ -67,12 +67,12 @@ class FriendProfileActivity : AppCompatActivity() {
 
         // button event listeners
         motivationButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, MotivationActivity::class.java)
             startActivity(intent)
         }
 
         friendsButton.setOnClickListener {
-            val intent = Intent(this, MotivationActivity::class.java)
+            val intent = Intent(this, FriendsListActivity::class.java)
             startActivity(intent)
         }
 

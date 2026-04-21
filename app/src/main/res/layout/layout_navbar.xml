@@ -32,7 +32,7 @@
     <Button style="@style/PillButton" android:id="@+id/events_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Events" />
     <Button style="@style/PillButton" android:id="@+id/guide_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Guides" />
     <Button style="@style/PillButton" android:id="@+id/community_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Community" />
-    <Button style="@style/PillButton" android:id="@+id/interests_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Interests" />
+    <Button style="@style/PillButton" android:id="@+id/interests_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Topics" />
     <Button style="@style/PillButton" android:id="@+id/motivation_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Motivation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
