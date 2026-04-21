@@ -18,15 +18,18 @@ import android.view.View
 
 import android.app.Activity
 import android.net.Uri
-
+import android.widget.TextView
 
 
 class TopicsActivity : AppCompatActivity() {
 
     private lateinit var adapter: TopicsAdapter
     private lateinit var topicsList: MutableList<Topic>
+    private var showingJoinedOnly = false
+    private var joinedTopicIDs: MutableSet<String> = mutableSetOf()
 
     private var selectedImageUri: Uri? = null  // Stores the uploaded image URI
+
     companion object {
         private const val IMAGE_PICK_CODE = 1001
     }
@@ -82,11 +85,18 @@ class TopicsActivity : AppCompatActivity() {
         //Get the list of topics a user has joined from Firestore as joinedIDs
         TopicRepository.getUserJoinedTopicIDs(
             onSuccess = { joinedIDs ->
+
+                joinedTopicIDs =
+                    joinedIDs.toMutableSet() //store the joinedTopicIDs to query Firestore only once
+
                 TopicRepository.loadTopics( //Load all topics from Firestore into topicsList next
-                    onSuccess = { topicsList ->
-                        val adapter = TopicsAdapter(    //Pass both lists to the Adapter
+                    onSuccess = { loadedTopics ->
+                        //Store the list of loaded Topics
+                        topicsList = loadedTopics.toMutableList()
+
+                        adapter = TopicsAdapter(    //Pass both lists to the Adapter
                             topicsList,
-                            joinedIDs.toMutableSet()
+                            joinedTopicIDs
                         )
                         recyclerView.adapter = adapter
 
@@ -107,15 +117,36 @@ class TopicsActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter.filter(s.toString())
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
 
         //Enter Community Button in Topics Activity - Not the one in the NavBar
-        val enterCommunityBtn = findViewById<Button>(R.id.communityBoardButton)
+        val myCommunitiesBtn = findViewById<Button>(R.id.myCommunitiesButton)
+        val viewTopicsHint = findViewById<TextView>(R.id.viewTopicsHint)
 
-        enterCommunityBtn.setOnClickListener {
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
+        //showingJoinedOnly == false on program start
+        myCommunitiesBtn.setOnClickListener {
+            //Set button state for joined topics / all topics
+            showingJoinedOnly = !showingJoinedOnly
+
+            if (showingJoinedOnly) {
+                // Show ONLY joined topics
+                val filtered = topicsList.filter { topic ->
+                    joinedTopicIDs.contains(topic.topicID)
+                }
+
+                adapter.updateList(filtered)
+                viewTopicsHint.text = "Want to view all Topics?"
+                myCommunitiesBtn.text = "Show All Topics"
+                Toast.makeText(this, "Showing your communities", Toast.LENGTH_SHORT).show()
+
+            } else { // Show ALL topics - Default program state
+                adapter.updateList(topicsList)
+                viewTopicsHint.text = "Want to view topics you've joined?"
+                myCommunitiesBtn.text = "My Communities"
+                Toast.makeText(this, "Showing all topics", Toast.LENGTH_SHORT).show()
+            }
         }
 
         //Create Topic Button
@@ -148,7 +179,8 @@ class TopicsActivity : AppCompatActivity() {
                     //THIS IS FOR CREATING A NEW TOPIC
                     if (name.isEmpty()) {
                         //Currently if name is empty, dialog closes
-                        Toast.makeText(this, "Topic name cannot be empty.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Topic name cannot be empty.", Toast.LENGTH_SHORT)
+                            .show()
                         return@setPositiveButton
                     }
                     // Only upload the image if the user picked one using TopicRepository uploadImage()
@@ -162,9 +194,14 @@ class TopicsActivity : AppCompatActivity() {
                                 createTopicInFirestore(name, desc, downloadUrl)
                             },
                             onFailure = { exception ->
-                                Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT)
+                                    .show()
                                 //Create the Topic and open its details page
-                                createTopicInFirestore(name, desc, selectedImageUri!!.toString()) // Store locally
+                                createTopicInFirestore(
+                                    name,
+                                    desc,
+                                    selectedImageUri!!.toString()
+                                ) // Store locally
                             }
                         )
                     } else {
@@ -222,7 +259,7 @@ class TopicsActivity : AppCompatActivity() {
 
         // passes the Firebase URL as a Uri string to TopicRepository function
         TopicRepository.createTopic(
-            name,desc,Uri.parse(imageUrl),userID,
+            name, desc, Uri.parse(imageUrl), userID,
             onSuccess = { topicID ->
                 val newTopic = Topic(name, userID, desc, imageUrl)
                 newTopic.isJoined = true
@@ -239,7 +276,11 @@ class TopicsActivity : AppCompatActivity() {
                 startActivity(intent)
             },
             onFailure = { exception ->
-                Toast.makeText(this, exception.message ?: "Error: Failed to create topic", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    exception.message ?: "Error: Failed to create topic",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }
@@ -252,15 +293,51 @@ class TopicsActivity : AppCompatActivity() {
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
             data?.data?.let { uri ->
                 // Persist permission so it works after restart
-                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
 
                 selectedImageUri = uri
                 println("Persisted permission for URI: $uri")
                 println("ImagePicker - selectedImageUri value: $selectedImageUri")
-                }
+            }
             if (selectedImageUri != null) {
                 Toast.makeText(this, "Image selected!", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    //If the page is navigated back to via the back btn, reload the user's joined topics incase they change elsewhere(TopicDetails)
+    override fun onResume() {
+        super.onResume()
+        TopicRepository.getUserJoinedTopicIDs(
+            onSuccess = { joinedIDs ->
+
+                joinedTopicIDs = joinedIDs.toMutableSet() //store the joinedTopicIDs to query Firestore only once
+
+                TopicRepository.loadTopics( //Load all topics from Firestore into topicsList next
+                    onSuccess = { loadedTopics  ->
+                        //Store the list of loaded Topics
+                        val recyclerView = findViewById<RecyclerView>(R.id.topicsRecyclerView)
+
+                        topicsList = loadedTopics.toMutableList()
+
+                        adapter = TopicsAdapter(    //Pass both lists to the Adapter
+                            topicsList,
+                            joinedTopicIDs
+                        )
+                        recyclerView.adapter = adapter
+
+                    },
+                    onFailure = {
+                        println("Failed to load topics: ${it.message}")
+                    }
+                )
+            },
+            onFailure = {
+                println("Failed to load the user's joined topics: ${it.message}")
+            }
+        )
     }
 }
