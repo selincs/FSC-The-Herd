@@ -49,10 +49,10 @@ class GuidesActivity : AppCompatActivity() {
             startActivity(intent)
         }
 //
-//        friendsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        friendsButton.setOnClickListener {
+            val intent = Intent(this, FriendsListActivity::class.java)
+            startActivity(intent)
+        }
 //
         interestsButton.setOnClickListener {
             val intent = Intent(this, TopicsActivity::class.java)
@@ -69,9 +69,9 @@ class GuidesActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        guideButton.setOnClickListener {
-            Toast.makeText(this, "You are already on the Guides page!", Toast.LENGTH_SHORT).show()
-        }
+//        guideButton.setOnClickListener {
+//            Toast.makeText(this, "You are already on the Guides page!", Toast.LENGTH_SHORT).show()
+//        }
 
         createGuideButton.setOnClickListener {
             println("in createGuideButton onclick listener:")

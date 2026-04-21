@@ -36,7 +36,7 @@ class FriendsListActivity : AppCompatActivity() {
         val btnAddFriend = findViewById<MaterialButton>(R.id.btnAddFriend)
 
         // buttons
-        val eventsButton: Button = findViewById(R.id.events_button)
+//        val eventsButton: Button = findViewById(R.id.events_button)
         val motivationButton: Button = findViewById(R.id.motivation_button)
         val friendsButton: Button = findViewById(R.id.friends_button)
         val interestsButton: Button = findViewById(R.id.interests_button)
@@ -57,13 +57,13 @@ class FriendsListActivity : AppCompatActivity() {
         }
 
         // button event listeners
-        eventsButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-        }
+//        eventsButton.setOnClickListener {
+//            val intent = Intent(this, LoginActivity::class.java)
+//            startActivity(intent)
+//        }
 
         motivationButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, MotivationActivity::class.java)
             startActivity(intent)
         }
 //

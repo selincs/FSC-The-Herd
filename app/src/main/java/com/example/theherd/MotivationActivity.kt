@@ -22,7 +22,7 @@ class MotivationActivity : AppCompatActivity() {
 
         // toolbar buttons
         val eventsButton: Button = findViewById(R.id.events_button)
-        val motivationButton: Button = findViewById(R.id.motivation_button)
+//        val motivationButton: Button = findViewById(R.id.motivation_button)
         val friendsButton: Button = findViewById(R.id.friends_button)
         val interestsButton: Button = findViewById(R.id.interests_button)
         val communityButton: Button = findViewById(R.id.community_button)
@@ -40,15 +40,15 @@ class MotivationActivity : AppCompatActivity() {
 //            startActivity(intent)
 //        }
 //
-        motivationButton.setOnClickListener {
-            val intent = Intent(this, MotivationActivity::class.java)
-            startActivity(intent)
-        }
-//
-//        friendsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
+//        motivationButton.setOnClickListener {
+//            val intent = Intent(this, MotivationActivity::class.java)
 //            startActivity(intent)
 //        }
+//
+        friendsButton.setOnClickListener {
+            val intent = Intent(this, FriendsListActivity::class.java)
+            startActivity(intent)
+        }
 //
         interestsButton.setOnClickListener {
             val intent = Intent(this, TopicsActivity::class.java)
