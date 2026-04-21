@@ -2,20 +2,22 @@ package com.example.theherd
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
+import android.view.View
 import android.widget.Button
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
-import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 
 
-class GuidesActivity : AppCompatActivity() {
+class MotivationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_guides) // connects XML
+        setContentView(R.layout.activity_motivation) // connects XML
         val homeButton: ImageButton = findViewById(R.id.homeButton)
 
         // toolbar buttons
@@ -26,17 +28,11 @@ class GuidesActivity : AppCompatActivity() {
         val communityButton: Button = findViewById(R.id.community_button)
         val profileButton: Button = findViewById(R.id.profile_button)
         val guideButton: Button = findViewById(R.id.guide_button)
-        val createGuideButton: Button = findViewById(R.id.create_guide_button)
+
 
         // toolbar
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         setSupportActionBar(toolbar)
-
-        val backButton = findViewById<ImageButton>(R.id.btnBack)
-        backButton.visibility = View.VISIBLE
-        backButton.setOnClickListener {
-            finish() // Closes this page and goes back
-        }
 
         // button event listeners
 //        eventsButton.setOnClickListener {
@@ -70,14 +66,11 @@ class GuidesActivity : AppCompatActivity() {
         }
 
         guideButton.setOnClickListener {
-            Toast.makeText(this, "You are already on the Guides page!", Toast.LENGTH_SHORT).show()
-        }
-
-        createGuideButton.setOnClickListener {
-            println("in createGuideButton onclick listener:")
-            val intent = Intent(this, CreateGuideActivity::class.java)
+            val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
         }
+
+
         // Settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
         settingsButton.setOnClickListener { view ->
@@ -94,21 +87,34 @@ class GuidesActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        setupCategoryClick(R.id.navigation_guide, "Navigation")
-        setupCategoryClick(R.id.travel_guide, "Travel")
-        setupCategoryClick(R.id.academic_guide, "Academic")
-        setupCategoryClick(R.id.financial_aid_guid, "Financial Aid")
-        setupCategoryClick(R.id.housing_guides, "Housing")
-        setupCategoryClick(R.id.clubs_guide, "Clubs")
-        setupCategoryClick(R.id.health_wellness_guide, "Health & Wellness")
-        setupCategoryClick(R.id.miscellaneous_guides, "Miscellaneous")
-    }
+        val mentorsRecyclerView = findViewById<RecyclerView>(R.id.mentorsRecyclerView)
+        val commitmentsRecyclerView = findViewById<RecyclerView>(R.id.commitmentsRecyclerView)
 
-    private fun setupCategoryClick(viewId: Int, categoryName: String) {
-        findViewById<TextView>(viewId).setOnClickListener {
-            val intent = Intent(this, GuideMainPageActivity::class.java)
-            intent.putExtra("CATEGORY_NAME", categoryName)
-            startActivity(intent)
+        mentorsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        commitmentsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        //Fake Data -- Can remove when firebase is connected
+        val fakeMentors = listOf(Mentor("Rachel Green", "Mentor"), Mentor("Ross Geller", "Mentor"), Mentor("Monica Geller", "Mentor"), Mentor("Chandler Bing", "Mentor"), Mentor("Joey Tribbiani", "Mentor"), Mentor("Phoebe Buffay", "Mentor"))
+        val fakeCommitments = listOf(Commitment("Go to Gym", "Chandler", 3), Commitment("Study", "Monica", 5), Commitment("Go for a hike", "Joey", 9), Commitment("Self Defense", "Rachel", 15))
+
+        mentorsRecyclerView.adapter = MentorAdapter(fakeMentors)
+
+        commitmentsRecyclerView.adapter = CommitmentAdapter(fakeCommitments) { clickedCommitment ->
+            val bottomSheet = BottomSheetDialog(this)
+            bottomSheet.setContentView(R.layout.bottom_sheet_commitment)
+
+            val titleText = bottomSheet.findViewById<TextView>(R.id.detailActivityName)
+            val partnerText = bottomSheet.findViewById<TextView>(R.id.detailPartnerName)
+            val streakNum = bottomSheet.findViewById<TextView>(R.id.detailStreakNumber)
+
+            titleText?.text = clickedCommitment.activityName
+            partnerText?.text = "Shared commitment with ${clickedCommitment.partnerName}"
+            streakNum?.text = "🔥 ${clickedCommitment.streak} Days"
+
+            bottomSheet.show()
         }
+
     }
 }
+
+data class Mentor(val name: String, val role: String)

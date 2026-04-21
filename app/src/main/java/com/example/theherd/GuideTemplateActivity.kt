@@ -51,6 +51,13 @@ class GuideTemplateActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        motivationButton.setOnClickListener {
+            val intent = Intent(this, MotivationActivity::class.java)
+            startActivity(intent)
+        }
+
+
+
         // toolbar
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         setSupportActionBar(toolbar)

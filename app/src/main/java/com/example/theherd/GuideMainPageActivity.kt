@@ -51,6 +51,10 @@ class GuideMainPageActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        motivationButton.setOnClickListener {
+            val intent = Intent(this, MotivationActivity::class.java)
+            startActivity(intent)
+        }
 
         val incomingCategory = intent.getStringExtra("CATEGORY_NAME")
 
