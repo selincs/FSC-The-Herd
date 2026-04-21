@@ -120,7 +120,7 @@
         <item>Student Life</item>
         <item>Other</item>
     </string-array>
-
+    <string name="send_friend_request">Send Friend Request</string>
     <string-array name="sort_options">
         <item>Newest</item>
         <item>Oldest</item>

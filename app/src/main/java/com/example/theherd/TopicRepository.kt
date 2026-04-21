@@ -60,7 +60,8 @@ object TopicRepository {
                     "creatorID" to creatorID,
                     "memberCount" to 1,
                     "createdAt" to FieldValue.serverTimestamp(),
-                    "isArchived" to false
+                    "isArchived" to false,
+                    "nameLowercase" to topicName.lowercase(), // New hidden field for searching
                 )
                 batch.set(topicRef, topicData)
                 // ------------------------

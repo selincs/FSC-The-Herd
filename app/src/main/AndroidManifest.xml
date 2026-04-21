@@ -54,10 +54,11 @@
 
         <activity
             android:name=".CreateCommunityActivity"
-            android:exported="false" />
+            android:exported="false"/>
+
         <activity
             android:name=".CreatePostActivity"
-            android:exported="false" />
+            android:exported="false"/>
 
         <activity
             android:name=".PostDetailActivity"
@@ -67,6 +68,13 @@
             android:exported="false"/>
 
         <activity android:name=".GuideTemplateActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".FriendsListActivity"
+            android:exported="false"/>
+
+        <activity android:name=".FriendProfileActivity"
             android:exported="false"/>
     </application>
 
