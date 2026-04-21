@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import android.view.View
 
 import android.app.Activity
 import android.net.Uri
@@ -25,7 +26,7 @@ class TopicsActivity : AppCompatActivity() {
     private lateinit var adapter: TopicsAdapter
     private lateinit var topicsList: MutableList<Topic>
 
-    private var selectedImageUri: Uri? = null  // Stores the uploaded image
+    private var selectedImageUri: Uri? = null  // Stores the uploaded image URI
     companion object {
         private const val IMAGE_PICK_CODE = 1001
     }
@@ -45,31 +46,60 @@ class TopicsActivity : AppCompatActivity() {
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
 
         // toolbar
-        val toolbar: Toolbar = findViewById(R.id.topToolbar)
+        val toolbar = findViewById<Toolbar>(R.id.includedToolbar)
+//        val toolbar: Toolbar = findViewById(R.id.topToolbar)
+
+        setSupportActionBar(toolbar)
         val homeButton: ImageButton = findViewById(R.id.homeButton)
         setSupportActionBar(toolbar)
+
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+        backButton.visibility = View.VISIBLE
+        backButton.setOnClickListener {
+            finish() // Closes this page and goes back
+        }
 
         val recyclerView = findViewById<RecyclerView>(R.id.topicsRecyclerView)
         val searchBar = findViewById<EditText>(R.id.searchTopics)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Sample topics - Hardcoded
-        topicsList = mutableListOf(
-            Topic("Gym Buddies", "user123", "Connect with fellow gym goers", R.drawable.gym.toString()),
-            Topic("Chess Club", "user456", "Join the strategy fun!", R.drawable.chess.toString()),
-            Topic("Hiking Lovers", "user789", "Explore trails together", R.drawable.hiking.toString()),
-            Topic("Foodies", "user321", "Share recipes and restaurants", R.drawable.food.toString())
+        // Sample topics - Hardcoded - Make Real Topics out of these later before removing
+//        topicsList = mutableListOf(
+//            Topic("Gym Buddies", "user123", "Connect with fellow gym goers", R.drawable.gym.toString()),
+//            Topic("Chess Club", "user456", "Join the strategy fun!", R.drawable.chess.toString()),
+//            Topic("Hiking Lovers", "user789", "Explore trails together", R.drawable.hiking.toString()),
+//            Topic("Foodies", "user321", "Share recipes and restaurants", R.drawable.food.toString())
+//        )
+//        topicsList = mutableListOf()
+//
+//        //Adapter with sample topics
+//        adapter = TopicsAdapter(topicsList)
+//        recyclerView.adapter = adapter
+//
+//        //Call loadTopics helper in TopicsActivity to load Firestore Topics
+//        loadTopics()
+        //Get the list of topics a user has joined from Firestore as joinedIDs
+        TopicRepository.getUserJoinedTopicIDs(
+            onSuccess = { joinedIDs ->
+                TopicRepository.loadTopics( //Load all topics from Firestore into topicsList next
+                    onSuccess = { topicsList ->
+                        val adapter = TopicsAdapter(    //Pass both lists to the Adapter
+                            topicsList,
+                            joinedIDs.toMutableSet()
+                        )
+                        recyclerView.adapter = adapter
+
+                    },
+                    onFailure = {
+                        println("Failed to load topics: ${it.message}")
+                    }
+                )
+            },
+            onFailure = {
+                println("Failed to load the user's joined topics: ${it.message}")
+            }
         )
-
-
-        //Adapter with sample topics
-        adapter = TopicsAdapter(topicsList)
-        recyclerView.adapter = adapter
-
-        // Append Firestore loaded topics to topicsList with sample topics
-        //Verify placement of loadTopicsFromFS()in code->Merging happened since this was put here
-//        loadTopicsFromFirestore(topicsList) Broken after Test Party Merge, revisit fnc later anyway
 
         // Search filter
         searchBar.addTextChangedListener(object : TextWatcher {
@@ -88,25 +118,24 @@ class TopicsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        //Create Button starts here
+        //Create Topic Button
         val createButton = findViewById<Button>(R.id.createTopicButton)
 
         createButton.setOnClickListener {
             val dialogView = layoutInflater.inflate(R.layout.dialog_create_topic, null)
-
             val nameInput = dialogView.findViewById<EditText>(R.id.inputTopicName)
             val descInput = dialogView.findViewById<EditText>(R.id.inputTopicDesc)
             val uploadButton = dialogView.findViewById<ImageButton>(R.id.uploadImageButton)
 
             // Reset selected image for each dialog open
             selectedImageUri = null
-
             // Upload button opens device image picker
             uploadButton.setOnClickListener {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
                 intent.addCategory(Intent.CATEGORY_OPENABLE)
                 intent.type = "image/*"
                 startActivityForResult(intent, IMAGE_PICK_CODE)
+                println("UPLOAD BUTTON PRESSED")
             }
 
             AlertDialog.Builder(this)
@@ -117,47 +146,32 @@ class TopicsActivity : AppCompatActivity() {
                     val name = nameInput.text.toString()
                     val desc = descInput.text.toString()
                     //THIS IS FOR CREATING A NEW TOPIC
-                    if (name.isNotEmpty()) {
-                        val newTopic = if (selectedImageUri != null) {
-                            // Store the URI as a string for your Topic model
-                            Topic(name, "currentUser", desc, selectedImageUri.toString())
-                        }
-                        else {
-                            // Set imageUriString to default image if none selected
-                            println("Default image option, no image selected")
-                            Topic(name, "currentUser", desc, "default")
-                        }
-                        //If User is null, stop topic creation and return
-                        val userID = SessionManager.getUser()?.userID ?: return@setPositiveButton
-
-                     //Firestore createTopic() fnc call
-                        TopicRepository.createTopic(
-                            name,
-                            desc,
-                            selectedImageUri,
-                            userID,
-                            onSuccess = { topicID ->
-                                //Set imageURI to either use selected image or default image
-                                val imageUriString = selectedImageUri?.toString() ?: "default"
-                                val newTopic = Topic(
-                                    name,
-                                    userID,
-                                    desc,
-                                    imageUriString
-                                )
-
-                                topicsList.add(newTopic)
-                                adapter.updateList(topicsList)
-                                //Update the Topics List with a new Topic at the bottom
-//                                adapter.notifyItemInserted(topicsList.size - 1) //Doesn't work
-                                Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
+                    if (name.isEmpty()) {
+                        //Currently if name is empty, dialog closes
+                        Toast.makeText(this, "Topic name cannot be empty.", Toast.LENGTH_SHORT).show()
+                        return@setPositiveButton
+                    }
+                    // Only upload the image if the user picked one using TopicRepository uploadImage()
+                    if (selectedImageUri != null) {
+                        println("Uploading image: $selectedImageUri")
+                        TopicRepository.uploadImage(
+                            this, // pass activity context to uploadImage in TopicRepository
+                            selectedImageUri!!,
+                            onSuccess = { downloadUrl ->
+                                //Create the Topic and open its details page
+                                createTopicInFirestore(name, desc, downloadUrl)
                             },
                             onFailure = { exception ->
-                                Toast.makeText(this,exception.message ?: "Failed to create topic",Toast.LENGTH_LONG).show()
+                                Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT).show()
+                                //Create the Topic and open its details page
+                                createTopicInFirestore(name, desc, selectedImageUri!!.toString()) // Store locally
                             }
                         )
                     } else {
-                        Toast.makeText(this, "Topic name cannot be empty.", Toast.LENGTH_SHORT).show()
+                        // No image selected -> use default
+                        println("No image selected, using default, Topic created in FS")
+                        //Create the Topic and open its details page
+                        createTopicInFirestore(name, desc, "default")
                     }
                 }
                 .setNegativeButton("Cancel", null)
@@ -201,45 +215,49 @@ class TopicsActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadTopicsFromFirestore(list: MutableList<Topic>) {
+    //Topic currently does not update on createTopic()
+    //Helper function to create a topic in Firestore via TopicRepository, then creates the new topic and updates the list
+    private fun createTopicInFirestore(name: String, desc: String, imageUrl: String) {
+        val userID = SessionManager.getUser()?.userID ?: return
 
-        FirestoreDatabase.db.collection("topics")
-            .get()
-            .addOnSuccessListener { result ->
+        // passes the Firebase URL as a Uri string to TopicRepository function
+        TopicRepository.createTopic(
+            name,desc,Uri.parse(imageUrl),userID,
+            onSuccess = { topicID ->
+                val newTopic = Topic(name, userID, desc, imageUrl)
+                newTopic.isJoined = true
 
-                for (doc in result) {
+                Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
 
-                    val topicID = doc.getString("topicID") ?: continue
-                    val topicName = doc.getString("topicName") ?: ""
-                    val topicDesc = doc.getString("topicDesc") ?: ""
-                    val creatorID = doc.getString("creatorID") ?: ""
-                    val memberCount = doc.getLong("memberCount")?.toInt() ?: 0
-                    val imageResId = doc.getLong("imageResId")?.toInt() ?: R.drawable.marquee_logo
+                val intent = Intent(this, TopicDetailActivity::class.java)
+                //TODO: Review, should I just pass the firestore fields here as a extra in the intent?
+                intent.putExtra("topicID", topicID)
+                intent.putExtra("topicName", name)
+                intent.putExtra("topicDesc", desc)
+                intent.putExtra("memberCount", 1)
 
-
-                    // Create Topic object (using your constructor)
-                    val topic = Topic(topicName, creatorID, topicDesc, imageResId)
-
-                    topic.setMemberCount(memberCount)
-
-                    // Add to list
-                    list.add(topic)
-                }
-
-                // RecyclerView doesnt auto refresh, use notifyDataSetChanged() to update
-                adapter.notifyDataSetChanged()
+                startActivity(intent)
+            },
+            onFailure = { exception ->
+                Toast.makeText(this, exception.message ?: "Error: Failed to create topic", Toast.LENGTH_LONG).show()
             }
-            .addOnFailureListener {
-                println("Failed to load topics from Firestore")
-            }
+        )
     }
 
     // Handle image picker result
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        println("Image picker onActivityResult triggered")
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
-            selectedImageUri = data?.data
+            data?.data?.let { uri ->
+                // Persist permission so it works after restart
+                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                selectedImageUri = uri
+                println("Persisted permission for URI: $uri")
+                println("ImagePicker - selectedImageUri value: $selectedImageUri")
+                }
             if (selectedImageUri != null) {
                 Toast.makeText(this, "Image selected!", Toast.LENGTH_SHORT).show()
             }
