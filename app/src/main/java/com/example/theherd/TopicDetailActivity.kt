@@ -221,6 +221,12 @@ class TopicDetailActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        motivationButton.setOnClickListener {
+            val intent = Intent(this, MotivationActivity::class.java)
+            startActivity(intent)
+        }
+
+
         // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
         settingsButton.setOnClickListener { view ->
             SettingsMenuHelper.showSettingsMenu(this, view)

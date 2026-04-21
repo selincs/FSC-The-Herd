@@ -8,6 +8,7 @@ import android.widget.Button
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,8 +42,7 @@ class MotivationActivity : AppCompatActivity() {
 //        }
 //
         motivationButton.setOnClickListener {
-            val intent = Intent(this, MotivationActivity::class.java)
-            startActivity(intent)
+            Toast.makeText(this, "You are already on the Motivation page!", Toast.LENGTH_SHORT).show()
         }
 //
 //        friendsButton.setOnClickListener {
