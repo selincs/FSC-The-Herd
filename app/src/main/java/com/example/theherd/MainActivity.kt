@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 //        }
 //
         motivationButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, MotivationActivity::class.java)
             startActivity(intent)
         }
 //

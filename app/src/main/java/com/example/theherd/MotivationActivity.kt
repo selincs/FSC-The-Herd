@@ -22,7 +22,7 @@ class MotivationActivity : AppCompatActivity() {
 
         // toolbar buttons
         val eventsButton: Button = findViewById(R.id.events_button)
-//        val motivationButton: Button = findViewById(R.id.motivation_button)
+        val motivationButton: Button = findViewById(R.id.motivation_button)
         val friendsButton: Button = findViewById(R.id.friends_button)
         val interestsButton: Button = findViewById(R.id.interests_button)
         val communityButton: Button = findViewById(R.id.community_button)
