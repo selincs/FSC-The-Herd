@@ -84,7 +84,7 @@ class TopicsActivity : AppCompatActivity() {
             onSuccess = { joinedIDs ->
                 TopicRepository.loadTopics( //Load all topics from Firestore into topicsList next
                     onSuccess = { topicsList ->
-                        val adapter = TopicsAdapter(    //Pass both lists to the Adapter
+                        adapter = TopicsAdapter( //Pass both lists to the Adapter
                             topicsList,
                             joinedIDs.toMutableSet()
                         )
