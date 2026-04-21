@@ -18,13 +18,15 @@ import android.view.View
 
 import android.app.Activity
 import android.net.Uri
-
+import android.widget.TextView
 
 
 class TopicsActivity : AppCompatActivity() {
 
     private lateinit var adapter: TopicsAdapter
     private lateinit var topicsList: MutableList<Topic>
+    private var showingJoinedOnly = false
+    private var joinedTopicIDs: MutableSet<String> = mutableSetOf()
 
     private var selectedImageUri: Uri? = null  // Stores the uploaded image URI
     companion object {
@@ -82,11 +84,18 @@ class TopicsActivity : AppCompatActivity() {
         //Get the list of topics a user has joined from Firestore as joinedIDs
         TopicRepository.getUserJoinedTopicIDs(
             onSuccess = { joinedIDs ->
+
+                joinedTopicIDs = joinedIDs.toMutableSet() //store the joinedTopicIDs to query Firestore only once
+
                 TopicRepository.loadTopics( //Load all topics from Firestore into topicsList next
-                    onSuccess = { topicsList ->
-                        val adapter = TopicsAdapter(    //Pass both lists to the Adapter
+                    onSuccess = { loadedTopics  ->
+
+                        //Store the list of loaded Topics
+                        topicsList = loadedTopics.toMutableList()
+
+                        adapter = TopicsAdapter(    //Pass both lists to the Adapter
                             topicsList,
-                            joinedIDs.toMutableSet()
+                            joinedTopicIDs
                         )
                         recyclerView.adapter = adapter
 
@@ -112,10 +121,30 @@ class TopicsActivity : AppCompatActivity() {
 
         //Enter Community Button in Topics Activity - Not the one in the NavBar
         val myCommunitiesBtn = findViewById<Button>(R.id.myCommunitiesButton)
+        val viewTopicsHint = findViewById<TextView>(R.id.viewTopicsHint)
 
+        //showingJoinedOnly == false on program start
         myCommunitiesBtn.setOnClickListener {
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
+            //Set button state for joined topics / all topics
+            showingJoinedOnly = !showingJoinedOnly
+
+            if (showingJoinedOnly) {
+                // Show ONLY joined topics
+                val filtered = topicsList.filter { topic ->
+                    joinedTopicIDs.contains(topic.topicID)
+                }
+
+                adapter.updateList(filtered)
+                viewTopicsHint.text = "Want to view all Topics?"
+                myCommunitiesBtn.text = "Show All Topics"
+                Toast.makeText(this, "Showing your communities", Toast.LENGTH_SHORT).show()
+
+            } else { // Show ALL topics - Default program state
+                adapter.updateList(topicsList)
+                viewTopicsHint.text = "Want to view topics you've joined?"
+                myCommunitiesBtn.text = "My Communities"
+                Toast.makeText(this, "Showing all topics", Toast.LENGTH_SHORT).show()
+            }
         }
 
         //Create Topic Button
