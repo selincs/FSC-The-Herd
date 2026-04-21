@@ -199,6 +199,12 @@ class TopicsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        motivationButton.setOnClickListener {
+            val intent = Intent(this, MotivationActivity::class.java)
+            startActivity(intent)
+        }
+
+
         // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
         settingsButton.setOnClickListener { view ->
             SettingsMenuHelper.showSettingsMenu(this, view)
@@ -213,6 +219,8 @@ class TopicsActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
+
+
     }
 
     //Topic currently does not update on createTopic()
