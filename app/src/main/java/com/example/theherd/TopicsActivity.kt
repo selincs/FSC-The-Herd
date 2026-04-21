@@ -111,9 +111,9 @@ class TopicsActivity : AppCompatActivity() {
         })
 
         //Enter Community Button in Topics Activity - Not the one in the NavBar
-        val enterCommunityBtn = findViewById<Button>(R.id.communityBoardButton)
+        val myCommunitiesBtn = findViewById<Button>(R.id.myCommunitiesButton)
 
-        enterCommunityBtn.setOnClickListener {
+        myCommunitiesBtn.setOnClickListener {
             val intent = Intent(this, CommunityBoardActivity::class.java)
             startActivity(intent)
         }
