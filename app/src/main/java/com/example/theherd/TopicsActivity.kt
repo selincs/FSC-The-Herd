@@ -29,6 +29,7 @@ class TopicsActivity : AppCompatActivity() {
     private var joinedTopicIDs: MutableSet<String> = mutableSetOf()
 
     private var selectedImageUri: Uri? = null  // Stores the uploaded image URI
+
     companion object {
         private const val IMAGE_PICK_CODE = 1001
     }
@@ -85,11 +86,11 @@ class TopicsActivity : AppCompatActivity() {
         TopicRepository.getUserJoinedTopicIDs(
             onSuccess = { joinedIDs ->
 
-                joinedTopicIDs = joinedIDs.toMutableSet() //store the joinedTopicIDs to query Firestore only once
+                joinedTopicIDs =
+                    joinedIDs.toMutableSet() //store the joinedTopicIDs to query Firestore only once
 
                 TopicRepository.loadTopics( //Load all topics from Firestore into topicsList next
-                    onSuccess = { loadedTopics  ->
-
+                    onSuccess = { loadedTopics ->
                         //Store the list of loaded Topics
                         topicsList = loadedTopics.toMutableList()
 
@@ -116,6 +117,7 @@ class TopicsActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter.filter(s.toString())
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
 
@@ -177,7 +179,8 @@ class TopicsActivity : AppCompatActivity() {
                     //THIS IS FOR CREATING A NEW TOPIC
                     if (name.isEmpty()) {
                         //Currently if name is empty, dialog closes
-                        Toast.makeText(this, "Topic name cannot be empty.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Topic name cannot be empty.", Toast.LENGTH_SHORT)
+                            .show()
                         return@setPositiveButton
                     }
                     // Only upload the image if the user picked one using TopicRepository uploadImage()
@@ -191,9 +194,14 @@ class TopicsActivity : AppCompatActivity() {
                                 createTopicInFirestore(name, desc, downloadUrl)
                             },
                             onFailure = { exception ->
-                                Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT)
+                                    .show()
                                 //Create the Topic and open its details page
-                                createTopicInFirestore(name, desc, selectedImageUri!!.toString()) // Store locally
+                                createTopicInFirestore(
+                                    name,
+                                    desc,
+                                    selectedImageUri!!.toString()
+                                ) // Store locally
                             }
                         )
                     } else {
@@ -251,7 +259,7 @@ class TopicsActivity : AppCompatActivity() {
 
         // passes the Firebase URL as a Uri string to TopicRepository function
         TopicRepository.createTopic(
-            name,desc,Uri.parse(imageUrl),userID,
+            name, desc, Uri.parse(imageUrl), userID,
             onSuccess = { topicID ->
                 val newTopic = Topic(name, userID, desc, imageUrl)
                 newTopic.isJoined = true
@@ -268,7 +276,11 @@ class TopicsActivity : AppCompatActivity() {
                 startActivity(intent)
             },
             onFailure = { exception ->
-                Toast.makeText(this, exception.message ?: "Error: Failed to create topic", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    exception.message ?: "Error: Failed to create topic",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }
@@ -281,15 +293,51 @@ class TopicsActivity : AppCompatActivity() {
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
             data?.data?.let { uri ->
                 // Persist permission so it works after restart
-                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
 
                 selectedImageUri = uri
                 println("Persisted permission for URI: $uri")
                 println("ImagePicker - selectedImageUri value: $selectedImageUri")
-                }
+            }
             if (selectedImageUri != null) {
                 Toast.makeText(this, "Image selected!", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    //If the page is navigated back to via the back btn, reload the user's joined topics incase they change elsewhere(TopicDetails)
+    override fun onResume() {
+        super.onResume()
+        TopicRepository.getUserJoinedTopicIDs(
+            onSuccess = { joinedIDs ->
+
+                joinedTopicIDs = joinedIDs.toMutableSet() //store the joinedTopicIDs to query Firestore only once
+
+                TopicRepository.loadTopics( //Load all topics from Firestore into topicsList next
+                    onSuccess = { loadedTopics  ->
+                        //Store the list of loaded Topics
+                        val recyclerView = findViewById<RecyclerView>(R.id.topicsRecyclerView)
+
+                        topicsList = loadedTopics.toMutableList()
+
+                        adapter = TopicsAdapter(    //Pass both lists to the Adapter
+                            topicsList,
+                            joinedTopicIDs
+                        )
+                        recyclerView.adapter = adapter
+
+                    },
+                    onFailure = {
+                        println("Failed to load topics: ${it.message}")
+                    }
+                )
+            },
+            onFailure = {
+                println("Failed to load the user's joined topics: ${it.message}")
+            }
+        )
     }
 }

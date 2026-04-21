@@ -228,4 +228,11 @@ class TopicsAdapter(
             topics = newList
             notifyDataSetChanged()
         }
+
+        fun updateData(newTopics: List<Topic>, newJoinedIDs: Set<String>) {
+            topics = newTopics
+            joinedTopicIDs.clear()
+            joinedTopicIDs.addAll(newJoinedIDs)
+            notifyDataSetChanged()
+        }
 }
