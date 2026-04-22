@@ -77,6 +77,21 @@ object TopicRepository {
                 )
                 batch.set(memberRef, memberData)
                 // ------------------------
+                // Update the User's joinedTopic's field, so that the list will be updated when the program returns to Topic
+                // ------------------------
+                val userJoinedRef = db.collection("users")
+                    .document(creatorID)
+                    .collection("joinedTopics")
+                    .document(topicID)
+
+                val joinedTopicData = hashMapOf(
+                    "topicID" to topicID,
+                    "joinedAt" to FieldValue.serverTimestamp()
+                )
+
+                batch.set(userJoinedRef, joinedTopicData)
+
+                // ------------------------
                 // Default Rules Post - "system - Community Rules : 1, 2, 3"
                 // ------------------------
                 val rulesPostData = hashMapOf(
