@@ -267,7 +267,8 @@ class TopicsActivity : AppCompatActivity() {
     //Topic currently does not update on createTopic()
     //Helper function to create a topic in Firestore via TopicRepository, then creates the new topic and updates the list
     private fun createTopicInFirestore(name: String, desc: String, imageUrl: String) {
-        val userID = SessionManager.getUser()?.userID ?: return
+        val userID = SessionManager.currentUserId ?: return
+        println("userID=" + userID)
 
         // passes the Firebase URL as a Uri string to TopicRepository function
         TopicRepository.createTopic(
