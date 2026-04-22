@@ -194,7 +194,7 @@ class TopicsActivity : AppCompatActivity() {
                                 createTopicInFirestore(name, desc, downloadUrl)
                             },
                             onFailure = { exception ->
-                                Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT)
+                                Toast.makeText(this, "Image upload (local)", Toast.LENGTH_SHORT)
                                     .show()
                                 //Create the Topic and open its details page
                                 createTopicInFirestore(
@@ -276,7 +276,7 @@ class TopicsActivity : AppCompatActivity() {
                 val newTopic = Topic(name, userID, desc, imageUrl)
                 newTopic.isJoined = true
 
-                Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Topic created!", Toast.LENGTH_LONG).show()
 
                 val intent = Intent(this, TopicDetailActivity::class.java)
                 //TODO: Review, should I just pass the firestore fields here as a extra in the intent?
@@ -293,6 +293,7 @@ class TopicsActivity : AppCompatActivity() {
                     exception.message ?: "Error: Failed to create topic",
                     Toast.LENGTH_LONG
                 ).show()
+                println("HERE")
             }
         )
     }
