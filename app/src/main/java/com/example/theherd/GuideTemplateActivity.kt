@@ -50,6 +50,16 @@ class GuideTemplateActivity : AppCompatActivity() {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
         }
+        friendsButton.setOnClickListener {
+            val intent = Intent(this, FriendsListActivity::class.java)
+            startActivity(intent)
+        }
+        motivationButton.setOnClickListener {
+            val intent = Intent(this, MotivationActivity::class.java)
+            startActivity(intent)
+        }
+
+
 
         // toolbar
         val toolbar: Toolbar = findViewById(R.id.topToolbar)

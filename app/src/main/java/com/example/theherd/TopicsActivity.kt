@@ -194,7 +194,7 @@ class TopicsActivity : AppCompatActivity() {
                                 createTopicInFirestore(name, desc, downloadUrl)
                             },
                             onFailure = { exception ->
-                                Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT)
+                                Toast.makeText(this, "Image upload (local)", Toast.LENGTH_SHORT)
                                     .show()
                                 //Create the Topic and open its details page
                                 createTopicInFirestore(
@@ -236,6 +236,16 @@ class TopicsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        motivationButton.setOnClickListener {
+            val intent = Intent(this, MotivationActivity::class.java)
+            startActivity(intent)
+        }
+
+        friendsButton.setOnClickListener {
+            val intent = Intent(this, FriendsListActivity::class.java)
+            startActivity(intent)
+        }
+
         // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
         settingsButton.setOnClickListener { view ->
             SettingsMenuHelper.showSettingsMenu(this, view)
@@ -250,6 +260,8 @@ class TopicsActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
+
+
     }
 
     //Topic currently does not update on createTopic()
@@ -264,7 +276,7 @@ class TopicsActivity : AppCompatActivity() {
                 val newTopic = Topic(name, userID, desc, imageUrl)
                 newTopic.isJoined = true
 
-                Toast.makeText(this, "Topic created!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Topic created!", Toast.LENGTH_LONG).show()
 
                 val intent = Intent(this, TopicDetailActivity::class.java)
                 //TODO: Review, should I just pass the firestore fields here as a extra in the intent?
@@ -272,6 +284,7 @@ class TopicsActivity : AppCompatActivity() {
                 intent.putExtra("topicName", name)
                 intent.putExtra("topicDesc", desc)
                 intent.putExtra("memberCount", 1)
+                intent.putExtra("isJoined", true)
 
                 startActivity(intent)
             },
@@ -281,6 +294,7 @@ class TopicsActivity : AppCompatActivity() {
                     exception.message ?: "Error: Failed to create topic",
                     Toast.LENGTH_LONG
                 ).show()
+                println("HERE")
             }
         )
     }
@@ -293,10 +307,7 @@ class TopicsActivity : AppCompatActivity() {
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
             data?.data?.let { uri ->
                 // Persist permission so it works after restart
-                contentResolver.takePersistableUriPermission(
-                    uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
+                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                 selectedImageUri = uri
                 println("Persisted permission for URI: $uri")

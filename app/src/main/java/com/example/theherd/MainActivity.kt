@@ -76,16 +76,16 @@ class MainActivity : AppCompatActivity() {
 //            startActivity(intent)
 //        }
 //
-//        motivationButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        motivationButton.setOnClickListener {
+            val intent = Intent(this, MotivationActivity::class.java)
+            startActivity(intent)
+        }
 //
-//        friendsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
+        friendsButton.setOnClickListener {
+            val intent = Intent(this, FriendsListActivity::class.java)
+            startActivity(intent)
+        }
+
         interestsButton.setOnClickListener {
             val intent = Intent(this, TopicsActivity::class.java)
            startActivity(intent)
@@ -106,7 +106,5 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
         }
-
-
     }
 }

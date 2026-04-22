@@ -123,7 +123,7 @@
     <Button style="@style/PillButton" android:id="@+id/community_button"
         android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Community" />
     <Button style="@style/PillButton" android:id="@+id/interests_button"
-        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Interests" />
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Topics" />
     <Button style="@style/PillButton" android:id="@+id/motivation_button"
         android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Motivation" />
 
