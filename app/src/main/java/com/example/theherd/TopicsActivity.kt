@@ -284,6 +284,7 @@ class TopicsActivity : AppCompatActivity() {
                 intent.putExtra("topicName", name)
                 intent.putExtra("topicDesc", desc)
                 intent.putExtra("memberCount", 1)
+                intent.putExtra("isJoined", true)
 
                 startActivity(intent)
             },

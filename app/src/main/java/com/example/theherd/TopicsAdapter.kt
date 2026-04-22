@@ -175,7 +175,6 @@ class TopicsAdapter(
 
                         topic.memberCount += 1
                         holder.members.text = "${topic.memberCount} members"
-//                        holder.joinButton.text = "Joined"
                         updateButtonUI()
 
                         Toast.makeText(
@@ -196,7 +195,6 @@ class TopicsAdapter(
 
                         topic.memberCount -= 1
                         holder.members.text = "${topic.memberCount} members"
-//                        holder.joinButton.text = "Join"
                         updateButtonUI()
 
                         Toast.makeText(
@@ -226,13 +224,6 @@ class TopicsAdapter(
 
         fun updateList(newList: List<Topic>) {
             topics = newList
-            notifyDataSetChanged()
-        }
-
-        fun updateData(newTopics: List<Topic>, newJoinedIDs: Set<String>) {
-            topics = newTopics
-            joinedTopicIDs.clear()
-            joinedTopicIDs.addAll(newJoinedIDs)
             notifyDataSetChanged()
         }
 }
