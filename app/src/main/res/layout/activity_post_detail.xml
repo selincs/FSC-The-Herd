@@ -38,6 +38,7 @@
             android:layout_marginStart="8dp"
             android:layout_gravity="start|center_vertical" />
 
+
         <ImageButton
             android:id="@+id/settingsButton"
             android:layout_width="48dp"
@@ -135,7 +136,17 @@
             android:layout_marginTop="12dp"
             android:textColor="#333333"
             android:textSize="16sp" />
+        <TextView
+            android:id="@+id/detailTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="12sp"
+            android:textColor="#808080"
+            android:gravity="end"
+            android:layout_marginTop="8dp" />
     </LinearLayout>
+
 
     <ListView
         android:id="@+id/commentsListView"

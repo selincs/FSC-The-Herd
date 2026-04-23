@@ -24,10 +24,18 @@ object PostRepository {
 
         val postID = UUID.randomUUID().toString() // generating random post id
 
+        val email = auth.currentUser?.email ?: "unknown"
+        val displayName = if (email.contains("@")) {
+            email.substringBefore("@")
+        } else {
+            "User"
+        }
+
         //initalizing the values to the parameters
         val postData = hashMapOf(
             "postID" to postID,
             "postedByUID" to userID,
+            "displayName" to displayName,
             "postTitle" to postTitle,
             "postContents" to postContents,
             "likeCount" to 0,
@@ -65,22 +73,24 @@ object PostRepository {
                 for(doc in result ){
 
                     val postID = doc.getString("postID") ?: doc.id
-                    val postedByUID = doc.getString("postedByUID" )
+                    val displayName = doc.getString("displayName")
                         ?: doc.getString("posterID")
-                        ?: ""
+                        ?: "Rambo"
                     val postTitle = doc.getString("postTitle") ?: ""
                     val postContents= doc.getString("postContents")
                         ?: doc.getString("postText")
                         ?: ""
+
+
                     val likeCount = doc.getLong("likeCount")?.toInt() ?: 0
 
 
                     val post = Post(
-                        postedByUID,
+                        displayName,
                         postID,
                         postTitle,
                         postContents,
-                        likeCount,
+                        likeCount
 
                     )
                     postsList.add(post)

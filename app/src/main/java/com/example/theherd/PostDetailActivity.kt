@@ -94,13 +94,25 @@ class PostDetailActivity : AppCompatActivity() {
                     ?: doc.getString("postText")
                     ?: ""
 
-                val author = doc.getString("postedByUID")
+                val author = doc.getString("displayName")
                     ?: doc.getString("posterID")
-                    ?: ""
+                    ?: "Rambo"
+
+                val timestamp = doc.getTimestamp("postDateTime")
+                    ?: doc.getTimestamp("postedAt")
+
+
+                val formattedTime = if (timestamp != null) {
+                    val sdf = java.text.SimpleDateFormat("MMM d, h:mm a", java.util.Locale.getDefault())
+                    sdf.format(timestamp.toDate())
+                } else {
+                    ""
+                }
 
                 findViewById<TextView>(R.id.detailTitle).text = title
                 findViewById<TextView>(R.id.detailAuthor).text = "By $author"
                 findViewById<TextView>(R.id.detailContent).text = content
+                findViewById<TextView>(R.id.detailTime).text = formattedTime
             }
 
     }
@@ -151,18 +163,5 @@ class PostDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveUpdatedPost(updatedPost: Post, communityName: String) {
-        val allPosts = PreferencesManager.loadPosts(this, communityName)
 
-        val index = allPosts.indexOfFirst { it.title == updatedPost.title && it.author == updatedPost.author }
-        if (index != -1) {
-            allPosts[index] = updatedPost
-            PreferencesManager.savePosts(this, communityName, allPosts)
-        }
-    }
-
-    private fun formatTimestamp(timeInMillis: Long): String {
-        val sdf = java.text.SimpleDateFormat("MMM d, h:mm a", java.util.Locale.getDefault())
-        return sdf.format(java.util.Date(timeInMillis))
-    }
 }
