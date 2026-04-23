@@ -32,11 +32,22 @@ class CommunityBoardActivity : AppCompatActivity() {
     private fun loadCommunitiesFromFirestore(){
         //clears the old list.
         allCommunities.clear()
+        val userId = FirestoreAuthManager.currentUserId
+        if(userId == null){
+            filterList(searchView.query.toString())
+            return
+        }
         FirebaseFirestore.getInstance()
             .collection("topics")
             .get()
             .addOnSuccessListener{
                 result ->
+                if (result.isEmpty){
+                    filterList(searchView.query.toString())
+                    return@addOnSuccessListener
+                }
+                var remainingChecks = result.size()
+
                 for( doc in result){
                     val topicID = doc.id
                     val name = doc.getString("topicName") ?: ""
@@ -44,14 +55,50 @@ class CommunityBoardActivity : AppCompatActivity() {
                     val memberCount = doc.getLong("memberCount")?.toInt() ?: 0
 
 
-                    val community = Community(
-                        topicID = topicID,
-                        name = name,
-                        description = desc,
-                        memberCount = memberCount,
-                        isJoined = false
-                    )
-                    allCommunities.add(community)
+                    FirebaseFirestore.getInstance()
+                        .collection("topics")
+                        .document(topicID)
+                        .collection("members")
+                        .document(userId)
+                        .get()
+                        .addOnSuccessListener { memberDoc  ->
+                            val community = Community(
+                                topicID = topicID,
+                                name = name,
+                                description = desc,
+                                memberCount = memberCount,
+                                isJoined = memberDoc.exists()
+                            )
+                            allCommunities.add(community)
+
+                            remainingChecks --
+
+                            if( remainingChecks == 0){
+                                filterList(searchView.query.toString())
+                            }
+                        }
+                        .addOnFailureListener{
+                            val community = Community(
+                                topicID = topicID,
+                                name = name,
+                                description = desc,
+                                memberCount = memberCount,
+                                isJoined = false
+                            )
+
+                            allCommunities.add(community)
+
+                            remainingChecks--
+
+                            if(remainingChecks == 0 ){
+                                filterList(searchView.query.toString())
+                            }
+
+                        }
+
+
+
+
                 }
                 filterList(searchView.query.toString())
             }
