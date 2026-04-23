@@ -90,8 +90,13 @@ class PostDetailActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { doc ->
                 val title = doc.getString("postTitle") ?: ""
-                val content = doc.getString("postContents") ?: ""
-                val author = doc.getString("postedByUID") ?: ""
+                val content = doc.getString("postContents")
+                    ?: doc.getString("postText")
+                    ?: ""
+
+                val author = doc.getString("postedByUID")
+                    ?: doc.getString("posterID")
+                    ?: ""
 
                 findViewById<TextView>(R.id.detailTitle).text = title
                 findViewById<TextView>(R.id.detailAuthor).text = "By $author"

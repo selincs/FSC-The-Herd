@@ -64,10 +64,14 @@ object PostRepository {
 
                 for(doc in result ){
 
-                    val postID = doc.getString("postID") ?: continue
-                    val postedByUID = doc.getString("postedByUID" ) ?: ""
+                    val postID = doc.getString("postID") ?: doc.id
+                    val postedByUID = doc.getString("postedByUID" )
+                        ?: doc.getString("posterID")
+                        ?: ""
                     val postTitle = doc.getString("postTitle") ?: ""
-                    val postContents= doc.getString("postContents") ?: ""
+                    val postContents= doc.getString("postContents")
+                        ?: doc.getString("postText")
+                        ?: ""
                     val likeCount = doc.getLong("likeCount")?.toInt() ?: 0
 
 

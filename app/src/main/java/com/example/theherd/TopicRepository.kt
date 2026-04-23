@@ -86,16 +86,17 @@ object TopicRepository {
                 // ------------------------
                 val rulesPostData = hashMapOf(
                     "topicID" to topicID,
-                    "posterID" to "Ram-Bo",
+                    "postID" to postID,
+                    "postedByUID" to "Ram-Bo",
                     "postTitle" to "Community Rules",
-                    "postText" to """
-                    1. Be respectful
-                    2. Stay on topic
-                    3. No harassment
-                """.trimIndent(),
+                    "postContents" to """
+                        1. Be respectful
+                        2. Stay on topic
+                        3. No harassment
+                    """.trimIndent(),
                     "likeCount" to 1,
                     "commentCount" to 1,
-                    "postedAt" to FieldValue.serverTimestamp(),
+                    "postDateTime" to FieldValue.serverTimestamp(),
                     "isPinned" to true
                 )
                 batch.set(rulesPostRef, rulesPostData)
