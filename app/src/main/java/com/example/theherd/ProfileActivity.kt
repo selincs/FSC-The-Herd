@@ -21,6 +21,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 
 class ProfileActivity : AppCompatActivity() {
+    private lateinit var communitiesRecycler: RecyclerView
+    private val communities = mutableListOf<String>()
+    private lateinit var statusPostsRecycler: RecyclerView
+    private lateinit var statusAdapter: StatusAdapter
+    private val statusPosts = mutableListOf<StatusPost>()
     private lateinit var askMeRecycler: RecyclerView
     private lateinit var adapter: AskMeAdapter
     private val topics = mutableListOf<String>()
@@ -36,6 +41,21 @@ class ProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+
+        statusPostsRecycler = findViewById(R.id.statusPostsRecycler)
+        statusPostsRecycler.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        statusAdapter = StatusAdapter(statusPosts)
+        statusPostsRecycler.adapter = statusAdapter
+
+        loadStatusPostsFromFirestore()
+
+        communitiesRecycler = findViewById(R.id.communitiesRecycler)
+        communitiesRecycler.layoutManager = LinearLayoutManager(this)
+        communitiesRecycler.adapter = AskMeAdapter(this, communities, false)
+
+        loadCommunitiesFromFirestore()
 
         editProfileButton = findViewById(R.id.editProfileButton)
 
@@ -58,22 +78,22 @@ class ProfileActivity : AppCompatActivity() {
         graduationDateInput.isClickable = false
 
         //This will need to be changed to autopop once Topic Firestore is done.
-        val interestsText = findViewById<TextView>(R.id.selectedInterestsText)
+        //val interestsText = findViewById<TextView>(R.id.selectedInterestsText)
         val otherInterestInput = findViewById<EditText>(R.id.otherInterestInput)
 
-        //Hard coded values
+        /*//Hard coded values
         val fitnessCheck = findViewById<CheckBox>(R.id.fitnessCheck)
         val codingCheck = findViewById<CheckBox>(R.id.codingCheck)
         val musicCheck = findViewById<CheckBox>(R.id.musicCheck)
         val gamingCheck = findViewById<CheckBox>(R.id.gamingCheck)
         val artCheck = findViewById<CheckBox>(R.id.artCheck)
-
+*/
         // Load saved data from Firestore into Profile
         loadProfileFromFirestore()
 
         //Interests not pop from Firestore yet, use default
         val savedInterests = PreferencesManager.getInterests(this)
-        interestsText.text = savedInterests.joinToString(", ")
+        //interestsText.text = savedInterests.joinToString(", ")
         // OPTIONAL: put "other" back into input if it's not a default one
         val defaultInterests = listOf("Fitness", "Coding", "Music", "Gaming", "Art")
 
@@ -193,6 +213,66 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadCommunitiesFromFirestore() {
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val uid = user.uid
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("communities")
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                communities.clear()
+
+                for (doc in snapshot.documents) {
+                    val name = doc.getString("name") ?: continue
+                    communities.add(name)
+                }
+
+                if (communities.isEmpty()) {
+                    Toast.makeText(this, "No communities yet", Toast.LENGTH_SHORT).show()
+                }
+
+                (communitiesRecycler.adapter as AskMeAdapter).notifyDataSetChanged()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load communities", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun loadStatusPostsFromFirestore() {
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val uid = user.uid
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("statusPosts")
+            .orderBy("timestamp") // maybe idk
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                statusPosts.clear()
+
+                for (doc in snapshot.documents) {
+
+                    val content = doc.getString("content") ?: ""
+
+                    // keep same format as FriendProfileActivity
+                    val timestamp = doc.getString("timestamp") ?: "Just now"
+
+                    statusPosts.add(StatusPost(content, timestamp))
+                }
+
+                statusAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load status posts", Toast.LENGTH_SHORT).show()
+            }
+    }
+
     private fun setEditMode(isEditing: Boolean) {
 
         val inputs = listOf(
@@ -217,7 +297,7 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
-        val checkboxes = listOf(
+        /*val checkboxes = listOf(
             R.id.fitnessCheck,
             R.id.codingCheck,
             R.id.musicCheck,
@@ -228,6 +308,8 @@ class ProfileActivity : AppCompatActivity() {
         checkboxes.forEach {
             findViewById<CheckBox>(it).isEnabled = isEditing
         }
+
+         */
 
         findViewById<Button>(R.id.addTopicButton).visibility =
             if (isEditing) Button.VISIBLE else Button.GONE
