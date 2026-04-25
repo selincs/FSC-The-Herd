@@ -3,7 +3,7 @@ package com.example.theherd
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
-class FriendsRepository {
+object FriendsRepository {
 
     //Send Friend request - email
     //user types in email, check email in path
@@ -175,6 +175,69 @@ class FriendsRepository {
             }
             .addOnFailureListener { onFailure(it) }
     }
+
+    //Accept the friend request, removes the request, NEEDS TO HANDLE MUTUAL REQUESTS STILL
+    //Adds each user to each others friends collection, removes the request, (mutual requests incomplete)
+    fun acceptFriendRequest(
+        fromUserID: String,
+        onComplete: (Boolean) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+        val currentUserID = SessionManager.requireUserId()
+
+        val currentUserRef = db.collection("users").document(currentUserID)
+        val otherUserRef = db.collection("users").document(fromUserID)
+
+        val batch = db.batch()
+
+        // Add friend to current user
+        val myFriendRef = currentUserRef
+            .collection("friends")
+            .document(fromUserID)
+
+        batch.set(myFriendRef, mapOf(
+            "userID" to fromUserID,
+            "addedAt" to FieldValue.serverTimestamp()
+        ))
+
+        // Add current user to other user's friends
+        val theirFriendRef = otherUserRef
+            .collection("friends")
+            .document(currentUserID)
+
+        batch.set(theirFriendRef, mapOf(
+            "userID" to currentUserID,
+            "addedAt" to FieldValue.serverTimestamp()
+        ))
+
+        // Remove friend request
+        val requestRef = currentUserRef
+            .collection("friendRequests")
+            .document(fromUserID)
+
+        batch.delete(requestRef)
+
+        batch.commit()
+            .addOnSuccessListener { onComplete(true) }
+            .addOnFailureListener { onComplete(false) }
+    }
+
+    fun rejectFriendRequest(
+        fromUserID: String,
+        onComplete: (Boolean) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+        val currentUserID = SessionManager.requireUserId()
+
+        db.collection("users")
+            .document(currentUserID)
+            .collection("friendRequests")
+            .document(fromUserID)
+            .delete()
+            .addOnSuccessListener { onComplete(true) }
+            .addOnFailureListener { onComplete(false) }
+    }
+
 
 //    fun loadFriends(
 //        onSuccess: (List<Friend>) -> Unit,

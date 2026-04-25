@@ -154,6 +154,8 @@ class FriendsListActivity : AppCompatActivity() {
         findViewById<RecyclerView>(R.id.friendsRecyclerView).adapter = adapter
     }
 
+    //User types email or username -> if username, normalizeEmail() -> email string -> Firestore query(users)
+    //Write to users/{targetUserID}/friendRequests/{currentUserID}
     private fun showAddFriendDialog() {
         val dialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.dialog_add_friend, null)
@@ -165,18 +167,40 @@ class FriendsListActivity : AppCompatActivity() {
 
         btnSend.setOnClickListener {
             val input = etInput.text.toString().trim()
-            if (input.isNotEmpty()) {
-                // 1. Save the added friend to the repo
-                repo.addFriendRequest(input)
-                // 2. Tell the user the request was sent
-                Toast.makeText(this, "Friend request sent to $input!", Toast.LENGTH_SHORT).show()
-                // 3. refresh the view
-                filterFriends(searchInput.text.toString())
 
-                dialog.dismiss()
+            inputLayout.error = null
+
+            if (input.isNotEmpty()) {
+
+                FriendsRepository.sendFriendRequest(
+                    input,
+                    onSuccess = {
+                        Toast.makeText(this, "Friend request sent!", Toast.LENGTH_SHORT).show()
+                        filterFriends(searchInput.text.toString())
+                        dialog.dismiss()
+                    },
+                    onFailure = { e ->
+                        inputLayout.error = e.message ?: "Failed to send request"
+                    }
+                )
+
             } else {
                 inputLayout.error = "Email or username required"
             }
+
+//            val input = etInput.text.toString().trim()
+//            if (input.isNotEmpty()) {
+//                // 1. Save the added friend to the repo
+//                repo.addFriendRequest(input)
+//                // 2. Tell the user the request was sent
+//                Toast.makeText(this, "Friend request sent to $input!", Toast.LENGTH_SHORT).show()
+//                // 3. refresh the view
+//                filterFriends(searchInput.text.toString())
+//
+//                dialog.dismiss()
+//            } else {
+//                inputLayout.error = "Email or username required"
+//            }
         }
 
         btnCancel.setOnClickListener { dialog.dismiss() }

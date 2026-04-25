@@ -39,7 +39,7 @@ class FriendsAdapter(
         val friend = friendsList[position]
         val context = holder.itemView.context
 
-        //Is this GUI entry a Friend item or a Friend Request?
+        //isRequest == Is this GUI entry a Friend item or a Friend Request?
         val isRequest = !friend.isFriend
 
 
@@ -56,15 +56,16 @@ class FriendsAdapter(
 //        } else {
 //            holder.btnMessage.visibility = View.VISIBLE
 //        }
+        holder.btnMessage.visibility = View.VISIBLE
 
         if (isRequest) {
             holder.btnAdd.visibility = View.VISIBLE     // Accept
             holder.btnRemove.visibility = View.VISIBLE  // Reject
             holder.btnMessage.visibility = View.GONE    // No messaging yet
         } else {
-            holder.btnAdd.visibility = View.GONE        // Not needed
+            holder.btnAdd.visibility = View.GONE        // Cant Add someone already your Friend
             holder.btnRemove.visibility = View.VISIBLE  // Remove friend
-            holder.btnMessage.visibility = View.VISIBLE // Message
+            holder.btnMessage.visibility = View.VISIBLE // Message friend
         }
 
         fun openProfile() {
@@ -80,21 +81,61 @@ class FriendsAdapter(
         holder.root.setOnClickListener { openProfile() }
         holder.profileImage.setOnClickListener { openProfile() }
 
-        //TODO: What is btnMessage?
+        //TODO: What is btnMessage? Made some edits to make it message button, unimplemented
         holder.btnMessage.setOnClickListener {
-            val intent = Intent(context, MessageActivity::class.java)
-            intent.putExtra("FRIEND_NAME", friend.name)
-            context.startActivity(intent)
+            Toast.makeText(context, "Message your friend!", Toast.LENGTH_SHORT).show()
+            //commented until messageactivity impl
+//            val intent = Intent(context, MessageActivity::class.java)
+//            intent.putExtra("FRIEND_NAME", friend.name)
+//            context.startActivity(intent)
         }
 
         holder.btnRemove.setOnClickListener {
             //TODO: Remove Friend in Firestore logic here
-            showDeleteConfirmation(context, friend, holder.bindingAdapterPosition)
+            val pos = holder.bindingAdapterPosition
+            if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
+
+            // if isRequest, reject request, else remove friend button is being used
+            if (isRequest) {
+                // REJECT REQUEST
+                FriendsRepository.rejectFriendRequest(friend.id) { success ->
+                    if (success) {
+                        Toast.makeText(context, "Request rejected", Toast.LENGTH_SHORT).show()
+
+                        friendsList.removeAt(pos)
+                        notifyItemRemoved(pos)
+                    } else {
+                        Toast.makeText(context, "Failed to reject request", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                // REMOVE FRIEND (existing behavior)
+                showDeleteConfirmation(context, friend, pos)
+            }
+//            showDeleteConfirmation(context, friend, holder.bindingAdapterPosition)
         }
+
         holder.btnAdd.setOnClickListener {
             //TODO: Add Friend in Firestore logic here
-         println("Add Friend button pressed")
+            if (isRequest) {
+                FriendsRepository.acceptFriendRequest(friend.id) { success ->
+                    if (success) {
+                        Toast.makeText(context, "Friend added!", Toast.LENGTH_SHORT).show()
+
+                        val pos = holder.bindingAdapterPosition
+                        if (pos != RecyclerView.NO_POSITION) {
+                            friendsList.removeAt(pos)
+                            notifyItemRemoved(pos)
+                        }
+                    } else {
+                        Toast.makeText(context, "Failed to accept request", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            println("Add Friend button pressed")
         }
+
+
     }
 
     override fun getItemCount() = friendsList.size
