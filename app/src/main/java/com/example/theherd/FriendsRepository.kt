@@ -13,6 +13,7 @@ class FriendsRepository {
     //Get users target email, filter out @Farmingdale case
     //TODO: Validate for if document already exists : requestRef.get()
     // & dont send if already friends : users/{currentUserID}/friends/{targetUserID}
+    //TODO: If 2 users request each other, if one FriendReq is accepted, make sure to clean up the other list
     fun sendFriendRequest(
         username: String,
         onSuccess: () -> Unit,
@@ -104,6 +105,72 @@ class FriendsRepository {
                     onSuccess(email)
                 } else {
                     onFailure(Exception("Email not found in FriendsRepo getCurrUserEmail"))
+                }
+            }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+    //Get user's incoming friend requests from Firestore for display in the Requests Tab
+//    println("User has no current friend requests, do something here")
+    fun getIncomingFriendRequests(
+        onSuccess: (List<Friend>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+        val currentUserID = SessionManager.requireUserId()
+
+        db.collection("users")
+            .document(currentUserID)
+            .collection("friendRequests")
+            .get()
+            .addOnSuccessListener { requestDocs ->
+
+                if (requestDocs.isEmpty) {
+                    onSuccess(emptyList())
+                    return@addOnSuccessListener
+                }
+
+                val requests = mutableListOf<Friend>()
+                var remaining = requestDocs.size()  //remaining friend requests
+
+                //For each document in the friend request sub collection, create a friend entry until none remain
+                for (doc in requestDocs) {
+                    val fromUserID = doc.getString("fromUserID") ?: continue
+
+                    //enter users collection -> in userDoc(foundByID) -> get fields
+                    db.collection("users")
+                        .document(fromUserID)
+                        .get()
+                        .addOnSuccessListener { userDoc ->
+
+                            val firstName = userDoc.getString("firstName") ?: ""
+                            val lastName = userDoc.getString("lastName") ?: ""
+                            val fullName = "$firstName $lastName".trim()    //combine fName+lName for display name
+
+                            val isOnline = userDoc.getString("onlineStatus") == "online" //only online atm?
+
+                            //create Friend entry for display, id, name, statusText, online status, isFriend=false(for friend request)
+                            val friend = Friend(
+                                id = fromUserID,
+                                name = fullName,
+                                statusText = "Sent you a friend request", // replaces "3 mutual friends" in hardcode
+                                isOnline = isOnline,
+                                isFriend = false
+                            )
+
+                            requests.add(friend)
+
+                            remaining--
+                            if (remaining == 0) {
+                                onSuccess(requests)
+                            }
+                        }
+                        .addOnFailureListener {
+                            remaining--
+                            if (remaining == 0) {
+                                onSuccess(requests)
+                            }
+                        }
                 }
             }
             .addOnFailureListener { onFailure(it) }

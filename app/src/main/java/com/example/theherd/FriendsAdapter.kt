@@ -23,6 +23,7 @@ class FriendsAdapter(
         val tvStatus: TextView = view.findViewById(R.id.tvFriendStatus)
         val statusDot: View = view.findViewById(R.id.onlineStatusDot)
         val btnRemove: ImageButton = view.findViewById(R.id.btnRemoveFriend)
+        val btnAdd: ImageButton = view.findViewById(R.id.btnAddFriend)
         val btnMessage: ImageButton = view.findViewById(R.id.btnMessage)
         val profileImage: ImageView = view.findViewById(R.id.imgProfilePic)
         val root: View = view
@@ -38,6 +39,10 @@ class FriendsAdapter(
         val friend = friendsList[position]
         val context = holder.itemView.context
 
+        //Is this GUI entry a Friend item or a Friend Request?
+        val isRequest = !friend.isFriend
+
+
         holder.tvName.text = friend.name
         holder.tvStatus.text = friend.statusText
 
@@ -45,11 +50,21 @@ class FriendsAdapter(
         holder.statusDot.backgroundTintList = ColorStateList.valueOf(
             ContextCompat.getColor(context, dotColor)
         )
+//
+//        if (friend.statusText == "Pending Request") {
+//            holder.btnMessage.visibility = View.GONE
+//        } else {
+//            holder.btnMessage.visibility = View.VISIBLE
+//        }
 
-        if (friend.statusText == "Pending Request") {
-            holder.btnMessage.visibility = View.GONE
+        if (isRequest) {
+            holder.btnAdd.visibility = View.VISIBLE     // Accept
+            holder.btnRemove.visibility = View.VISIBLE  // Reject
+            holder.btnMessage.visibility = View.GONE    // No messaging yet
         } else {
-            holder.btnMessage.visibility = View.VISIBLE
+            holder.btnAdd.visibility = View.GONE        // Not needed
+            holder.btnRemove.visibility = View.VISIBLE  // Remove friend
+            holder.btnMessage.visibility = View.VISIBLE // Message
         }
 
         fun openProfile() {
@@ -65,6 +80,7 @@ class FriendsAdapter(
         holder.root.setOnClickListener { openProfile() }
         holder.profileImage.setOnClickListener { openProfile() }
 
+        //TODO: What is btnMessage?
         holder.btnMessage.setOnClickListener {
             val intent = Intent(context, MessageActivity::class.java)
             intent.putExtra("FRIEND_NAME", friend.name)
@@ -72,7 +88,12 @@ class FriendsAdapter(
         }
 
         holder.btnRemove.setOnClickListener {
+            //TODO: Remove Friend in Firestore logic here
             showDeleteConfirmation(context, friend, holder.bindingAdapterPosition)
+        }
+        holder.btnAdd.setOnClickListener {
+            //TODO: Add Friend in Firestore logic here
+         println("Add Friend button pressed")
         }
     }
 
