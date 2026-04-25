@@ -1,5 +1,7 @@
 package com.example.theherd
 
+
+//For displaying the FriendProfile in FriendProfileActivity
 data class Friend(
     val id: String,
     val name: String,

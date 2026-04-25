@@ -118,6 +118,7 @@ class FriendsListActivity : AppCompatActivity() {
         })
     }
 
+    //Tabs - 0 = Friends List, 1 = Online Friends Filtering, 2 = Friend Requests Tab
     private fun filterFriends(query: String) {
         val baseList = when (currentTab) {
             1 -> repo.getMockFriends().filter { it.isOnline }
