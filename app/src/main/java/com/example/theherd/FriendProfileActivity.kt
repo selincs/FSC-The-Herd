@@ -130,6 +130,16 @@ class FriendProfileActivity : AppCompatActivity() {
             actionButton.text = "Message"
         } else {
             //else if(isFriend && status == "pending") actBtn.text= "Request Pending" -> Then what? Let user cancel? Disable button?
+            //TODO: Call send friend request here
+            FriendsRepository.sendFriendRequest(
+                username,
+                onSuccess = {
+                    Toast.makeText(this, "Friend request sent!", Toast.LENGTH_SHORT).show()
+                },
+                onFailure = { e ->
+                    println("Failed to send friend request")
+                }
+            )
             actionButton.text = "Send Friend Request"
         }
 
@@ -162,30 +172,54 @@ class FriendProfileActivity : AppCompatActivity() {
             }
         }
 
-        //TODO: Figure out block button functionality... Block lists -> What happens here? How to unblock?
+        //Firestore block listener - calls Block User function. BlockUser() will :
+        //add user to block list, remove friends on both ends, and delete friend requests atomically
         btnBlock.setOnClickListener {
-                        AlertDialog.Builder(this)
+            AlertDialog.Builder(this)
                 .setTitle("Block $firstName?")
                 .setMessage("You will no longer see each other in the Herd.")
                 .setPositiveButton("Block") { _, _ ->
-                    //TODO: REMOVE MOCKFRIENDSREPO REMOVE FRIEND BUTTON HERE -> RemoveFriend in FriendsRepo
-                    FriendsRepository.removeFriend(friendId) { success ->
-                        if (success) {
-                            Toast.makeText(this, "Friend removed", Toast.LENGTH_SHORT).show()
 
+                    FriendsRepository.blockUser(friendId) { success ->
+                        if (success) {
+                            Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show()
+                            finish()
                         } else {
-                            Toast.makeText(this, "Failed to remove friend", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Failed to block user.", Toast.LENGTH_SHORT).show()
                         }
                     }
-                    //TODO: Block the Friend next, not just remove Friend. combine functions in FriendRepo? Create blockFriend()
-                    //TODO: that runs remove too? Then only one function is called in the activity for less code clutter
-//                    MockFriendsRepo.removeFriendByName(friendName)
-                    Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show()
-                    finish()
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
+        }
 
+        //TODO: Figure out block button functionality... Block lists -> What happens here? How to unblock?
+//        btnBlock.setOnClickListener {
+//            AlertDialog.Builder(this)
+//                .setTitle("Block $firstName?")
+//                .setMessage("You will no longer see each other in the Herd.")
+//                .setPositiveButton("Block") { _, _ ->
+//                    //TODO: REMOVE MOCKFRIENDSREPO REMOVE FRIEND BUTTON HERE -> RemoveFriend in FriendsRepo
+//                    FriendsRepository.removeFriend(friendId) { success ->
+//                        if (success) {
+//                            Toast.makeText(this, "Friend removed", Toast.LENGTH_SHORT).show()
+//
+//                        } else {
+//                            Toast.makeText(this, "Failed to remove friend", Toast.LENGTH_SHORT)
+//                                .show()
+//                        }
+//                    }
+//                    //TODO: Block the Friend next, not just remove Friend. Create blockUser() ->
+//                    //TODO: If you can block non-friend users, must run both removeFriend() and blockUser() here
+////                    MockFriendsRepo.removeFriendByName(friendName)
+//                    Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show()
+//                    finish()
+//                }
+//                .setNegativeButton("Cancel", null)
+//                .show()
+//        }
+
+        //MockFriends Repo Block code, saved just in case
 //            AlertDialog.Builder(this)
 //                .setTitle("Block $firstName?")
 //                .setMessage("You will no longer see each other in the Herd.")
@@ -196,7 +230,10 @@ class FriendProfileActivity : AppCompatActivity() {
 //                }
 //                .setNegativeButton("Cancel", null)
 //                .show()
-        }
+//        }
+
+
+        //TODO: Change status posts to load from Firestore once we have data in Firestore
         val statusPosts = listOf(
             StatusPost("Fountain Fest was 10/10 today! 🎡", "3 hours ago"),
             StatusPost("Looking for a study group for the CS Senior Project.", "Yesterday"),
@@ -225,7 +262,7 @@ class FriendProfileActivity : AppCompatActivity() {
                 gradYear = doc.getString("graduationDate") ?: ""
                 val email = doc.getString("email") ?: ""
                 username = if (email.contains("@")) {
-                    email.substringAfter("@")
+                    email.substringBefore("@")
                 } else {
                     "Ram User"
                 }
@@ -242,6 +279,7 @@ class FriendProfileActivity : AppCompatActivity() {
             }
     }
 
+    //TODO: Validate this function once Firestore has status post data. statusPost-> new subcollection, save latest in user doc
     //Loads up to 10 status posts ordered by creation date for the Friend Profile
     private fun loadStatusPosts(friendId: String) {
         val db = FirebaseFirestore.getInstance()
@@ -255,9 +293,12 @@ class FriendProfileActivity : AppCompatActivity() {
             .addOnSuccessListener { docs ->
 
                 val posts = docs.map { doc ->
+                    //Format the timestamp of when the status post was made for readability
+                    val timestamp = doc.getTimestamp("createdAt")
+
                     StatusPost(
                         doc.getString("text") ?: "",
-                        "Just now"
+                        formatTimestamp(timestamp)
                     )
                 }
 
@@ -266,5 +307,31 @@ class FriendProfileActivity : AppCompatActivity() {
                     LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
                 recycler.adapter = StatusAdapter(posts)
             }
+    }
+
+    //Formats the status posts createdAt field for readability
+    private fun formatTimestamp(timestamp: com.google.firebase.Timestamp?): String {
+        if (timestamp == null) return ""
+
+        val now = System.currentTimeMillis()
+        val time = timestamp.toDate().time
+        val diff = now - time
+
+        val seconds = diff / 1000
+        val minutes = seconds / 60
+        val hours = minutes / 60
+        val days = hours / 24
+
+        return when {
+            seconds < 60 -> "Just now"
+            minutes < 60 -> "$minutes minute${if (minutes == 1L) "" else "s"} ago"
+            hours < 24 -> "$hours hour${if (hours == 1L) "" else "s"} ago"
+            days == 1L -> "Yesterday"
+            days < 7 -> "$days day${if (days == 1L) "" else "s"} ago"
+            else -> {
+                val sdf = java.text.SimpleDateFormat("MMM d", java.util.Locale.getDefault())
+                sdf.format(timestamp.toDate())
+            }
+        }
     }
 }

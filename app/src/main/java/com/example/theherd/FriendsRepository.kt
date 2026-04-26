@@ -103,10 +103,6 @@ object FriendsRepository {
 //write request to      users/{targetID}/friendRequests/{currentUserID}
 
     //Get users target email, filter out @Farmingdale case
-    //TODO: Validate for if document already exists : requestRef.get()
-    // & dont send if already friends : users/{currentUserID}/friends/{targetUserID}
-    //TODO: If 2 users request each other, if one FriendReq is accepted, make sure to clean up the other list
-    //TODO:Works but trying to auto accept mutual friend requests below, saving code
     //Send a friend request to another user, with auto accepting mutual requests
     fun sendFriendRequest(
         username: String,
@@ -123,6 +119,7 @@ object FriendsRepository {
             .addOnSuccessListener { result ->
 
                 if (result.isEmpty) {
+                    println("User not found for friend request sending")
                     onFailure(Exception("User not found"))
                     return@addOnSuccessListener
                 }
@@ -131,6 +128,7 @@ object FriendsRepository {
                 val targetUserID = targetDoc.id
 
                 if (targetUserID == currentUserID) {
+                    println("You cannot add yourself")
                     onFailure(Exception("You cannot add yourself"))
                     return@addOnSuccessListener
                 }
@@ -138,53 +136,85 @@ object FriendsRepository {
                 val currentUserRef = db.collection("users").document(currentUserID)
                 val targetUserRef = db.collection("users").document(targetUserID)
 
-                // 1. Check if already friends
-                currentUserRef.collection("friends")
+                // 🔴 1. Check if CURRENT USER has blocked TARGET
+                currentUserRef.collection("blockedUsers")
                     .document(targetUserID)
                     .get()
-                    .addOnSuccessListener { friendDoc ->
+                    .addOnSuccessListener { blockedDoc ->
 
-                        if (friendDoc.exists()) {
-                            onFailure(Exception("You are already friends"))
+                        if (blockedDoc.exists()) {
+                            println("You have blocked this user")
+                            onFailure(Exception("You have blocked this user"))
                             return@addOnSuccessListener
                         }
 
-                        // 2. Check if request already sent
-                        targetUserRef.collection("friendRequests")
+                        // 🔴 2. Check if TARGET has blocked CURRENT USER
+                        targetUserRef.collection("blockedUsers")
                             .document(currentUserID)
                             .get()
-                            .addOnSuccessListener { existingRequest ->
+                            .addOnSuccessListener { blockedByTargetDoc ->
 
-                                if (existingRequest.exists()) {
-                                    onFailure(Exception("Friend request already sent"))
+                                if (blockedByTargetDoc.exists()) {
+                                    println("Friend request attempt sent to blocked user")
+                                    onFailure(Exception("You cannot send a request to this user"))
                                     return@addOnSuccessListener
                                 }
 
-                                // 3. Check for mutual request between the two users
-                                currentUserRef.collection("friendRequests")
+                                // 🟢 3. Check if already friends
+                                currentUserRef.collection("friends")
                                     .document(targetUserID)
                                     .get()
-                                    .addOnSuccessListener { reverseRequest ->
+                                    .addOnSuccessListener { friendDoc ->
 
-                                        if (reverseRequest.exists()) {
-                                            // 🔥 AUTO ACCEPT
-                                            acceptFriendRequest(targetUserID) { success ->
-                                                if (success) {
-                                                    onSuccess()
-                                                } else {
-                                                    onFailure(Exception("Failed to auto-accept request"))
-                                                }
-                                            }
+                                        if (friendDoc.exists()) {
+                                            println("You are already friends")
+                                            onFailure(Exception("You are already friends"))
                                             return@addOnSuccessListener
                                         }
 
-                                        // 4. Safe to create request
-                                        createRequest(
-                                            targetUserID,
-                                            currentUserID,
-                                            onSuccess,
-                                            onFailure
-                                        )
+                                        // 🟢 4. Check if request already sent
+                                        targetUserRef.collection("friendRequests")
+                                            .document(currentUserID)
+                                            .get()
+                                            .addOnSuccessListener { existingRequest ->
+
+                                                if (existingRequest.exists()) {
+                                                    println("Friend request already sent")
+                                                    onFailure(Exception("Friend request already sent"))
+                                                    return@addOnSuccessListener
+                                                }
+
+                                                // 🟢 5. Check for mutual request
+                                                currentUserRef.collection("friendRequests")
+                                                    .document(targetUserID)
+                                                    .get()
+                                                    .addOnSuccessListener { reverseRequest ->
+
+                                                        if (reverseRequest.exists()) {
+                                                            // 🔥 AUTO ACCEPT
+                                                            acceptFriendRequest(targetUserID) { success ->
+                                                                if (success) {
+                                                                    onSuccess()
+                                                                } else {
+                                                                    println("Failed to auto-accept request")
+                                                                    onFailure(Exception("Failed to auto-accept request"))
+                                                                }
+                                                            }
+                                                            return@addOnSuccessListener
+                                                        }
+
+                                                        // 🟢 6. Safe to create request
+                                                        println("Creating friend request")
+                                                        createRequest(
+                                                            targetUserID,
+                                                            currentUserID,
+                                                            onSuccess,
+                                                            onFailure
+                                                        )
+                                                    }
+                                                    .addOnFailureListener { onFailure(it) }
+                                            }
+                                            .addOnFailureListener { onFailure(it) }
                                     }
                                     .addOnFailureListener { onFailure(it) }
                             }
@@ -194,6 +224,7 @@ object FriendsRepository {
             }
             .addOnFailureListener { onFailure(it) }
     }
+
 
     //Helper for sendFriendRequest, creates the actual request after the validation logic for users sending friend requests
     private fun createRequest(
@@ -396,5 +427,134 @@ object FriendsRepository {
             .addOnSuccessListener { onComplete(true) }
             .addOnFailureListener { onComplete(false) }
     }
+
+    fun blockUser(
+        targetUserId: String,
+        onComplete: (Boolean) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+        val currentUserId = SessionManager.requireUserId()
+
+        val batch = db.batch()
+
+        val currentUserRef = db.collection("users").document(currentUserId)
+        val targetUserRef = db.collection("users").document(targetUserId)
+
+        // 1. Add to blocked list
+        val blockRef = currentUserRef
+            .collection("blockedUsers")
+            .document(targetUserId)
+
+        batch.set(blockRef, hashMapOf(
+            "userID" to targetUserId,
+            "blockedAt" to FieldValue.serverTimestamp()
+        ))
+
+        // 2. Remove from friends (both sides)
+        val currentFriendRef = currentUserRef
+            .collection("friends")
+            .document(targetUserId)
+
+        val targetFriendRef = targetUserRef
+            .collection("friends")
+            .document(currentUserId)
+
+        batch.delete(currentFriendRef)
+        batch.delete(targetFriendRef)
+
+        // 3. Delete friend requests (both directions)
+
+        val incomingRequest = currentUserRef
+            .collection("friendRequests")
+            .document(targetUserId)
+
+        val outgoingRequest = targetUserRef
+            .collection("friendRequests")
+            .document(currentUserId)
+
+        batch.delete(incomingRequest)
+        batch.delete(outgoingRequest)
+
+        // Commit everything atomically
+        batch.commit()
+            .addOnSuccessListener { onComplete(true) }
+            .addOnFailureListener { onComplete(false) }
+    }
+
+    //Unvalidated unblockUser() fnc for Firestore TODO: Validate fnc
+    fun unblockUser(
+        targetUserId: String,
+        onComplete: (Boolean) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+        val currentUserId = SessionManager.requireUserId()
+
+        val blockRef = db.collection("users")
+            .document(currentUserId)
+            .collection("blockedUsers")
+            .document(targetUserId)
+
+        blockRef.delete()
+            .addOnSuccessListener { onComplete(true) }
+            .addOnFailureListener { onComplete(false) }
+    }
+
+    //Unvalidated getBlockedUsers() fnc for Firestore TODO: Validate fnc
+    fun getBlockedUsers(
+        onSuccess: (List<Friend>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+        val currentUserId = SessionManager.requireUserId()
+
+        db.collection("users")
+            .document(currentUserId)
+            .collection("blockedUsers")
+            .get()
+            .addOnSuccessListener { docs ->
+
+                if (docs.isEmpty) {
+                    onSuccess(emptyList())
+                    return@addOnSuccessListener
+                }
+
+                val blockedIds = docs.map { it.id }
+
+                val blockedUsers = mutableListOf<Friend>()
+
+                // Fetch user data for each blocked user
+                var remaining = blockedIds.size
+
+                for (userId in blockedIds) {
+                    db.collection("users")
+                        .document(userId)
+                        .get()
+                        .addOnSuccessListener { userDoc ->
+
+                            val firstName = userDoc.getString("firstName") ?: ""
+                            val lastName = userDoc.getString("lastName") ?: ""
+
+                            blockedUsers.add(
+                                Friend(
+                                    id = userId,
+                                    name = "$firstName $lastName".trim(),
+                                    isOnline = false, // optional
+                                    statusText = "Blocked",
+                                    isFriend = false
+                                )
+                            )
+
+                            remaining--
+                            if (remaining == 0) {
+                                onSuccess(blockedUsers)
+                            }
+                        }
+                        .addOnFailureListener { onFailure(it) }
+                }
+            }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+
 
 }
