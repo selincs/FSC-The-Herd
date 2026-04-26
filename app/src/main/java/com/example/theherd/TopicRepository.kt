@@ -1,26 +1,21 @@
 package com.example.theherd
 
 import Model.Topic
+import android.content.Context
 import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 
 //Firestore Topic access is done through FirestoreDatabase.topics
 object TopicRepository {
-    private const val USE_FIRESTORE = true  //what does this do?
-    private const val SYSTEM_USER = "system"
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance() //Call the singleton Firebase db instance
+    private const val SYSTEM_USER = "system" //change to rambo?
+    private val auth: FirebaseAuth =
+        FirebaseAuth.getInstance() //Call the singleton Firebase db instance
 
-    //TODO: Only createTopic() is properly implemented. Revisit all. joinTopic() must update 3 documents in Firestore in a BATCH
-    //TODO: WRITE, or else race conditions/write failures can be a problem. FS Docs for joinTopic update below
-    /*
-    topics/topicID/members/userID
-    users/userID/joinedTopics/topicID
-    topics/topicID/memberCount
-     */
-
-    //Create Topic atomically via batch
+    //Create Topic atomically via batch and upload batch to Firestore
     fun createTopic(
         topicName: String,
         topicDesc: String,
@@ -31,7 +26,7 @@ object TopicRepository {
     ) {
         val db = FirebaseFirestore.getInstance()
 
-        // Step 1: Prevent duplicate topic names
+        // Prevent duplicate topic names before creation
         db.collection("topics")
             .whereEqualTo("topicName", topicName.trim())
             .get()
@@ -45,6 +40,7 @@ object TopicRepository {
 //                val topicRef = db.collection("topics").document() old version of below 2 lines
 //                val topicID = topicRef.id
                 //Use Topic Name as Unique Identifier (Only 1 Topic of this name Exists)
+                //Topic Name is stored in the document for access purposes for ID (same values)
                 val topicID = topicName.trim().lowercase()
                 val topicRef = db.collection("topics").document(topicID)
 
@@ -60,13 +56,14 @@ object TopicRepository {
                 // Topic document - trim() prevents white space duplication of Topic Names on save to FS
                 // ------------------------
                 val topicData = hashMapOf(
-                    "topicName" to topicName.trim(),
+                    "topicName" to topicName.trim(),    //topic Name == topic ID, so this field can be used to retrieve topicID in the document
                     "topicDesc" to topicDesc.trim(),
                     "imageUri" to imageUri?.toString(),
                     "creatorID" to creatorID,
                     "memberCount" to 1,
                     "createdAt" to FieldValue.serverTimestamp(),
-                    "isArchived" to false
+                    "isArchived" to false,
+                    "nameLowercase" to topicName.lowercase(), // New hidden field for searching
                 )
                 batch.set(topicRef, topicData)
                 // ------------------------
@@ -130,138 +127,222 @@ object TopicRepository {
             }
     }
 
-    //TODO:Improve to preserve TopicID for further diving -> Might be needed for post ID and stuff
-    //Load Topics from Firestore
-    //Reading the URI for loading a topic, after TestParty changes of resId->Uri
-//    val uriString = document.getString("imageUri")
-//    val imageUri = uriString?.let { Uri.parse(it) }
-//    fun getTopics(onResult: (List<Topic>) -> Unit) {
-//
-//        FirestoreDatabase.topics
-//            .get()
-//            .addOnSuccessListener { result ->
-//
-//                val topicsList = mutableListOf<Topic>()
-//
-//                for (doc in result) {
-//
-//                    val topicID = doc.getString("topicID") ?: continue
-//                    val name = doc.getString("topicName") ?: ""
-//                    val desc = doc.getString("topicDesc") ?: ""
-//                    val creatorID = doc.getString("creatorID") ?: ""
-//                    val memberCount = doc.getLong("memberCount")?.toInt() ?: 0
-//                    val imageResId = doc.getLong("imageResId")?.toInt() ?: R.drawable.marquee_logo
-//
-//                    //I think this could be technically just added to list below as a anonymous topic instead of declaring it here
-//                    val topic = Topic(
-//                        topicID,
-//                        name,
-//                        creatorID,
-//                        desc,
-//                        imageResId,
-//                        memberCount
-//                    )
-//
-//                    topicsList.add(topic)
-//                }
-//
-//                onResult(topicsList)
-//            }
-//    }
-
-    //To hopefully enable keyword searching
-    /* If searching by keyword "Chess", will show
-        Chess
-        Chess Club
-        Chess Tournament
-     */
-    fun searchTopics(
-        keyword: String,
-        onResult: (List<Model.Topic>) -> Unit
+    fun loadTopics(
+        onSuccess: (List<Topic>) -> Unit,
+        onFailure: (Exception) -> Unit
     ) {
-
-        FirestoreDatabase.topics
-            .whereGreaterThanOrEqualTo("topicName", keyword)
-            .whereLessThanOrEqualTo("topicName", keyword + "\uf8ff")
+        val db = FirebaseFirestore.getInstance()
+        // If we allow topics to be archived/deleted, the isArchived boolean doesn't load archived Topics
+        db.collection("topics")
+            .whereEqualTo("isArchived", false)
             .get()
-            .addOnSuccessListener { result ->
+            .addOnSuccessListener { documents ->
+                val topics = mutableListOf<Topic>()
 
-                val topics = mutableListOf<Model.Topic>()
-
-                for (doc in result) {
-
-                    val topicName = doc.getString("topicName") ?: ""
-                    val topicDesc = doc.getString("topicDesc") ?: ""
-                    val creatorID = doc.getString("creatorID") ?: ""
-
-                    topics.add(Model.Topic(topicName, creatorID, topicDesc))
+                for (doc in documents) {
+                    val id = doc.id
+                    val name = doc.getString("topicName") ?: continue
+                    val desc = doc.getString("topicDesc") ?: ""
+                    val creator = doc.getString("creatorID") ?: "unknown"
+                    val imageUri = doc.getString("imageUri") ?: "default"
+                    val memberCt = doc.getLong("memberCount")?.toInt() ?: 0
+                    //Constructor to load a Topic from Firestore
+//             Topic(String topicID, String topicName, String topicDesc, String imageUriString, int memberCount)
+                    val topic = Topic(
+                        id, //Topic ID == Document ID
+                        name,
+                        desc,
+                        imageUri,
+                        memberCt
+                    )
+                    topics.add(topic)
                 }
-
-                onResult(topics)
+                onSuccess(topics)
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception)
             }
     }
 
-    // Allows a User to join a Topic as a member of the Community
-    fun joinTopic(
+    //This is "Broken" unless we decide to upgrade our Firebase plan.
+    //It works but doesn't actually upload images--saves them as a string and loads them if found locally on the device
+    fun uploadImage(
+        context: Context,
+        imageUri: Uri,
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        try {
+            println("Uploading image triggered")
+            val inputStream = context.contentResolver.openInputStream(imageUri)
+            if (inputStream == null) {
+                onFailure(Exception("Cannot open selected image"))
+                return
+            }
+
+            // Generate a unique path in Firebase Storage
+            val filename = "topic_images/${UUID.randomUUID()}.jpg"
+            val storageRef = FirebaseStorage.getInstance().reference.child(filename)
+
+            storageRef.putStream(inputStream)
+                .addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { uri ->
+                        val downloadUrl = uri.toString()
+                        println("Image uploaded, DOWNLOAD URL: $downloadUrl")
+                        onSuccess(downloadUrl)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    println("Image upload failed: ${exception.message}")
+                    onFailure(exception)
+                }
+        } catch (e: Exception) {
+            onFailure(e)
+        }
+    }
+
+    /* Joining a Topic updates these 3 Firestore Documents:
+    topics/topicID/members/userID -> Stores userID in the Topic
+    users/userID/joinedTopics/topicID -> Stores the Topic ID in the Users joined topics list
+    topics/topicID/memberCount -> Updates member count in the Topic
+    */
+    // Allows a User to join a Topic as a member of the Community in Firestore database
+    fun joinTopic(//joinTopicPressed
         topicID: String,
         onDone: (Boolean) -> Unit
     ) {
 
         val userID = FirestoreAuthManager.currentUserId ?: return
+        //Get Firestore current user id and authenticate
+        if (userID == null) {
+            println("Used ID auth failure in joinTopic->TopicRepo")
+            onDone(false)
+            return
+        }
 
-        //Set the joining User to a member of Topic & save Timestamp of join date
+        //load firestore db instance and batch all 3 updates together
+        val db = FirebaseFirestore.getInstance()
+        val batch = db.batch()
+
+        //Get reference for Topic being joined, member joining, and user joinedTopics list
+        val topicRef = db.collection("topics").document(topicID)
+        val memberRef = topicRef.collection("members").document(userID)
+        val userTopicRef = db.collection("users").document(userID)
+            .collection("joinedTopics")
+            .document(topicID)
+
+
+        // Data for topic membership - membership + join timestamp
         val memberData = hashMapOf(
             "role" to "member",
             "joinedAt" to FieldValue.serverTimestamp()
         )
 
-        //Open members subcollection and add new User who is joining
-        FirestoreDatabase.topics
-            .document(topicID)
-            .collection("members")
-            .document(userID)
-            .set(memberData)
-            .addOnSuccessListener {
-                //Increment member count of Topic
-                FirestoreDatabase.topics
-                    .document(topicID)
-                    .update("memberCount", FieldValue.increment(1))
-                    .addOnSuccessListener { onDone(true) }
-                    .addOnFailureListener { onDone(false) }
+        val userTopicData = hashMapOf(
+            "joinedAt" to FieldValue.serverTimestamp()
+        )
+        //if the TopicID is found in User's joinedTopics subcollection -> user is already a member
+
+        //Otherwise, set the joining User to a member of Topic & save Timestamp of join date
+
+        //if the TopicID is found in User's joinedTopics subcollection -> user is already a member
+        memberRef.get().addOnSuccessListener { doc ->
+            if (doc.exists()) { //If user has already joined (user has a reference in their joinedTopics in Firestore)
+                onDone(false) // already joined
+            } else { //Update the Firestore database
+                batch.set(memberRef, memberData)
+                batch.set(userTopicRef, userTopicData)
+                batch.update(topicRef, "memberCount", FieldValue.increment(1))
+
+                batch.commit()
+                    .addOnSuccessListener {
+                        println("User successfully joined topic")
+                        onDone(true)
+                    }
+                    .addOnFailureListener { e ->
+                        println("Join topic failed: ${e.message}")
+                        onDone(false)
+                    }
             }
-            .addOnFailureListener {
-                onDone(false)
-            }
+        }
     }
 
-    //Allows a User to leave a Topic/Community
-    fun leaveTopic(
-        topicID: String,
-        onDone: (Boolean) -> Unit
+        //Allows a User to leave a Topic/Community in Firestore db, update same 3 documents join references above
+        fun leaveTopic(
+            topicID: String,
+            onDone: (Boolean) -> Unit
+        ) {
+            //Get Firestore current user id
+            val userID = FirestoreAuthManager.currentUserId
+            if (userID == null) {
+                onDone(false)
+                return
+            }
+
+            //load firestore db instance and batch all 3 updates together
+            val db = FirebaseFirestore.getInstance()
+            val batch = db.batch()
+
+            val topicRef = db.collection("topics").document(topicID)
+            val memberRef = topicRef.collection("members").document(userID)
+            val userTopicRef = db.collection("users")
+                .document(userID)
+                .collection("joinedTopics")
+                .document(topicID)
+
+            // Batch leave operations, update 3 firestore documents atomically
+            batch.delete(memberRef)
+            batch.delete(userTopicRef)
+            batch.update(topicRef, "memberCount", FieldValue.increment(-1))
+
+            batch.commit()
+                .addOnSuccessListener {
+                    println("User successfully left topic")
+                    onDone(true)
+                }
+                .addOnFailureListener { e ->
+                    println("Leave topic failed in TopicRepo: ${e.message}")
+                    onDone(false)
+                }
+        }
+
+    //Retrieves all the topics a user has joined from Firestore, and loads button state based off boolean state
+    fun getUserJoinedTopicIDs(
+        onSuccess: (Set<String>) -> Unit,
+        onFailure: (Exception) -> Unit
     ) {
+        //Get Firestore current user id and make sure its not null
+        val userID = FirestoreAuthManager.currentUserId
+        if (userID == null) {
+            onSuccess(emptySet())   //If user ID invalid, return a empty set of Topic Strings
+            println("Empty list returned in Topic List display")
+            return
+        }
 
-        val userID = FirestoreAuthManager.currentUserId ?: return
+        val db = FirebaseFirestore.getInstance()
 
-        //Open members subcollection and delete user by UserID in subcollection
-        FirestoreDatabase.topics
-            .document(topicID)
-            .collection("members")
+        //Search user by userID and get all joinedTopics in a mutable set, return this set.
+        db.collection("users")
             .document(userID)
-            .delete()
-            .addOnSuccessListener {
+            .collection("joinedTopics")
+            .get()
+            .addOnSuccessListener { documents ->
+                val joinedIDs = mutableSetOf<String>()
 
-                FirestoreDatabase.topics
-                    .document(topicID)
-                    .update("memberCount", FieldValue.increment(-1))
-                    .addOnSuccessListener { onDone(true) }
-                    .addOnFailureListener { onDone(false) }
+                for (doc in documents) {
+                    joinedIDs.add(doc.id)
+                }
+
+                onSuccess(joinedIDs)
             }
-            .addOnFailureListener {
-                onDone(false)
+            .addOnFailureListener { exception ->
+                onFailure(exception)
             }
     }
 
-    //CommunityBoard functions
+}
+
+    //Topic Event functions
     /*
         createEvent()
         getEvents()
@@ -282,14 +363,16 @@ object TopicRepository {
 
 /*
 Create a Topic X
-Fetch Topics X
-Join/leave a Topic
-Load a Topic’s CommunityBoard
+Load a Topic’s CommunityBoard X
+Join/leave a Topic X
+//Event stuff in Topic needs thought
+
 Create Posts
 Load Posts
-Like/Comment on Posts
+Like Posts
+Comment on Posts
+
+Create comments
+Load comments
+Like comment
  */
-
-
-
-}

@@ -15,10 +15,16 @@ import android.widget.Spinner
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import android.widget.ImageButton
+import androidx.core.net.toUri
+import android.content.Intent
 
 // to populate topic bubbles in topicActivity
-class TopicsAdapter(private val allTopics: List<Topic>) :
-    RecyclerView.Adapter<TopicsAdapter.TopicViewHolder>() {
+//class TopicsAdapter(private val allTopics: List<Topic>) :
+//    RecyclerView.Adapter<TopicsAdapter.TopicViewHolder>()
+class TopicsAdapter(
+    private val allTopics: List<Topic>,
+    private val joinedTopicIDs: MutableSet<String>  //list of a user's joined topics in Firestore for Join button state
+    ) : RecyclerView.Adapter<TopicsAdapter.TopicViewHolder>(){
 
     private var topics: List<Topic> = allTopics.toList()
 
@@ -65,7 +71,7 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
                     val selectedReason = spinner.selectedItem.toString()
                     val userComment = comment.text.toString()
 
-                    // write implementation for backend here
+                    // write implementation for backend here (Topic Reporting)
 
                     Toast.makeText(
                         context,
@@ -82,69 +88,142 @@ class TopicsAdapter(private val allTopics: List<Topic>) :
         holder.description.text = topic.topicDesc
         holder.members.text = "${topic.memberCount} members"
 
-//        // Display uploaded image if exists, else default drawable
-//        if (topic.getImageUriString() != null) {
-//            holder.image.setImageURI(Uri.parse(topic.getImageUriString()))
-//        } else {
-//            holder.image.setImageResource(topic.getImageResId())
-//        }
+        //when a topic is clicked, open its details page
+        holder.itemView.setOnClickListener {
+            val context = holder.itemView.context
+            val intent = Intent(context, TopicDetailActivity::class.java)
 
-        //Selin entry - Hope this works avnoor sorry
-        // Display uploaded image if exists, else default drawable
-        val imageUriString = topic.getImageUriString()
-        if (imageUriString != null && imageUriString != "default") {
-            //Accommodate hard coded sample topics - Remove when backend works starting w/ this comment
-            if (imageUriString == R.drawable.gym.toString()) {
-                holder.image.setImageResource(R.drawable.gym)
-            } else if (imageUriString == R.drawable.chess.toString()) {
-                holder.image.setImageResource(R.drawable.chess)
-            } else if (imageUriString == R.drawable.hiking.toString()) {
-                holder.image.setImageResource(R.drawable.hiking)
-            } else if (imageUriString == R.drawable.food.toString()) {
-                holder.image.setImageResource(R.drawable.food)
-            }
-            else {  //When the above if/else ifs are removed, leave this as the only code in the block
-                //Remove up to here and the corresponding closing bracket for the else statement
+            //TODO:Integrate backend here
+            // Pass topic data to details page
+            intent.putExtra("topicID", topic.topicID)
+            intent.putExtra("topicName", topic.topicName)
+            intent.putExtra("topicDesc", topic.topicDesc)
+            intent.putExtra("memberCount", topic.memberCount)
+            //Used for Joined button state, is user a member of this topic
+            intent.putExtra("isJoined", topic.isJoined)
 
-                // User uploaded an image -> show it
-                println("User image set")
-                holder.image.setImageURI(Uri.parse(imageUriString))
-            }
+            context.startActivity(intent)
         }
 
-        else {
-            // No image uploaded -> show default logo
-            println("Default set in Topics Adapter else block")
+        // Display uploaded imageUri if exists in Firestore, else default drawable
+        val imageUriString = topic.getImageUriString()
+        println("Topic imageUri from Firestore: $imageUriString")
+
+        try {
+            when {
+                imageUriString == null || imageUriString == "default" -> {
+                    // Default image for no selection (The Herd logo)
+                    println("Default image used")
+                    holder.image.setImageResource(R.drawable.marquee_logo)
+                }
+
+                imageUriString.startsWith("content://") -> {
+                    // Local image chosen by user was stored, load the local device image
+                    val uri = imageUriString.toUri()
+                    holder.image.setImageURI(uri)
+                    println("Loaded local content URI image")
+                }
+
+                imageUriString.startsWith("http") -> {
+                    // Firebase storage URL case, but this doesn't work unless we pay $$$ I think
+                    val uri = imageUriString.toUri()
+                    holder.image.setImageURI(uri)
+                    println("Loaded remote image URL")
+                }
+
+                else -> {
+                    println("Unknown image format - TopicsAdapter")
+                    holder.image.setImageResource(R.drawable.marquee_logo)
+                }
+            }
+        } catch (e: Exception) {
+            println("Image loading failed-Topics Adapter: ${e.message}")
             holder.image.setImageResource(R.drawable.marquee_logo)
         }
 
+        // ---------------- JOIN / UNJOIN ----------------
+        fun updateButtonUI() {
+            if (topic.isJoined) {
+                holder.joinButton.text = "Leave"
+                holder.joinButton.setBackgroundColor(
+                    android.graphics.Color.GRAY
+                )
+            } else {
+                holder.joinButton.text = "Join"
+                holder.joinButton.setBackgroundColor(
+                    android.graphics.Color.parseColor("#2F442F")
+                )
+            }
+            holder.joinButton.setTextColor(android.graphics.Color.WHITE)
+        }
+
+        // Set initial UI state & button state based on whether a user has joined a topic
+        topic.isJoined = joinedTopicIDs.contains(topic.topicID) //button state from joinedList
+        updateButtonUI()    //update UI & set initial state after loading joined state
+
+        //Action a user states on joinButton press -> If Join->Join topic, if Joined->Leave Topic
         holder.joinButton.setOnClickListener {
-            topic.incrementMembers()
-            holder.members.text = "${topic.memberCount} members"
-            holder.joinButton.text = "Joined"
-            Toast.makeText(holder.itemView.context,
-                "You joined ${topic.topicName}!", Toast.LENGTH_SHORT).show()
+            val context = holder.itemView.context
+
+            //if user is a member of topic in firestore reference
+            if (!topic.isJoined) {
+                // JOIN
+                TopicRepository.joinTopic(topic.topicID) { success ->
+                    if (success) {
+                        topic.isJoined = true
+                        joinedTopicIDs.add(topic.topicID)
+
+                        topic.memberCount += 1
+                        holder.members.text = "${topic.memberCount} members"
+                        updateButtonUI()
+
+                        Toast.makeText(
+                            context,
+                            "You joined ${topic.topicName}!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(context, "Failed to join${topic.topicName} in joinTopic", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                // LEAVE ("Joined Button State")
+                TopicRepository.leaveTopic(topic.topicID) { success ->
+                    if (success) {
+                        topic.isJoined = false
+                        joinedTopicIDs.remove(topic.topicID)
+
+                        topic.memberCount -= 1
+                        holder.members.text = "${topic.memberCount} members"
+                        updateButtonUI()
+
+                        Toast.makeText(
+                            context,
+                            "You left ${topic.topicName}!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(context, "Failed to leave ${topic.topicName} in leaveTopic", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
-        holder.joinButton.setBackgroundColor(
-            android.graphics.Color.parseColor("#2F442F") //green btn
-        )
-        holder.joinButton.setTextColor(android.graphics.Color.WHITE)
     }
 
-    override fun getItemCount(): Int = topics.size
+        override fun getItemCount(): Int = topics.size
 
-    // Search filter
-    fun filter(query: String) {
-        topics = if (query.isEmpty()) {
-            allTopics.toList()
-        } else {
-            allTopics.filter { it.topicName.contains(query, ignoreCase = true) }
+        // Search filter
+        fun filter(query: String) {
+            topics = if (query.isEmpty()) {
+                allTopics.toList()
+            } else {
+                allTopics.filter { it.topicName.contains(query, ignoreCase = true) }
+            }
+            notifyDataSetChanged()
         }
-        notifyDataSetChanged()
-    }
 
-    fun updateList(newList: List<Topic>) {
-        topics = newList
-        notifyDataSetChanged()
-    }
+        fun updateList(newList: List<Topic>) {
+            topics = newList
+            notifyDataSetChanged()
+        }
 }

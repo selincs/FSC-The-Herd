@@ -263,15 +263,55 @@
                 android:autofillHints="password"
                 android:layout_marginBottom="12dp"/>
 
-            <TextView
-                android:id="@+id/passwordHint"
+            <LinearLayout
+                android:id="@+id/passwordRequirementsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:layout_marginBottom="12dp"
-                android:text="Password must be at least 12 characters and include:\n• 1 uppercase letter\n• 1 lowercase letter\n• 1 digit\n• 1 special character"
-                android:textColor="#555555"
-                android:textSize="12sp"
-                android:lineSpacingExtra="2dp" />
+                android:padding="8dp"
+                android:background="#10000000">
+
+                <TextView
+                    android:id="@+id/reqLength"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• At least 8 characters"
+                    android:textSize="12sp"
+                    android:textColor="#888888" />
+
+                <TextView
+                    android:id="@+id/reqUpper"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• 1 uppercase letter"
+                    android:textSize="12sp"
+                    android:textColor="#888888" />
+
+                <TextView
+                    android:id="@+id/reqLower"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• 1 lowercase letter"
+                    android:textSize="12sp"
+                    android:textColor="#888888" />
+
+                <TextView
+                    android:id="@+id/reqDigit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• 1 number"
+                    android:textSize="12sp"
+                    android:textColor="#888888" />
+
+                <TextView
+                    android:id="@+id/reqMatch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• Passwords match"
+                    android:textSize="12sp"
+                    android:textColor="#888888" />
+            </LinearLayout>
 
             <!-- Validation message -->
             <TextView

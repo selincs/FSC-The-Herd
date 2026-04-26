@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
+import android.view.View
 
 class CreateGuideActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +26,14 @@ class CreateGuideActivity : AppCompatActivity() {
         settingsButton.setOnClickListener { view ->
             SettingsMenuHelper.showSettingsMenu(this, view)
         }
+
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+        backButton.visibility = View.VISIBLE
+        backButton.setOnClickListener {
+            finish() // Closes this page and goes back
+        }
+
+
 
         // xml views
         val guideTitle: EditText = findViewById(R.id.enter_guide_title)
@@ -58,15 +67,15 @@ class CreateGuideActivity : AppCompatActivity() {
 //            startActivity(intent)
 //        }
 //
-//        motivationButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        motivationButton.setOnClickListener {
+            val intent = Intent(this, MotivationActivity::class.java)
+            startActivity(intent)
+        }
 //
-//        friendsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        friendsButton.setOnClickListener {
+            val intent = Intent(this, FriendsListActivity::class.java)
+            startActivity(intent)
+        }
 //
         interestsButton.setOnClickListener {
             val intent = Intent(this, TopicsActivity::class.java)

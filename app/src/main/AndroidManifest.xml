@@ -49,15 +49,41 @@
             android:exported="false"/>
 
         <activity
-            android:name=".CreateCommunityActivity"
+            android:name=".TopicDetailActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".CreateCommunityActivity"
+            android:exported="false"/>
+
         <activity
             android:name=".CreatePostActivity"
-            android:exported="false" />
+            android:exported="false"/>
 
         <activity
             android:name=".PostDetailActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".MotivationActivity"
+            android:exported="false" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+
+        <activity android:name=".GuideMainPageActivity"
+            android:exported="false"/>
+
+        <activity android:name=".GuideTemplateActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".FriendsListActivity"
+            android:exported="false"/>
+
+        <activity android:name=".FriendProfileActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>

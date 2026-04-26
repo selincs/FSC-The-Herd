@@ -2,12 +2,14 @@ package com.example.theherd
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
+import android.view.View
 
 
 class GuidesActivity : AppCompatActivity() {
@@ -30,21 +32,27 @@ class GuidesActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         setSupportActionBar(toolbar)
 
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+        backButton.visibility = View.VISIBLE
+        backButton.setOnClickListener {
+            finish() // Closes this page and goes back
+        }
+
         // button event listeners
 //        eventsButton.setOnClickListener {
 //            val intent = Intent(this, LoginActivity::class.java)
 //            startActivity(intent)
 //        }
 //
-//        motivationButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        motivationButton.setOnClickListener {
+            val intent = Intent(this, MotivationActivity::class.java)
+            startActivity(intent)
+        }
 //
-//        friendsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        friendsButton.setOnClickListener {
+            val intent = Intent(this, FriendsListActivity::class.java)
+            startActivity(intent)
+        }
 //
         interestsButton.setOnClickListener {
             val intent = Intent(this, TopicsActivity::class.java)
@@ -61,10 +69,9 @@ class GuidesActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        guideButton.setOnClickListener {
-            val intent = Intent(this, GuidesActivity::class.java)
-            startActivity(intent)
-        }
+//        guideButton.setOnClickListener {
+//            Toast.makeText(this, "You are already on the Guides page!", Toast.LENGTH_SHORT).show()
+//        }
 
         createGuideButton.setOnClickListener {
             println("in createGuideButton onclick listener:")
@@ -84,6 +91,23 @@ class GuidesActivity : AppCompatActivity() {
         homeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+        }
+
+        setupCategoryClick(R.id.navigation_guide, "Navigation")
+        setupCategoryClick(R.id.travel_guide, "Travel")
+        setupCategoryClick(R.id.academic_guide, "Academic")
+        setupCategoryClick(R.id.financial_aid_guid, "Financial Aid")
+        setupCategoryClick(R.id.housing_guides, "Housing")
+        setupCategoryClick(R.id.clubs_guide, "Clubs")
+        setupCategoryClick(R.id.health_wellness_guide, "Health & Wellness")
+        setupCategoryClick(R.id.miscellaneous_guides, "Miscellaneous")
+    }
+
+    private fun setupCategoryClick(viewId: Int, categoryName: String) {
+        findViewById<TextView>(viewId).setOnClickListener {
+            val intent = Intent(this, GuideMainPageActivity::class.java)
+            intent.putExtra("CATEGORY_NAME", categoryName)
             startActivity(intent)
         }
     }
