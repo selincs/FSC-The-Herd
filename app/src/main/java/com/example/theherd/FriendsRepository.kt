@@ -14,28 +14,83 @@ object FriendsRepository {
     //TODO: Validate for if document already exists : requestRef.get()
     // & dont send if already friends : users/{currentUserID}/friends/{targetUserID}
     //TODO: If 2 users request each other, if one FriendReq is accepted, make sure to clean up the other list
+    //TODO:Works but trying to auto accept mutual friend requests below, saving code
+//    fun sendFriendRequest(
+//        username: String,
+//        onSuccess: () -> Unit,
+//        onFailure: (Exception) -> Unit
+//    ) {
+//        val db = FirebaseFirestore.getInstance()
+//        //The ID of the user making the request
+//        val currentUserID = SessionManager.requireUserId()
+//
+//        //The email the Friend Request is sent to-- Fnc normalizes email to handle "email" or "email@farmingdale.edu"
+//        val email = normalizeEmail(username)
+//
+//        //TODO Validations here later
+//
+//        // Find target user by email
+//        db.collection("users")
+//            .whereEqualTo("email", email)
+//            .get()
+//            .addOnSuccessListener { result ->
+//
+//                if (result.isEmpty) {
+//                    println("User not found")
+//                    onFailure(Exception("User not found"))
+//                    return@addOnSuccessListener
+//                }
+//
+//                val targetDoc = result.documents[0]
+//                val targetUserID = targetDoc.id
+//
+//                if (targetUserID == currentUserID) {
+//                    println("You cannot add yourself")
+//                    onFailure(Exception("You cannot add yourself"))
+//                    return@addOnSuccessListener
+//                }
+//
+//                // Get sender email
+//                getCurrentUserEmail(
+//                    onSuccess = { senderEmail ->
+//
+//                        val requestRef = db.collection("users")
+//                            .document(targetUserID)
+//                            .collection("friendRequests")
+//                            .document(currentUserID)
+//
+//                        val requestData = hashMapOf(
+//                            "fromUserID" to currentUserID,
+//                            "fromEmail" to senderEmail,
+//                            "status" to "pending",
+//                            "sentAt" to FieldValue.serverTimestamp()
+//                        )
+//
+//                        requestRef.set(requestData)
+//                            .addOnSuccessListener { onSuccess() }
+//                            .addOnFailureListener { onFailure(it) }
+//                    },
+//                    onFailure = { onFailure(it) }
+//                )
+//            }
+//            .addOnFailureListener { onFailure(it) }
+//    }
+
     fun sendFriendRequest(
         username: String,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
         val db = FirebaseFirestore.getInstance()
-        //The ID of the user making the request
         val currentUserID = SessionManager.requireUserId()
-
-        //The email the Friend Request is sent to-- Fnc normalizes email to handle "email" or "email@farmingdale.edu"
         val email = normalizeEmail(username)
 
-        //TODO Validations here later
-
-        // Find target user by email
         db.collection("users")
             .whereEqualTo("email", email)
             .get()
             .addOnSuccessListener { result ->
 
                 if (result.isEmpty) {
-                    println("User not found")
                     onFailure(Exception("User not found"))
                     return@addOnSuccessListener
                 }
@@ -44,35 +99,99 @@ object FriendsRepository {
                 val targetUserID = targetDoc.id
 
                 if (targetUserID == currentUserID) {
-                    println("You cannot add yourself")
                     onFailure(Exception("You cannot add yourself"))
                     return@addOnSuccessListener
                 }
 
-                // Get sender email
-                getCurrentUserEmail(
-                    onSuccess = { senderEmail ->
+                val currentUserRef = db.collection("users").document(currentUserID)
+                val targetUserRef = db.collection("users").document(targetUserID)
 
-                        val requestRef = db.collection("users")
-                            .document(targetUserID)
-                            .collection("friendRequests")
+                // 1. Check if already friends
+                currentUserRef.collection("friends")
+                    .document(targetUserID)
+                    .get()
+                    .addOnSuccessListener { friendDoc ->
+
+                        if (friendDoc.exists()) {
+                            onFailure(Exception("You are already friends"))
+                            return@addOnSuccessListener
+                        }
+
+                        // 2. Check if request already sent
+                        targetUserRef.collection("friendRequests")
                             .document(currentUserID)
+                            .get()
+                            .addOnSuccessListener { existingRequest ->
 
-                        val requestData = hashMapOf(
-                            "fromUserID" to currentUserID,
-                            "fromEmail" to senderEmail,
-                            "status" to "pending",
-                            "sentAt" to FieldValue.serverTimestamp()
-                        )
+                                if (existingRequest.exists()) {
+                                    onFailure(Exception("Friend request already sent"))
+                                    return@addOnSuccessListener
+                                }
 
-                        requestRef.set(requestData)
-                            .addOnSuccessListener { onSuccess() }
+                                // 3. Check for mutual request between the two users
+                                currentUserRef.collection("friendRequests")
+                                    .document(targetUserID)
+                                    .get()
+                                    .addOnSuccessListener { reverseRequest ->
+
+                                        if (reverseRequest.exists()) {
+                                            // 🔥 AUTO ACCEPT
+                                            acceptFriendRequest(targetUserID) { success ->
+                                                if (success) {
+                                                    onSuccess()
+                                                } else {
+                                                    onFailure(Exception("Failed to auto-accept request"))
+                                                }
+                                            }
+                                            return@addOnSuccessListener
+                                        }
+
+                                        // 4. Safe to create request
+                                        createRequest(
+                                            targetUserID,
+                                            currentUserID,
+                                            onSuccess,
+                                            onFailure
+                                        )
+                                    }
+                                    .addOnFailureListener { onFailure(it) }
+                            }
                             .addOnFailureListener { onFailure(it) }
-                    },
-                    onFailure = { onFailure(it) }
-                )
+                    }
+                    .addOnFailureListener { onFailure(it) }
             }
             .addOnFailureListener { onFailure(it) }
+    }
+
+    private fun createRequest(
+        targetUserID: String,
+        currentUserID: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+
+        getCurrentUserEmail(
+            onSuccess = { senderEmail ->
+
+                val requestRef = db.collection("users")
+                    .document(targetUserID)
+                    .collection("friendRequests")
+                    .document(currentUserID)
+
+                val requestData = hashMapOf(
+                    "fromUserID" to currentUserID,
+                    "fromEmail" to senderEmail,
+                    "status" to "pending",
+                    "sentAt" to FieldValue.serverTimestamp()
+                )
+
+                requestRef.set(requestData)
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener { onFailure(it) }
+            },
+            onFailure = { onFailure(it) }
+        )
     }
 
     //Accounts for email / username entries without the @farmingdale.edu in sending Friend Requests
@@ -210,12 +329,19 @@ object FriendsRepository {
             "addedAt" to FieldValue.serverTimestamp()
         ))
 
-        // Remove friend request
+        //Case 1: Remove friend request (Normal case, user A sent request to user B with no pending requests)
         val requestRef = currentUserRef
             .collection("friendRequests")
             .document(fromUserID)
 
         batch.delete(requestRef)
+
+        //Case 2: If both users friend requested each other, remove the request from both accounts
+        val reverseRequestRef = otherUserRef
+            .collection("friendRequests")
+            .document(currentUserID)
+
+        batch.delete(reverseRequestRef)
 
         batch.commit()
             .addOnSuccessListener { onComplete(true) }
@@ -238,31 +364,4 @@ object FriendsRepository {
             .addOnFailureListener { onComplete(false) }
     }
 
-
-//    fun loadFriends(
-//        onSuccess: (List<Friend>) -> Unit,
-//        onFailure: (Exception) -> Unit
-//    ) {
-//        val db = FirebaseFirestore.getInstance()
-//        val userID = SessionManager.requireUserId()
-//
-//        db.collection("users")
-//            .document(userID)
-//            .collection("friends")
-//            .get()
-//            .addOnSuccessListener { docs ->
-//
-//                val friends = docs.map { doc ->
-//                    Friend(
-//                        friendID = doc.id,
-//                        displayName = doc.getString("displayName") ?: "",
-//                        latestStatus = doc.getString("latestStatusPost") ?: "",
-//                        onlineStatus = doc.getString("onlineStatus") ?: "offline"
-//                    )
-//                }
-//
-//                onSuccess(friends)
-//            }
-//            .addOnFailureListener { onFailure(it) }
-//    }
 }

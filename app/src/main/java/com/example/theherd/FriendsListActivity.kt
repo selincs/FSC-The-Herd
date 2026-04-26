@@ -119,10 +119,54 @@ class FriendsListActivity : AppCompatActivity() {
     }
 
     //Tabs - 0 = Friends List, 1 = Online Friends Filtering, 2 = Friend Requests Tab
+//    private fun filterFriends(query: String) {
+//        val baseList = when (currentTab) {
+//            1 -> repo.getMockFriends().filter { it.isOnline }
+//            2 -> repo.getMockRequests()
+//            else -> repo.getMockFriends()
+//        }
+//
+//        val filteredList = if (query.isEmpty()) {
+//            baseList
+//        } else {
+//            baseList.filter { it.name.contains(query, ignoreCase = true) }
+//        }
+//
+//        val finalSortedList = if (currentTab != 2) {
+//            filteredList.sortedByDescending { it.isOnline }
+//        } else {
+//            filteredList
+//        }
+//
+//        updateRecycler(finalSortedList)
+//    }
+    //Tabs - 0 = Friends List, 1 = Online Friends Filtering, 2 = Friend Requests Tab
     private fun filterFriends(query: String) {
+
+        if (currentTab == 2) {
+            // Requests tab selected -> Query Firestore
+            FriendsRepository.getIncomingFriendRequests(
+                onSuccess = { requests ->
+                    val filtered = if (query.isEmpty()) {
+                        requests
+                    } else {
+                        requests.filter {
+                            it.name.contains(query, ignoreCase = true)
+                        }
+                    }
+
+                    updateRecycler(filtered)
+                },
+                onFailure = {
+                    Toast.makeText(this, "Failed to load requests", Toast.LENGTH_SHORT).show()
+                }
+            )
+            return
+        }
+
+        // Use Mock Repo for the rest rn
         val baseList = when (currentTab) {
             1 -> repo.getMockFriends().filter { it.isOnline }
-            2 -> repo.getMockRequests()
             else -> repo.getMockFriends()
         }
 
@@ -132,11 +176,7 @@ class FriendsListActivity : AppCompatActivity() {
             baseList.filter { it.name.contains(query, ignoreCase = true) }
         }
 
-        val finalSortedList = if (currentTab != 2) {
-            filteredList.sortedByDescending { it.isOnline }
-        } else {
-            filteredList
-        }
+        val finalSortedList = filteredList.sortedByDescending { it.isOnline }
 
         updateRecycler(finalSortedList)
     }
