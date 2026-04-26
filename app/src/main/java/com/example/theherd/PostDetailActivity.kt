@@ -123,45 +123,43 @@ class PostDetailActivity : AppCompatActivity() {
         val commentInput = findViewById<EditText>(R.id.etCommentInput)
         val btnSend = findViewById<ImageButton>(R.id.btnSendComment)
 
-        val displayList = ArrayList<String>()
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, displayList)
-        listView.adapter = adapter
+        val commentsList = ArrayList<Model.Comment>()
+        lateinit var adapter: CommentAdapter
 
-        //load comments from firestore
-        fun loadComments(){
-            CommentRepository.getComments(topicID, postID){ comments ->
-                displayList.clear()
-
-                for (c in comments){
-                    val text = "${c.commentedByUID}: ${c.commContents}"
-                    displayList.add(text)
-                }
+        fun loadComments() {
+            CommentRepository.getComments(topicID, postID) { comments ->
+                commentsList.clear()
+                commentsList.addAll(comments)
                 adapter.notifyDataSetChanged()
             }
         }
 
+        adapter = CommentAdapter(this, commentsList) { comment ->
+            CommentRepository.toggleLikeComment(topicID, postID, comment.commentID) { success ->
+                if (success) {
+                    loadComments()
+                } else {
+                    Toast.makeText(this, "Failed to like comment", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        listView.adapter = adapter
         loadComments()
 
-        //send comment
         btnSend.setOnClickListener {
             val text = commentInput.text.toString().trim()
 
-            if(text.isNotEmpty()){
-                CommentRepository.createComment(
-                    topicID,
-                    postID,
-                    text
-                ){ sucess ->
-                    if(sucess){
+            if (text.isNotEmpty()) {
+                CommentRepository.createComment(topicID, postID, text) { success ->
+                    if (success) {
                         commentInput.text.clear()
-                        loadComments() // refresh list.
-                    } else{
-                        Toast.makeText(this, " failed to send comment", Toast.LENGTH_SHORT ).show()
+                        loadComments()
+                    } else {
+                        Toast.makeText(this, "failed to send comment", Toast.LENGTH_SHORT).show()
                     }
-
                 }
             }
-
         }
     }
 
