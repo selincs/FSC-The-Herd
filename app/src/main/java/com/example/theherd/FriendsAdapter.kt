@@ -56,7 +56,7 @@ class FriendsAdapter(
 //        } else {
 //            holder.btnMessage.visibility = View.VISIBLE
 //        }
-        holder.btnMessage.visibility = View.VISIBLE
+//        holder.btnMessage.visibility = View.VISIBLE
 
         if (isRequest) {
             holder.btnAdd.visibility = View.VISIBLE     // Accept
@@ -71,6 +71,7 @@ class FriendsAdapter(
         fun openProfile() {
             val intent = Intent(context, FriendProfileActivity::class.java).apply {
                 putExtra("FRIEND_NAME", friend.name)
+                putExtra("FRIEND_ID", friend.id)
                 putExtra("IS_FRIEND", friend.isFriend)
                 putExtra("USERNAME", "@${friend.name.replace(" ", "_").lowercase()}")
                 putExtra("GRAD_YEAR", "2026")
@@ -91,22 +92,52 @@ class FriendsAdapter(
         }
 
         holder.btnRemove.setOnClickListener {
-            //TODO: Remove Friend in Firestore logic here
-            // REMOVE FRIEND
-            FriendsRepository.removeFriend(friend.id) { success ->
-                if (success) {
-                    Toast.makeText(context, "Friend removed", Toast.LENGTH_SHORT).show()
+            val pos = holder.bindingAdapterPosition
+            if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
 
-                    val pos = holder.bindingAdapterPosition
-                    if (pos != RecyclerView.NO_POSITION) {
+            if (isRequest) {
+                // Reject request
+                FriendsRepository.rejectFriendRequest(friend.id) { success ->
+                    if (success) {
+                        Toast.makeText(context, "Request rejected", Toast.LENGTH_SHORT).show()
                         friendsList.removeAt(pos)
                         notifyItemRemoved(pos)
+                    } else {
+                        Toast.makeText(context, "Failed to reject request", Toast.LENGTH_SHORT).show()
                     }
-                } else {
-                    Toast.makeText(context, "Failed to remove friend", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                // Remove friend
+                FriendsRepository.removeFriend(friend.id) { success ->
+                    if (success) {
+                        Toast.makeText(context, "Friend removed", Toast.LENGTH_SHORT).show()
+                        friendsList.removeAt(pos)
+                        notifyItemRemoved(pos)
+                    } else {
+                        Toast.makeText(context, "Failed to remove friend", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
+
+        //Previous version, works but only has removeFriend implemented for both versions of button -> no reject friend request implementation
+//        holder.btnRemove.setOnClickListener {
+//            //TODO: Remove Friend in Firestore logic here
+//            // REMOVE FRIEND
+//            FriendsRepository.removeFriend(friend.id) { success ->
+//                if (success) {
+//                    Toast.makeText(context, "Friend removed", Toast.LENGTH_SHORT).show()
+//
+//                    val pos = holder.bindingAdapterPosition
+//                    if (pos != RecyclerView.NO_POSITION) {
+//                        friendsList.removeAt(pos)
+//                        notifyItemRemoved(pos)
+//                    }
+//                } else {
+//                    Toast.makeText(context, "Failed to remove friend", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        }
 
                 //backup for mock repo code
 //            val pos = holder.bindingAdapterPosition

@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -17,6 +18,8 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class FriendsListActivity : AppCompatActivity() {
 
@@ -123,7 +126,7 @@ class FriendsListActivity : AppCompatActivity() {
     private fun filterFriends(query: String) {
 
         if (currentTab == 2) {
-            // 🔹 Requests tab
+            // Requests tab
             repo.getIncomingFriendRequests(
                 onSuccess = { requests ->
                     val filtered = if (query.isEmpty()) {
@@ -158,9 +161,9 @@ class FriendsListActivity : AppCompatActivity() {
 
                     val sorted = filtered.sortedByDescending { it.isOnline }
 
-                    runOnUiThread {
+//                    runOnUiThread {
                         updateRecycler(sorted)
-                    }
+//                    }
                 },
                 onFailure = {
                     Toast.makeText(this, "Failed to load friends", Toast.LENGTH_SHORT).show()
@@ -209,7 +212,9 @@ class FriendsListActivity : AppCompatActivity() {
 //
 //        updateRecycler(finalSortedList)
 //    }
-//
+
+
+// Is friendToRemove still needed below?
     private fun updateRecycler(newList: List<Friend>) {
         adapter = FriendsAdapter(newList.toMutableList()) { friendToRemove ->
 
@@ -234,6 +239,12 @@ class FriendsListActivity : AppCompatActivity() {
 
         findViewById<RecyclerView>(R.id.friendsRecyclerView).adapter = adapter
     }
+
+    //TODO: see if this works - no filterFriends test
+//    private fun updateRecycler(newList: List<Friend>) {
+//        adapter = FriendsAdapter(newList.toMutableList()) {
+//        findViewById<RecyclerView>(R.id.friendsRecyclerView).adapter = adapter
+//    }
 
     //User types email or username -> if username, normalizeEmail() -> email string -> Firestore query(users)
     //Write to users/{targetUserID}/friendRequests/{currentUserID}
