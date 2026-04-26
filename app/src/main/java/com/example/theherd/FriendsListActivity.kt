@@ -21,7 +21,8 @@ import com.google.android.material.textfield.TextInputLayout
 class FriendsListActivity : AppCompatActivity() {
 
     private lateinit var adapter: FriendsAdapter
-    private val repo = MockFriendsRepo
+//    private val repo = MockFriendsRepo
+    private val repo = FriendsRepository
 
     private lateinit var searchInput: TextInputEditText
     private var currentTab = 0
@@ -119,10 +120,82 @@ class FriendsListActivity : AppCompatActivity() {
     }
 
     //Tabs - 0 = Friends List, 1 = Online Friends Filtering, 2 = Friend Requests Tab
+    private fun filterFriends(query: String) {
+
+        if (currentTab == 2) {
+            // 🔹 Requests tab
+            repo.getIncomingFriendRequests(
+                onSuccess = { requests ->
+                    val filtered = if (query.isEmpty()) {
+                        requests
+                    } else {
+                        requests.filter { it.name.contains(query, ignoreCase = true) }
+                    }
+
+                    updateRecycler(filtered)
+                },
+                onFailure = {
+                    Toast.makeText(this, "Failed to load requests", Toast.LENGTH_SHORT).show()
+                }
+            )
+
+        } else {
+            // Friends / Online tabs
+            repo.loadFriends(
+                onSuccess = { friends ->
+
+                    val baseList = if (currentTab == 1) {
+                        friends.filter { it.isOnline }
+                    } else {
+                        friends
+                    }
+
+                    val filtered = if (query.isEmpty()) {
+                        baseList
+                    } else {
+                        baseList.filter { it.name.contains(query, ignoreCase = true) }
+                    }
+
+                    val sorted = filtered.sortedByDescending { it.isOnline }
+
+                    runOnUiThread {
+                        updateRecycler(sorted)
+                    }
+                },
+                onFailure = {
+                    Toast.makeText(this, "Failed to load friends", Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+    }
+
+    //Tabs - 0 = Friends List, 1 = Online Friends Filtering, 2 = Friend Requests Tab
 //    private fun filterFriends(query: String) {
+//
+//        if (currentTab == 2) {
+//            // Requests tab selected -> Query Firestore
+//            FriendsRepository.getIncomingFriendRequests(
+//                onSuccess = { requests ->
+//                    val filtered = if (query.isEmpty()) {
+//                        requests
+//                    } else {
+//                        requests.filter {
+//                            it.name.contains(query, ignoreCase = true)
+//                        }
+//                    }
+//
+//                    updateRecycler(filtered)
+//                },
+//                onFailure = {
+//                    Toast.makeText(this, "Failed to load requests", Toast.LENGTH_SHORT).show()
+//                }
+//            )
+//            return
+//        }
+//
+//        // Use Mock Repo for the rest rn
 //        val baseList = when (currentTab) {
 //            1 -> repo.getMockFriends().filter { it.isOnline }
-//            2 -> repo.getMockRequests()
 //            else -> repo.getMockFriends()
 //        }
 //
@@ -132,60 +205,28 @@ class FriendsListActivity : AppCompatActivity() {
 //            baseList.filter { it.name.contains(query, ignoreCase = true) }
 //        }
 //
-//        val finalSortedList = if (currentTab != 2) {
-//            filteredList.sortedByDescending { it.isOnline }
-//        } else {
-//            filteredList
-//        }
+//        val finalSortedList = filteredList.sortedByDescending { it.isOnline }
 //
 //        updateRecycler(finalSortedList)
 //    }
-    //Tabs - 0 = Friends List, 1 = Online Friends Filtering, 2 = Friend Requests Tab
-    private fun filterFriends(query: String) {
-
-        if (currentTab == 2) {
-            // Requests tab selected -> Query Firestore
-            FriendsRepository.getIncomingFriendRequests(
-                onSuccess = { requests ->
-                    val filtered = if (query.isEmpty()) {
-                        requests
-                    } else {
-                        requests.filter {
-                            it.name.contains(query, ignoreCase = true)
-                        }
-                    }
-
-                    updateRecycler(filtered)
-                },
-                onFailure = {
-                    Toast.makeText(this, "Failed to load requests", Toast.LENGTH_SHORT).show()
-                }
-            )
-            return
-        }
-
-        // Use Mock Repo for the rest rn
-        val baseList = when (currentTab) {
-            1 -> repo.getMockFriends().filter { it.isOnline }
-            else -> repo.getMockFriends()
-        }
-
-        val filteredList = if (query.isEmpty()) {
-            baseList
-        } else {
-            baseList.filter { it.name.contains(query, ignoreCase = true) }
-        }
-
-        val finalSortedList = filteredList.sortedByDescending { it.isOnline }
-
-        updateRecycler(finalSortedList)
-    }
-
+//
     private fun updateRecycler(newList: List<Friend>) {
         adapter = FriendsAdapter(newList.toMutableList()) { friendToRemove ->
 
             // 1. remove friend from repo
-            repo.removeFriend(friendToRemove)
+//            repo.removeFriend(friendToRemove)
+
+            //should remove friends be done here or in adapter?
+//            repo.removeFriend(friendToRemove.id) { success ->
+//                if (success) {
+//                    Toast.makeText(this, "${friendToRemove.name} removed", Toast.LENGTH_SHORT).show()
+//                } else {
+//                    Toast.makeText(this, "Failed to remove friend", Toast.LENGTH_SHORT).show()
+//                }
+
+                // refresh UI either way
+//                filterFriends(searchInput.text.toString())
+//            }
 
             // 2. refresh to ensure that the removed friend is no longer displayed
             filterFriends(searchInput.text.toString())
