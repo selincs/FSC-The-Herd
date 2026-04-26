@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import Model.Post
 
 class SpecificCommunityActivity : AppCompatActivity() {
@@ -108,28 +108,29 @@ class SpecificCommunityActivity : AppCompatActivity() {
         loadPostsFromFirestore()
 
 
-        findViewById<FloatingActionButton>(R.id.fabAddPost).setOnClickListener {
+        findViewById<ExtendedFloatingActionButton>(R.id.fabAddPost).setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             intent.putExtra("COMMUNITY_NAME", communityName)
             intent.putExtra("TOPIC_ID", topicID)
             startCreatePost.launch(intent)
         }
+
         setupJoinLeaveSystem()
     }
 
     private fun setupJoinLeaveSystem() {
         val btnJoin = findViewById<Button>(R.id.btnJoinCommunity)
-        val btnLeave = findViewById<Button>(R.id.btnLeaveCommunity)
+
 
         val allClubs = PreferencesManager.loadAllCommunities(this)
         val currentClub = allClubs.find { it.name == communityName }
 
         if (currentClub?.isJoined == true) {
-            btnLeave.visibility = View.VISIBLE
+
             btnJoin.visibility = View.GONE
         } else {
             btnJoin.visibility = View.VISIBLE
-            btnLeave.visibility = View.GONE
+
         }
 
         btnJoin.setOnClickListener {
@@ -138,21 +139,11 @@ class SpecificCommunityActivity : AppCompatActivity() {
             PreferencesManager.saveAllCommunities(this, clubs)
 
             btnJoin.visibility = View.GONE
-            btnLeave.visibility = View.VISIBLE
+
             Toast.makeText(this, "Joined $communityName!", Toast.LENGTH_SHORT).show()
         }
 
-        btnLeave.setOnClickListener {
-            val clubs = PreferencesManager.loadAllCommunities(this)
-            clubs.find { it.name == communityName }?.isJoined = false
-            PreferencesManager.saveAllCommunities(this, clubs)
 
-            btnLeave.visibility = View.GONE
-            btnJoin.visibility = View.VISIBLE
-            Toast.makeText(this, "Left $communityName", Toast.LENGTH_SHORT).show()
-
-            finish()
-        }
 
 
     }
