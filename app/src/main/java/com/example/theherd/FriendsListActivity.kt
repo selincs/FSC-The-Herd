@@ -126,23 +126,37 @@ class FriendsListActivity : AppCompatActivity() {
     private fun filterFriends(query: String) {
 
         if (currentTab == 2) {
-            // Requests tab
-            repo.getIncomingFriendRequests(
-                onSuccess = { requests ->
-                    val filtered = if (query.isEmpty()) {
-                        requests
-                    } else {
-                        requests.filter { it.name.contains(query, ignoreCase = true) }
+            FriendsRepository.getAllRequests { requestList ->
+
+                val filtered = if (query.isEmpty()) {
+                    requestList
+                } else {
+                    requestList.filter {
+                        it.name.contains(query, ignoreCase = true)
                     }
-
-                    updateRecycler(filtered)
-                },
-                onFailure = {
-                    Toast.makeText(this, "Failed to load requests", Toast.LENGTH_SHORT).show()
                 }
-            )
 
-        } else {
+                val sorted = filtered.sortedByDescending { it.isOnline }
+
+                updateRecycler(sorted)
+            }
+            return
+//            repo.getIncomingFriendRequests(
+//                onSuccess = { requests ->
+//                    val filtered = if (query.isEmpty()) {
+//                        requests
+//                    } else {
+//                        requests.filter { it.name.contains(query, ignoreCase = true) }
+//                    }
+//
+//                    updateRecycler(filtered)
+//                },
+//                onFailure = {
+//                    Toast.makeText(this, "Failed to load requests", Toast.LENGTH_SHORT).show()
+//                }
+//            )
+        }
+        else {
             // Friends / Online tabs
             repo.loadFriends(
                 onSuccess = { friends ->
@@ -160,10 +174,7 @@ class FriendsListActivity : AppCompatActivity() {
                     }
 
                     val sorted = filtered.sortedByDescending { it.isOnline }
-
-//                    runOnUiThread {
-                        updateRecycler(sorted)
-//                    }
+                    updateRecycler(sorted)
                 },
                 onFailure = {
                     Toast.makeText(this, "Failed to load friends", Toast.LENGTH_SHORT).show()

@@ -39,7 +39,7 @@ class FriendsAdapter(
         val friend = friendsList[position]
         val context = holder.itemView.context
 
-        //isRequest == Is this GUI entry a Friend item or a Friend Request?
+        //isRequest == Is this GUI entry a Friend or a Friend Request?
         val isRequest = !friend.isFriend
 
 
@@ -50,22 +50,24 @@ class FriendsAdapter(
         holder.statusDot.backgroundTintList = ColorStateList.valueOf(
             ContextCompat.getColor(context, dotColor)
         )
-//
-//        if (friend.statusText == "Pending Request") {
-//            holder.btnMessage.visibility = View.GONE
-//        } else {
-//            holder.btnMessage.visibility = View.VISIBLE
-//        }
-//        holder.btnMessage.visibility = View.VISIBLE
 
-        if (isRequest) {
-            holder.btnAdd.visibility = View.VISIBLE     // Accept
-            holder.btnRemove.visibility = View.VISIBLE  // Reject
-            holder.btnMessage.visibility = View.GONE    // No messaging yet
+        if (!isRequest) {
+            // FRIEND (Remove or Message buttons)
+            holder.btnAdd.visibility = View.GONE
+            holder.btnRemove.visibility = View.VISIBLE
+            holder.btnMessage.visibility = View.VISIBLE
+
+        } else if (friend.isIncoming) {
+            // INCOMING FRIEND REQUEST (Accept or Reject buttons)
+            holder.btnAdd.visibility = View.VISIBLE   // Accept
+            holder.btnRemove.visibility = View.VISIBLE // Reject
+            holder.btnMessage.visibility = View.GONE
+
         } else {
-            holder.btnAdd.visibility = View.GONE        // Cant Add someone already your Friend
-            holder.btnRemove.visibility = View.VISIBLE  // Remove friend
-            holder.btnMessage.visibility = View.VISIBLE // Message friend
+            // OUTGOING FRIEND REQUEST (Enable Cancel button)
+            holder.btnAdd.visibility = View.GONE      // No accept button on outgoing requests
+            holder.btnRemove.visibility = View.VISIBLE // Cancel request allowed
+            holder.btnMessage.visibility = View.GONE    //no messaging without friendship
         }
 
         fun openProfile() {
@@ -95,49 +97,39 @@ class FriendsAdapter(
             val pos = holder.bindingAdapterPosition
             if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
 
-            if (isRequest) {
-                // Reject request
-                FriendsRepository.rejectFriendRequest(friend.id) { success ->
-                    if (success) {
-                        Toast.makeText(context, "Request rejected", Toast.LENGTH_SHORT).show()
-                        friendsList.removeAt(pos)
-                        notifyItemRemoved(pos)
-                    } else {
-                        Toast.makeText(context, "Failed to reject request", Toast.LENGTH_SHORT).show()
+            when {
+                !isRequest -> {
+                    // if !isRequest, the user is already a FRIEND -> show delete confirmation dialog
+                    showDeleteConfirmation(context, friend, pos)
+                }
+
+                friend.isIncoming -> {
+                    // INCOMING REQUEST -> reject (no confirmation)
+                    FriendsRepository.rejectFriendRequest(friend.id) { success ->
+                        if (success) {
+                            Toast.makeText(context, "Request rejected", Toast.LENGTH_SHORT).show()
+                            friendsList.removeAt(pos)
+                            notifyItemRemoved(pos)
+                        } else {
+                            Toast.makeText(context, "Failed to reject request", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
-            } else {
-                // Remove friend
-                FriendsRepository.removeFriend(friend.id) { success ->
-                    if (success) {
-                        Toast.makeText(context, "Friend removed", Toast.LENGTH_SHORT).show()
-                        friendsList.removeAt(pos)
-                        notifyItemRemoved(pos)
-                    } else {
-                        Toast.makeText(context, "Failed to remove friend", Toast.LENGTH_SHORT).show()
+
+                else -> {
+                    // OUTGOING REQUEST -> cancel (no confirmation)
+                    FriendsRepository.cancelFriendRequest(friend.id) { success ->
+                        if (success) {
+                            Toast.makeText(context, "Request cancelled", Toast.LENGTH_SHORT).show()
+                            friendsList.removeAt(pos)
+                            notifyItemRemoved(pos)
+                        } else {
+                            Toast.makeText(context, "Failed to cancel request", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
         }
-
-        //Previous version, works but only has removeFriend implemented for both versions of button -> no reject friend request implementation
-//        holder.btnRemove.setOnClickListener {
-//            //TODO: Remove Friend in Firestore logic here
-//            // REMOVE FRIEND
-//            FriendsRepository.removeFriend(friend.id) { success ->
-//                if (success) {
-//                    Toast.makeText(context, "Friend removed", Toast.LENGTH_SHORT).show()
-//
-//                    val pos = holder.bindingAdapterPosition
-//                    if (pos != RecyclerView.NO_POSITION) {
-//                        friendsList.removeAt(pos)
-//                        notifyItemRemoved(pos)
-//                    }
-//                } else {
-//                    Toast.makeText(context, "Failed to remove friend", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
 
                 //backup for mock repo code
 //            val pos = holder.bindingAdapterPosition
@@ -164,26 +156,21 @@ class FriendsAdapter(
 //        }
 
         holder.btnAdd.setOnClickListener {
-            //TODO: Add Friend in Firestore logic here
-            if (isRequest) {
+            val pos = holder.bindingAdapterPosition
+            if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
+
+            if (isRequest && friend.isIncoming) {
                 FriendsRepository.acceptFriendRequest(friend.id) { success ->
                     if (success) {
                         Toast.makeText(context, "Friend added!", Toast.LENGTH_SHORT).show()
-
-                        val pos = holder.bindingAdapterPosition
-                        if (pos != RecyclerView.NO_POSITION) {
-                            friendsList.removeAt(pos)
-                            notifyItemRemoved(pos)
-                        }
+                        friendsList.removeAt(pos)
+                        notifyItemRemoved(pos)
                     } else {
                         Toast.makeText(context, "Failed to accept request", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-            println("Add Friend button pressed")
         }
-
-
     }
 
     override fun getItemCount() = friendsList.size
@@ -209,6 +196,8 @@ class FriendsAdapter(
                     }
                 }
             }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     //backup

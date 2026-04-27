@@ -10,6 +10,7 @@ data class Friend(
     val isOnline: Boolean,
     val isMentor: Boolean = false,
     val isFriend: Boolean,
+    val isIncoming: Boolean = false,
     val major: String = "Computer Science",
     val gradDate: String = "Spring 2026",
     val username: String = "ram_user",
