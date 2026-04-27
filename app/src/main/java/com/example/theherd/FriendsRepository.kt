@@ -43,7 +43,7 @@ object FriendsRepository {
                             val friend = Friend(
                                 id = friendID,
                                 name = fullName,
-                                statusText = "No recent status", // placeholder for now
+                                statusText = "No recent status", // TODO: placeholder for now, add Firestore field
                                 isOnline = isOnline,
                                 isFriend = true
                             )
@@ -438,7 +438,7 @@ object FriendsRepository {
                                         Friend(
                                             id = toUserID,
                                             name = fullName,
-                                            statusText = "Pending friend request",
+                                            statusText = "Friend request sent! Waiting on their reply.",
                                             isOnline = isOnline,
                                             isFriend = false,
                                             isIncoming = false

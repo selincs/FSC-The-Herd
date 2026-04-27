@@ -2,6 +2,7 @@ package com.example.theherd
 
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,6 +52,19 @@ class FriendsAdapter(
             ContextCompat.getColor(context, dotColor)
         )
 
+        //Sets background color of the friend request entry, only for Requests atm. Can differentiate mentors here.
+        val bgView = holder.itemView.findViewById<View>(R.id.requestBackground)
+        if (isRequest) {
+            val color = if (friend.isIncoming) {
+                Color.parseColor("#1A4CAF50") // subtle green
+            } else {
+                Color.parseColor("#1A2196F3") // subtle blue
+            }
+            bgView.setBackgroundColor(color)
+        } else {
+            bgView.setBackgroundColor(Color.TRANSPARENT)
+        }
+
         if (!isRequest) {
             // FRIEND (Remove or Message buttons)
             holder.btnAdd.visibility = View.GONE
@@ -67,6 +81,7 @@ class FriendsAdapter(
             // OUTGOING FRIEND REQUEST (Enable Cancel button)
             holder.btnAdd.visibility = View.GONE      // No accept button on outgoing requests
             holder.btnRemove.visibility = View.VISIBLE // Cancel request allowed
+            holder.btnRemove.setImageResource(R.drawable.ic_delete) //Change btnRemove icon to trash can
             holder.btnMessage.visibility = View.GONE    //no messaging without friendship
         }
 
@@ -93,6 +108,7 @@ class FriendsAdapter(
 //            context.startActivity(intent)
         }
 
+        //Button Remove logic
         holder.btnRemove.setOnClickListener {
             val pos = holder.bindingAdapterPosition
             if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
@@ -130,30 +146,6 @@ class FriendsAdapter(
                 }
             }
         }
-
-                //backup for mock repo code
-//            val pos = holder.bindingAdapterPosition
-//            if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
-//
-//            // if isRequest, reject request, else remove friend button is being used
-//            if (isRequest) {
-//                // REJECT REQUEST
-//                FriendsRepository.rejectFriendRequest(friend.id) { success ->
-//                    if (success) {
-//                        Toast.makeText(context, "Request rejected", Toast.LENGTH_SHORT).show()
-//
-//                        friendsList.removeAt(pos)
-//                        notifyItemRemoved(pos)
-//                    } else {
-//                        Toast.makeText(context, "Failed to reject request", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            } else {
-//                // REMOVE FRIEND (existing behavior)
-//                showDeleteConfirmation(context, friend, pos)
-//            }
-//            showDeleteConfirmation(context, friend, holder.bindingAdapterPosition)
-//        }
 
         holder.btnAdd.setOnClickListener {
             val pos = holder.bindingAdapterPosition
@@ -199,25 +191,6 @@ class FriendsAdapter(
             .setNegativeButton("Cancel", null)
             .show()
     }
-
-    //backup
-//    private fun showDeleteConfirmation(context: android.content.Context, friend: Friend, position: Int) {
-//        AlertDialog.Builder(context)
-//            .setTitle("Remove Friend")
-//            .setMessage("Are you sure you want to remove ${friend.name} from your herd?")
-//            .setPositiveButton("Remove") { _, _ ->
-//                if (position != RecyclerView.NO_POSITION && position < friendsList.size) {
-//                    val friendToRemove = friendsList[position]
-//                    onRemoveClick(friendToRemove)
-//                    friendsList.removeAt(position)
-//                    notifyItemRemoved(position)
-//                    notifyItemRangeChanged(position, friendsList.size)
-//                    Toast.makeText(context, "${friendToRemove.name} removed", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//            .setNegativeButton("Cancel", null)
-//            .show()
-//    }
 
     fun updateList(newList: List<Friend>) {
         friendsList.clear()
