@@ -48,20 +48,16 @@
             <FrameLayout
                 android:layout_width="140dp"
                 android:layout_height="140dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
                 android:background="@drawable/circle_background"
-                android:backgroundTint="#D9E2D9"
-                android:padding="12dp">
+                android:backgroundTint="#D9E2D9">
 
                 <ImageView
                     android:id="@+id/profileImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_account_circle_24"
-                    android:scaleType="fitCenter"
-                    app:tint="#2F442F"
-                    android:contentDescription="@string/profile_image_desc" />
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/avatar_1"
+                    android:contentDescription="@string/profile_image_desc"/>
             </FrameLayout>
 
             <!-- NAME (CLEAN HEADER STYLE) -->

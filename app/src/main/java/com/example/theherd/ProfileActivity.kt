@@ -37,6 +37,8 @@ class ProfileActivity : AppCompatActivity() {
 
     private var isEditing = false
 
+    private val PICK_IMAGE_REQUEST = 1
+
     //Loads the User's profile from Firestore
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +60,16 @@ class ProfileActivity : AppCompatActivity() {
         loadCommunitiesFromFirestore()
 
         editProfileButton = findViewById(R.id.editProfileButton)
+
+        val profileImage = findViewById<ImageView>(R.id.profileImage)
+
+        profileImage.setOnClickListener {
+            if (isEditing) {
+                showAvatarPicker()
+            } else {
+                Toast.makeText(this, "Tap Edit Profile to change avatar", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         //Declare GUI elements as Vals
         val firstNameInput = findViewById<EditText>(R.id.firstNameInput)
@@ -213,6 +225,39 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun showAvatarPicker() {
+        val avatars = arrayOf(
+            R.drawable.avatar_1,
+            R.drawable.avatar_2,
+            R.drawable.avatar_3,
+            R.drawable.avatar_4
+        )
+
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setTitle("Choose an Avatar")
+
+        builder.setItems(arrayOf("Avatar 1", "Avatar 2", "Avatar 3", "Avatar 4")) { _, which ->
+            val selectedAvatar = avatars[which]
+
+            val profileImage = findViewById<ImageView>(R.id.profileImage)
+            profileImage.setImageResource(selectedAvatar)
+
+            saveAvatarToFirestore("avatar_${which + 1}")
+        }
+
+        builder.show()
+    }
+
+    private fun saveAvatarToFirestore(avatarName: String) {
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val uid = user.uid
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .update("avatar", avatarName)
+    }
+
     private fun loadCommunitiesFromFirestore() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val uid = user.uid
@@ -349,11 +394,35 @@ class ProfileActivity : AppCompatActivity() {
             }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            val imageUri = data.data
+            val profileImage = findViewById<ImageView>(R.id.profileImage)
+            profileImage.setImageURI(imageUri)
+
+            // TODO: upload to Firebase Storage here
+        }
+    }
+
     //Loads the Firestore profile via FirebaseAuth of current logged-in User - Can this move to userRepository?
     private fun loadProfileFromFirestore() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val uid = user.uid
         val db = FirebaseFirestore.getInstance()
+        val avatarName = "avatar_1"
+
+        val avatarResId = when (avatarName) {
+            "avatar_1" -> R.drawable.avatar_1
+            "avatar_2" -> R.drawable.avatar_2
+            "avatar_3" -> R.drawable.avatar_3
+            "avatar_4" -> R.drawable.avatar_4
+            else -> R.drawable.avatar_1
+        }
+
+
+        findViewById<ImageView>(R.id.profileImage).setImageResource(avatarResId)
 
         db.collection("users")
             .document(uid)
