@@ -4,7 +4,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 object FriendsRepository {
-
     fun loadFriends(
         onSuccess: (List<Friend>) -> Unit,
         onFailure: (Exception) -> Unit
@@ -99,9 +98,7 @@ object FriendsRepository {
     }
     //Send Friend request - email
     //user types in email, check email in path
-//    users.whereEqualTo("email", inputEmail)
-//write request to      users/{targetID}/friendRequests/{currentUserID}
-
+    //write request to users/{targetID}/friendRequests/{currentUserID}
     //Get users target email, filter out @Farmingdale case
     //Send a friend request to another user, with auto accepting mutual requests
     fun sendFriendRequest(
@@ -119,7 +116,7 @@ object FriendsRepository {
             .addOnSuccessListener { result ->
 
                 if (result.isEmpty) {
-                    println("User not found for friend request sending")
+                    println("User not found for sendFriendRequest() to $email - FriendsRepo")
                     onFailure(Exception("User not found"))
                     return@addOnSuccessListener
                 }
@@ -231,7 +228,7 @@ object FriendsRepository {
     private fun createRequest(
         targetUserID: String,
         currentUserID: String,
-        targetEmail: String, // ✅ passed from sendFriendRequest
+        targetEmail: String, // passed from sendFriendRequest
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
@@ -283,36 +280,6 @@ object FriendsRepository {
             onFailure = { onFailure(it) }
         )
     }
-//    private fun createRequest(
-//        targetUserID: String,
-//        currentUserID: String,
-//        onSuccess: () -> Unit,
-//        onFailure: (Exception) -> Unit
-//    ) {
-//        val db = FirebaseFirestore.getInstance()
-//
-//        getCurrentUserEmail(
-//            onSuccess = { senderEmail ->
-//
-//                val requestRef = db.collection("users")
-//                    .document(targetUserID)
-//                    .collection("friendRequests")
-//                    .document(currentUserID)
-//
-//                val requestData = hashMapOf(
-//                    "fromUserID" to currentUserID,
-//                    "fromEmail" to senderEmail,
-//                    "status" to "pending",
-//                    "sentAt" to FieldValue.serverTimestamp()
-//                )
-//
-//                requestRef.set(requestData)
-//                    .addOnSuccessListener { onSuccess() }
-//                    .addOnFailureListener { onFailure(it) }
-//            },
-//            onFailure = { onFailure(it) }
-//        )
-//    }
 
     //Accounts for email / username entries without the @farmingdale.edu in sending Friend Requests
     //User types "email", returns "email@farmingdale.edu" to find in Firestore
@@ -356,7 +323,7 @@ object FriendsRepository {
         val requests = mutableListOf<Friend>()
         val currentUserRef = db.collection("users").document(currentUserId)
 
-        // 🔢 Track async operations
+        // Track async Firestore operations
         var totalOperations = 0
         var completedOperations = 0
 
@@ -492,71 +459,6 @@ object FriendsRepository {
             .addOnSuccessListener { onComplete(true) }
             .addOnFailureListener { onComplete(false) }
     }
-    //Get user's incoming friend requests from Firestore for display in the Requests Tab
-//    println("User has no current friend requests, do something here")
-//    fun getIncomingFriendRequests(
-//        onSuccess: (List<Friend>) -> Unit,
-//        onFailure: (Exception) -> Unit
-//    ) {
-//        val db = FirebaseFirestore.getInstance()
-//        val currentUserID = SessionManager.requireUserId()
-//
-//        db.collection("users")
-//            .document(currentUserID)
-//            .collection("friendRequests")
-//            .get()
-//            .addOnSuccessListener { requestDocs ->
-//
-//                if (requestDocs.isEmpty) {
-//                    onSuccess(emptyList())
-//                    return@addOnSuccessListener
-//                }
-//
-//                val requests = mutableListOf<Friend>()
-//                var remaining = requestDocs.size()  //remaining friend requests
-//
-//                //For each document in the friend request sub collection, create a friend entry until none remain
-//                for (doc in requestDocs) {
-//                    val fromUserID = doc.getString("fromUserID") ?: continue
-//
-//                    //enter users collection -> in userDoc(foundByID) -> get fields
-//                    db.collection("users")
-//                        .document(fromUserID)
-//                        .get()
-//                        .addOnSuccessListener { userDoc ->
-//
-//                            val firstName = userDoc.getString("firstName") ?: ""
-//                            val lastName = userDoc.getString("lastName") ?: ""
-//                            val fullName = "$firstName $lastName".trim()    //combine fName+lName for display name
-//
-//                            val isOnline = userDoc.getString("onlineStatus") == "online" //only online atm?
-//
-//                            //create Friend entry for display, id, name, statusText, online status, isFriend=false(for friend request)
-//                            val friend = Friend(
-//                                id = fromUserID,
-//                                name = fullName,
-//                                statusText = "Sent you a friend request", // replaces "3 mutual friends" in hardcode
-//                                isOnline = isOnline,
-//                                isFriend = false
-//                            )
-//
-//                            requests.add(friend)
-//
-//                            remaining--
-//                            if (remaining == 0) {
-//                                onSuccess(requests)
-//                            }
-//                        }
-//                        .addOnFailureListener {
-//                            remaining--
-//                            if (remaining == 0) {
-//                                onSuccess(requests)
-//                            }
-//                        }
-//                }
-//            }
-//            .addOnFailureListener { onFailure(it) }
-//    }
 
     //Accept the friend request, removes the request, NEEDS TO HANDLE MUTUAL REQUESTS STILL
     //Adds each user to each others friends collection, removes the request, (mutual requests incomplete)

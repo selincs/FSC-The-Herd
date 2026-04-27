@@ -70,12 +70,12 @@ class FriendsListActivity : AppCompatActivity() {
             val intent = Intent(this, MotivationActivity::class.java)
             startActivity(intent)
         }
-//
+
 //        friendsButton.setOnClickListener {
 //            val intent = Intent(this, LoginActivity::class.java)
 //            startActivity(intent)
 //        }
-//
+
         interestsButton.setOnClickListener {
             val intent = Intent(this, TopicsActivity::class.java)
             startActivity(intent)
@@ -124,10 +124,8 @@ class FriendsListActivity : AppCompatActivity() {
 
     //Tabs - 0 = Friends List, 1 = Online Friends Filtering, 2 = Friend Requests Tab
     private fun filterFriends(query: String) {
-
         if (currentTab == 2) {
             FriendsRepository.getAllRequests { requestList ->
-
                 val filtered = if (query.isEmpty()) {
                     requestList
                 } else {
@@ -137,7 +135,6 @@ class FriendsListActivity : AppCompatActivity() {
                 }
 
                 val sorted = filtered.sortedByDescending { it.isOnline }
-
                 updateRecycler(sorted)
             }
             return
