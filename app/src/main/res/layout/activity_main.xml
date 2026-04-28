@@ -65,7 +65,7 @@
         android:id="@+id/create_post_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Todays Status Post"
+        android:text="Create Today's Status Post"
         android:backgroundTint="#2F442F"
         android:textColor="@android:color/white"
         android:layout_marginTop="16dp"
