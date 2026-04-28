@@ -45,7 +45,7 @@ class FriendProfileActivity : AppCompatActivity() {
 //        loadStatusPosts(friendId)
 
         //TODO: Fix friend name passed from adapter
-        val friendName = intent.getStringExtra("FRIEND_NAME") ?: "Ram User"
+//        val friendName = intent.getStringExtra("FRIEND_NAME") ?: "Ram User"
 //        val username = intent.getStringExtra("USERNAME") ?: "@${friendName.replace(" ", "_").lowercase()}"
 //        val gradYear = intent.getStringExtra("GRAD_YEAR") ?: "2026"
 
@@ -70,6 +70,7 @@ class FriendProfileActivity : AppCompatActivity() {
         val btnBlock = findViewById<Button>(R.id.btnBlockUser)
         val emptyText = findViewById<TextView>(R.id.emptyCommunitiesText)
         val moreText = findViewById<TextView>(R.id.moreCommunitiesText)
+        val emptySharedText = findViewById<TextView>(R.id.emptySharedText)
 
         // buttons
         val eventsButton: Button = findViewById(R.id.events_button)
@@ -224,11 +225,17 @@ class FriendProfileActivity : AppCompatActivity() {
 
         val sharedRecycler = findViewById<RecyclerView>(R.id.sharedTopicsRecycler)
         loadSharedCommunities(friendId) { sharedTopics ->
-            sharedRecycler.layoutManager = LinearLayoutManager(this)
-            sharedRecycler.adapter = AskMeAdapter(this, sharedTopics.toMutableList(), false)
+            if (sharedTopics.isEmpty()) {
+                emptySharedText.visibility = View.VISIBLE
+                sharedRecycler.visibility = View.GONE
+            } else {
+                emptySharedText.visibility = View.GONE
+                sharedRecycler.visibility = View.VISIBLE
+
+                sharedRecycler.layoutManager = LinearLayoutManager(this)
+                sharedRecycler.adapter = AskMeAdapter(this, sharedTopics.toMutableList(), false)
+            }
         }
-//        sharedRecycler.layoutManager = LinearLayoutManager(this)
-//        sharedRecycler.adapter = AskMeAdapter(this, sharedWithMe.toMutableList(), false)
 
         //Firestore block listener - calls Block User function. BlockUser() will :
         //add user to block list, remove friends on both ends, and delete friend requests atomically

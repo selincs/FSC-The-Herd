@@ -177,7 +177,10 @@
                     android:layout_height="wrap_content"
                     android:text="This user has not joined any Topics/Communities yet!"
                     android:textColor="#757575"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:visibility="gone"/>
+
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/communitiesRecycler"
@@ -207,6 +210,16 @@
                     android:textColor="#2F442F"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/emptySharedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="You do not share any communities with this user."
+                    android:textColor="#757575"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/sharedTopicsRecycler"
