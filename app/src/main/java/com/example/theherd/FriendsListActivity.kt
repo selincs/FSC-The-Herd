@@ -271,7 +271,6 @@ class FriendsListActivity : AppCompatActivity() {
             inputLayout.error = null
 
             if (input.isNotEmpty()) {
-
                 FriendsRepository.sendFriendRequest(
                     input,
                     onSuccess = {

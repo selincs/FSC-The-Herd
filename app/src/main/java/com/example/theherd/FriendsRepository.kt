@@ -529,6 +529,8 @@ object FriendsRepository {
             .addOnFailureListener { onComplete(false) }
     }
 
+
+    //TODO: Move below functions to BlockRepository if implemented
     fun blockUser(
         targetUserId: String,
         onComplete: (Boolean) -> Unit

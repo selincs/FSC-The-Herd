@@ -1,6 +1,7 @@
 package com.example.theherd
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -32,6 +33,9 @@ class FriendProfileActivity : AppCompatActivity() {
 
         val friendId = intent.getStringExtra("FRIEND_ID") ?: return
         val isFriend = intent.getBooleanExtra("IS_FRIEND", false)
+        val isIncoming = intent.getBooleanExtra("IS_INCOMING", false)
+        val isPending = intent.getBooleanExtra("IS_PENDING", false)
+        val disabledBtnColor = Color.parseColor("#808080")
 
         //loadFriendProfile - gets the Friends fName, lName, major, bio, & gradDate
         loadFriendProfile(friendId) //and sets the fields in the friend profile
@@ -125,22 +129,70 @@ class FriendProfileActivity : AppCompatActivity() {
 //        tvGradYear.text = "Class of $gradYear"
 //        tvBio.text = friendBio
 
-        //TODO: If theres time, this could do multiple new things.. if friend request is pending, could say "Pending" and block sends.
-        if (isFriend) {
-            actionButton.text = "Message"
-        } else {
-            //else if(isFriend && status == "pending") actBtn.text= "Request Pending" -> Then what? Let user cancel? Disable button?
-            //TODO: Call send friend request here
-            FriendsRepository.sendFriendRequest(
-                username,
-                onSuccess = {
-                    Toast.makeText(this, "Friend request sent!", Toast.LENGTH_SHORT).show()
-                },
-                onFailure = { e ->
-                    println("Failed to send friend request")
+        //Set the text of the action button
+        when {
+            isFriend -> {
+                actionButton.text = "Message"
+
+                actionButton.setOnClickListener {
+                    Toast.makeText(this, "Opening Chat...", Toast.LENGTH_SHORT).show()
                 }
-            )
-            actionButton.text = "Send Friend Request"
+            }
+
+            //If request is already incoming from this user, accept their friend request.
+            isIncoming -> {
+                actionButton.text = "Accept Request"
+
+                actionButton.setOnClickListener {
+                    FriendsRepository.acceptFriendRequest(friendId) { success ->
+                        if (success) {
+                            Toast.makeText(this, "Friend added!", Toast.LENGTH_SHORT).show()
+                            actionButton.text = "Friend added!"
+                            actionButton.isEnabled = false
+                            actionButton.setBackgroundColor(disabledBtnColor)
+                        } else {
+                            Toast.makeText(this, "Failed to accept request", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+
+            // Outgoing request to this user already exists, no incoming request and a pending request
+            !isIncoming && /* request exists */ isPending -> {
+                actionButton.text = "Cancel Request"
+
+                actionButton.setOnClickListener {
+                    FriendsRepository.cancelFriendRequest(friendId) { success ->
+                        if (success) {
+                            Toast.makeText(this, "Request cancelled", Toast.LENGTH_SHORT).show()
+                            actionButton.text = "Request Cancelled"
+                            actionButton.isEnabled = false
+                            actionButton.setBackgroundColor(disabledBtnColor)
+                        } else {
+                            Toast.makeText(this, "Failed to cancel request", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+            //Else, Send Friend Request (If CommBoard visiting exists, for example.
+            else -> {
+                actionButton.text = "Send Friend Request"
+
+                actionButton.setOnClickListener {
+                    FriendsRepository.sendFriendRequest(
+                        username,
+                        onSuccess = {
+                            Toast.makeText(this, "Friend request sent!", Toast.LENGTH_SHORT).show()
+                            actionButton.text = "Request Sent"
+                            actionButton.isEnabled = false
+                            actionButton.setBackgroundColor(disabledBtnColor)
+                        },
+                        onFailure = {
+                            Toast.makeText(this, "Failed to send request", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
+            }
         }
 
         val communitiesRecycler = findViewById<RecyclerView>(R.id.communitiesRecycler)
@@ -162,16 +214,6 @@ class FriendProfileActivity : AppCompatActivity() {
         sharedRecycler.layoutManager = LinearLayoutManager(this)
         sharedRecycler.adapter = AskMeAdapter(this, sharedWithMe.toMutableList(), false)
 
-        actionButton.setOnClickListener {
-            if (isFriend) {
-                Toast.makeText(this, "Opening Chat...", Toast.LENGTH_SHORT).show()
-            } else {
-                actionButton.text = "Request Pending"
-                actionButton.isEnabled = false
-                Toast.makeText(this, "Request sent to $firstName", Toast.LENGTH_SHORT).show()
-            }
-        }
-
         //Firestore block listener - calls Block User function. BlockUser() will :
         //add user to block list, remove friends on both ends, and delete friend requests atomically
         btnBlock.setOnClickListener {
@@ -192,32 +234,6 @@ class FriendProfileActivity : AppCompatActivity() {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
-
-        //TODO: Figure out block button functionality... Block lists -> What happens here? How to unblock?
-//        btnBlock.setOnClickListener {
-//            AlertDialog.Builder(this)
-//                .setTitle("Block $firstName?")
-//                .setMessage("You will no longer see each other in the Herd.")
-//                .setPositiveButton("Block") { _, _ ->
-//                    //TODO: REMOVE MOCKFRIENDSREPO REMOVE FRIEND BUTTON HERE -> RemoveFriend in FriendsRepo
-//                    FriendsRepository.removeFriend(friendId) { success ->
-//                        if (success) {
-//                            Toast.makeText(this, "Friend removed", Toast.LENGTH_SHORT).show()
-//
-//                        } else {
-//                            Toast.makeText(this, "Failed to remove friend", Toast.LENGTH_SHORT)
-//                                .show()
-//                        }
-//                    }
-//                    //TODO: Block the Friend next, not just remove Friend. Create blockUser() ->
-//                    //TODO: If you can block non-friend users, must run both removeFriend() and blockUser() here
-////                    MockFriendsRepo.removeFriendByName(friendName)
-//                    Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show()
-//                    finish()
-//                }
-//                .setNegativeButton("Cancel", null)
-//                .show()
-//        }
 
         //MockFriends Repo Block code, saved just in case
 //            AlertDialog.Builder(this)

@@ -92,6 +92,8 @@ class FriendsAdapter(
                 putExtra("IS_FRIEND", friend.isFriend)
                 putExtra("USERNAME", "@${friend.name.replace(" ", "_").lowercase()}")
                 putExtra("GRAD_YEAR", "2026")
+                putExtra("IS_INCOMING", friend.isIncoming)
+                putExtra("IS_PENDING", !friend.isIncoming)
             }
             context.startActivity(intent)
         }
