@@ -123,12 +123,6 @@ class FriendProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-//        tvName.text = "$firstName $lastName".trim()
-//        tvUsername.text = username
-//        tvMajor.text = friendMajor
-//        tvGradYear.text = "Class of $gradYear"
-//        tvBio.text = friendBio
-
         //Set the text of the action button
         when {
             isFriend -> {
@@ -196,23 +190,45 @@ class FriendProfileActivity : AppCompatActivity() {
         }
 
         val communitiesRecycler = findViewById<RecyclerView>(R.id.communitiesRecycler)
-        if (allCommunities.isEmpty()) {
-            emptyText.visibility = View.VISIBLE
-            communitiesRecycler.visibility = View.GONE
-        } else {
-            val displayList = allCommunities.take(8).toMutableList()
-            communitiesRecycler.layoutManager = LinearLayoutManager(this)
-            communitiesRecycler.adapter = AskMeAdapter(this, displayList, false)
+        loadAllCommunities(friendId) { allCommunities ->
+            if (allCommunities.isEmpty()) {
+                emptyText.visibility = View.VISIBLE
+                communitiesRecycler.visibility = View.GONE
+            } else {
+                val displayList = allCommunities.take(5)
 
-            if (allCommunities.size > 8) {
-                moreText.visibility = View.VISIBLE
-                moreText.text = "and ${allCommunities.size - 8} more communities"
+                communitiesRecycler.layoutManager = LinearLayoutManager(this)
+                communitiesRecycler.adapter = AskMeAdapter(this, displayList.toMutableList(), false)
+
+                if (allCommunities.size > 5) {
+                    moreText.visibility = View.VISIBLE
+                    //I used 8 here, but it still only shows 5? Changing this to say -5
+                    moreText.text = "and ${allCommunities.size - 5} more communities!"
+                }
             }
+            println(allCommunities.size)
         }
+//        if (allCommunities.isEmpty()) {
+//            emptyText.visibility = View.VISIBLE
+//            communitiesRecycler.visibility = View.GONE
+//        } else {
+//            val displayList = allCommunities.take(8).toMutableList()
+//            communitiesRecycler.layoutManager = LinearLayoutManager(this)
+//            communitiesRecycler.adapter = AskMeAdapter(this, displayList, false)
+//
+//            if (allCommunities.size > 8) {
+//                moreText.visibility = View.VISIBLE
+//                moreText.text = "and ${allCommunities.size - 8} more communities"
+//            }
+//        }
 
         val sharedRecycler = findViewById<RecyclerView>(R.id.sharedTopicsRecycler)
-        sharedRecycler.layoutManager = LinearLayoutManager(this)
-        sharedRecycler.adapter = AskMeAdapter(this, sharedWithMe.toMutableList(), false)
+        loadSharedCommunities(friendId) { sharedTopics ->
+            sharedRecycler.layoutManager = LinearLayoutManager(this)
+            sharedRecycler.adapter = AskMeAdapter(this, sharedTopics.toMutableList(), false)
+        }
+//        sharedRecycler.layoutManager = LinearLayoutManager(this)
+//        sharedRecycler.adapter = AskMeAdapter(this, sharedWithMe.toMutableList(), false)
 
         //Firestore block listener - calls Block User function. BlockUser() will :
         //add user to block list, remove friends on both ends, and delete friend requests atomically
@@ -350,4 +366,65 @@ class FriendProfileActivity : AppCompatActivity() {
             }
         }
     }
+
+    //allCommunities entry
+    private fun loadAllCommunities(friendId: String, onResult: (List<String>) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("users")
+            .document(friendId)
+            .collection("joinedTopics")
+            .get()
+            .addOnSuccessListener { docs ->
+                val topics = docs.map { doc ->
+                    doc.id // topicID = topic name
+                }
+                onResult(topics)
+            }
+            .addOnFailureListener {
+                onResult(emptyList())
+            }
+    }
+
+    //shared communities section
+    private fun loadSharedCommunities(friendId: String, onResult: (List<String>) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+        val currentUserId = SessionManager.requireUserId()
+
+        val currentUserTopics = mutableSetOf<String>()
+
+        // 1: Get current user's topics
+        db.collection("users")
+            .document(currentUserId)
+            .collection("joinedTopics")
+            .get()
+            .addOnSuccessListener { currentDocs ->
+
+                for (doc in currentDocs) {
+                    currentUserTopics.add(doc.id)
+                }
+
+                // 2: Get friend's topics
+                db.collection("users")
+                    .document(friendId)
+                    .collection("joinedTopics")
+                    .get()
+                    .addOnSuccessListener { friendDocs ->
+
+                        val shared = friendDocs.mapNotNull { doc ->
+                            val topicId = doc.id
+                            if (currentUserTopics.contains(topicId)) topicId else null
+                        }
+
+                        onResult(shared)
+                    }
+                    .addOnFailureListener {
+                        onResult(emptyList())
+                    }
+            }
+            .addOnFailureListener {
+                onResult(emptyList())
+            }
+    }
+
 }
