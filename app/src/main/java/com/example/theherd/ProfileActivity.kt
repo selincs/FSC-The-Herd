@@ -247,7 +247,7 @@ class ProfileActivity : AppCompatActivity() {
         val builder = android.app.AlertDialog.Builder(this)
         builder.setTitle("Choose an Avatar")
 
-        builder.setItems(arrayOf("Avatar 1", "Avatar 2", "Avatar 3", "Avatar 4", "Avatar 5")) { _, which ->
+        builder.setItems(arrayOf("Default", "Avatar 1", "Avatar 2", "Avatar 3", "Avatar 4")) { _, which ->
             val selectedAvatar = avatars[which]
 
             val profileImage = findViewById<ImageView>(R.id.profileImage)
@@ -429,14 +429,14 @@ class ProfileActivity : AppCompatActivity() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val uid = user.uid
         val db = FirebaseFirestore.getInstance()
-        val avatarName = "avatar_1"
+        val avatarName = "default"
 
         val avatarResId = when (avatarName) {
-            "avatar_1" -> R.drawable.avatar_1
-            "avatar_2" -> R.drawable.avatar_2
-            "avatar_3" -> R.drawable.avatar_3
-            "avatar_4" -> R.drawable.avatar_4
-            "avatar_5" -> R.drawable.avatar_5
+            "default" -> R.drawable.avatar_1
+            "avatar_1" -> R.drawable.avatar_2
+            "avatar_2" -> R.drawable.avatar_3
+            "avatar_3" -> R.drawable.avatar_4
+            "avatar_4" -> R.drawable.avatar_5
             else -> R.drawable.avatar_1
         }
 
