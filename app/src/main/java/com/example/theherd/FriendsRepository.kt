@@ -646,7 +646,6 @@ object FriendsRepository {
                                     isFriend = false
                                 )
                             )
-
                             remaining--
                             if (remaining == 0) {
                                 onSuccess(blockedUsers)

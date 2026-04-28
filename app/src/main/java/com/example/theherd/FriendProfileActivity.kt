@@ -44,27 +44,9 @@ class FriendProfileActivity : AppCompatActivity() {
         //loadStatusPosts - Loads up to 10 status posts ordered by creation date for the Friend Profile
 //        loadStatusPosts(friendId)
 
-        //TODO: Fix friend name passed from adapter
-//        val friendName = intent.getStringExtra("FRIEND_NAME") ?: "Ram User"
-//        val username = intent.getStringExtra("USERNAME") ?: "@${friendName.replace(" ", "_").lowercase()}"
-//        val gradYear = intent.getStringExtra("GRAD_YEAR") ?: "2026"
-
-//
-//        val nameParts = friendName.split(" ", limit = 2)
-//        val firstName = nameParts.getOrNull(0) ?: ""
-//        val lastName = nameParts.getOrNull(1) ?: ""
-//
-//        val friendMajor = "Computer Science"
-//        val friendBio = "Senior at Farmingdale. Love coding in Kotlin and playing soccer!"
         //TODO: Remove final hardcoded values after hooking them up correctly/adding functionality
-        val allCommunities = listOf("Android Devs", "Soccer Club", "Gaming", "IEEE", "Hackathon", "Math Club", "AI Research", "Coffee Lovers", "Chess")
-        val sharedWithMe = listOf("Android Devs", "Gaming")
-
-//        val tvName = findViewById<TextView>(R.id.nameText)
-//        val tvUsername = findViewById<TextView>(R.id.usernameText)
-//        val tvMajor = findViewById<TextView>(R.id.majorText)
-//        val tvGradYear = findViewById<TextView>(R.id.gradYearText)
-//        val tvBio = findViewById<TextView>(R.id.bioText)
+//        val allCommunities = listOf("Android Devs", "Soccer Club", "Gaming", "IEEE", "Hackathon", "Math Club", "AI Research", "Coffee Lovers", "Chess")
+//        val sharedWithMe = listOf("Android Devs", "Gaming")
 
         val actionButton = findViewById<Button>(R.id.actionButton)
         val btnBlock = findViewById<Button>(R.id.btnBlockUser)
@@ -121,6 +103,11 @@ class FriendProfileActivity : AppCompatActivity() {
 
         guideButton.setOnClickListener {
             val intent = Intent(this, GuidesActivity::class.java)
+            startActivity(intent)
+        }
+        homeButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
 
@@ -209,19 +196,6 @@ class FriendProfileActivity : AppCompatActivity() {
             }
             println(allCommunities.size)
         }
-//        if (allCommunities.isEmpty()) {
-//            emptyText.visibility = View.VISIBLE
-//            communitiesRecycler.visibility = View.GONE
-//        } else {
-//            val displayList = allCommunities.take(8).toMutableList()
-//            communitiesRecycler.layoutManager = LinearLayoutManager(this)
-//            communitiesRecycler.adapter = AskMeAdapter(this, displayList, false)
-//
-//            if (allCommunities.size > 8) {
-//                moreText.visibility = View.VISIBLE
-//                moreText.text = "and ${allCommunities.size - 8} more communities"
-//            }
-//        }
 
         val sharedRecycler = findViewById<RecyclerView>(R.id.sharedTopicsRecycler)
         loadSharedCommunities(friendId) { sharedTopics ->
@@ -257,20 +231,6 @@ class FriendProfileActivity : AppCompatActivity() {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
-
-        //MockFriends Repo Block code, saved just in case
-//            AlertDialog.Builder(this)
-//                .setTitle("Block $firstName?")
-//                .setMessage("You will no longer see each other in the Herd.")
-//                .setPositiveButton("Block") { _, _ ->
-//                    MockFriendsRepo.removeFriendByName(friendName)
-//                    Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show()
-//                    finish()
-//                }
-//                .setNegativeButton("Cancel", null)
-//                .show()
-//        }
-
 
         //TODO: Change status posts to load from Firestore once we have data in Firestore
         val statusPosts = listOf(

@@ -95,6 +95,11 @@ class FriendsListActivity : AppCompatActivity() {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
         }
+        homeButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+        }
 
         filterFriends("")
 
@@ -138,20 +143,6 @@ class FriendsListActivity : AppCompatActivity() {
                 updateRecycler(sorted)
             }
             return
-//            repo.getIncomingFriendRequests(
-//                onSuccess = { requests ->
-//                    val filtered = if (query.isEmpty()) {
-//                        requests
-//                    } else {
-//                        requests.filter { it.name.contains(query, ignoreCase = true) }
-//                    }
-//
-//                    updateRecycler(filtered)
-//                },
-//                onFailure = {
-//                    Toast.makeText(this, "Failed to load requests", Toast.LENGTH_SHORT).show()
-//                }
-//            )
         }
         else {
             // Friends / Online tabs
@@ -180,48 +171,6 @@ class FriendsListActivity : AppCompatActivity() {
         }
     }
 
-    //Tabs - 0 = Friends List, 1 = Online Friends Filtering, 2 = Friend Requests Tab
-//    private fun filterFriends(query: String) {
-//
-//        if (currentTab == 2) {
-//            // Requests tab selected -> Query Firestore
-//            FriendsRepository.getIncomingFriendRequests(
-//                onSuccess = { requests ->
-//                    val filtered = if (query.isEmpty()) {
-//                        requests
-//                    } else {
-//                        requests.filter {
-//                            it.name.contains(query, ignoreCase = true)
-//                        }
-//                    }
-//
-//                    updateRecycler(filtered)
-//                },
-//                onFailure = {
-//                    Toast.makeText(this, "Failed to load requests", Toast.LENGTH_SHORT).show()
-//                }
-//            )
-//            return
-//        }
-//
-//        // Use Mock Repo for the rest rn
-//        val baseList = when (currentTab) {
-//            1 -> repo.getMockFriends().filter { it.isOnline }
-//            else -> repo.getMockFriends()
-//        }
-//
-//        val filteredList = if (query.isEmpty()) {
-//            baseList
-//        } else {
-//            baseList.filter { it.name.contains(query, ignoreCase = true) }
-//        }
-//
-//        val finalSortedList = filteredList.sortedByDescending { it.isOnline }
-//
-//        updateRecycler(finalSortedList)
-//    }
-
-
 // Is friendToRemove still needed below?
     private fun updateRecycler(newList: List<Friend>) {
         adapter = FriendsAdapter(newList.toMutableList()) { friendToRemove ->
@@ -247,12 +196,6 @@ class FriendsListActivity : AppCompatActivity() {
 
         findViewById<RecyclerView>(R.id.friendsRecyclerView).adapter = adapter
     }
-
-    //TODO: see if this works - no filterFriends test
-//    private fun updateRecycler(newList: List<Friend>) {
-//        adapter = FriendsAdapter(newList.toMutableList()) {
-//        findViewById<RecyclerView>(R.id.friendsRecyclerView).adapter = adapter
-//    }
 
     //User types email or username -> if username, normalizeEmail() -> email string -> Firestore query(users)
     //Write to users/{targetUserID}/friendRequests/{currentUserID}
@@ -286,20 +229,6 @@ class FriendsListActivity : AppCompatActivity() {
             } else {
                 inputLayout.error = "Email or username required"
             }
-
-//            val input = etInput.text.toString().trim()
-//            if (input.isNotEmpty()) {
-//                // 1. Save the added friend to the repo
-//                repo.addFriendRequest(input)
-//                // 2. Tell the user the request was sent
-//                Toast.makeText(this, "Friend request sent to $input!", Toast.LENGTH_SHORT).show()
-//                // 3. refresh the view
-//                filterFriends(searchInput.text.toString())
-//
-//                dialog.dismiss()
-//            } else {
-//                inputLayout.error = "Email or username required"
-//            }
         }
 
         btnCancel.setOnClickListener { dialog.dismiss() }
