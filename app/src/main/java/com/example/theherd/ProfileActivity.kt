@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable
 import android.widget.ImageButton
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -241,13 +240,14 @@ class ProfileActivity : AppCompatActivity() {
             R.drawable.avatar_1,
             R.drawable.avatar_2,
             R.drawable.avatar_3,
-            R.drawable.avatar_4
+            R.drawable.avatar_4,
+            R.drawable.avatar_5
         )
 
         val builder = android.app.AlertDialog.Builder(this)
         builder.setTitle("Choose an Avatar")
 
-        builder.setItems(arrayOf("Avatar 1", "Avatar 2", "Avatar 3", "Avatar 4")) { _, which ->
+        builder.setItems(arrayOf("Avatar 1", "Avatar 2", "Avatar 3", "Avatar 4", "Avatar 5")) { _, which ->
             val selectedAvatar = avatars[which]
 
             val profileImage = findViewById<ImageView>(R.id.profileImage)
@@ -436,6 +436,7 @@ class ProfileActivity : AppCompatActivity() {
             "avatar_2" -> R.drawable.avatar_2
             "avatar_3" -> R.drawable.avatar_3
             "avatar_4" -> R.drawable.avatar_4
+            "avatar_5" -> R.drawable.avatar_5
             else -> R.drawable.avatar_1
         }
 
