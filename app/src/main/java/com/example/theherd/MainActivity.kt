@@ -15,10 +15,16 @@ import androidx.core.view.WindowInsetsCompat
 import kotlin.jvm.java
 import android.widget.ImageButton
 import android.widget.PopupMenu
+import android.widget.LinearLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
 
     private var keepSplash = true
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: PostAdapterMain
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -52,13 +58,20 @@ class MainActivity : AppCompatActivity() {
         //Set Welcome text to welcome user by first name
         val welcomeText = findViewById<TextView>(R.id.WelcomeText)
         SessionManager.getProfile()?.let { profile ->
-            welcomeText.text = "Welcome, ${profile.firstName}!"
+            welcomeText.text = "Welcome ${profile.firstName}!"
         }
 
         // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
         settingsButton.setOnClickListener { view ->
             SettingsMenuHelper.showSettingsMenu(this, view)
+        }
+
+        val createPostButton: Button = findViewById(R.id.create_post_button)
+
+        createPostButton.setOnClickListener {
+            val intent = Intent(this, CreatePostActivityMain::class.java)
+            startActivity(intent)
         }
 
         // buttons
@@ -106,5 +119,22 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadPosts()
+    }
+
+    private fun loadPosts() {
+        recyclerView = findViewById(R.id.post_container)
+
+        adapter = PostAdapterMain(PostRepositoryMain.posts)
+
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+
+        // 🎯 Step 3: spacing between posts
+        recyclerView.addItemDecoration(SpacingItemDecoration(24))
     }
 }

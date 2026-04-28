@@ -193,14 +193,15 @@
 
 
                 <!-- OTHER -->
+
                 <EditText
                     android:id="@+id/otherInterestInput"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:hint="@string/interest_other"
-                    android:padding="10dp"
                     android:layout_marginTop="10dp"
-                    android:background="#F2F5F2"/>
+                    android:background="#F2F5F2"
+                    android:hint="@string/interest_other"
+                    android:padding="10dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -224,7 +225,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
-                    tools:listitem="@layout/item_ask_me_topic"/>
+                    tools:listitem="@layout/item_ask_me_topic" />
 
                 <TextView
                     android:id="@+id/moreCommunitiesText"

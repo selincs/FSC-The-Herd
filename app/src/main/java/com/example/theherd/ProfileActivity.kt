@@ -44,6 +44,17 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
+        val recyclerView = findViewById<RecyclerView>(R.id.statusPostsRecycler)
+
+        recyclerView.layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+        recyclerView.addItemDecoration(SpacingItemDecoration(24, true))
+
+        recyclerView.adapter = PostAdapterMain(PostRepositoryMain.posts)
+
         statusPostsRecycler = findViewById(R.id.statusPostsRecycler)
         statusPostsRecycler.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -246,6 +257,13 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         builder.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val recyclerView = findViewById<RecyclerView>(R.id.statusPostsRecycler)
+        recyclerView.adapter = PostAdapterMain(PostRepositoryMain.posts)
     }
 
     private fun saveAvatarToFirestore(avatarName: String) {

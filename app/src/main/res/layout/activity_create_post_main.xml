@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#EAF1EA"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/topToolbar"
+        layout="@layout/layout_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+
+        <EditText
+            android:id="@+id/post_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="What's on your mind today?"
+            android:layout_margin="16dp"
+            app:layout_constraintTop_toBottomOf="@id/topToolbar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/submit_post_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Post"
+        android:layout_margin="16dp"
+        android:backgroundTint="#2F442F"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/post_input"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
