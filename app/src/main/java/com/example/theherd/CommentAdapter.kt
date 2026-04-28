@@ -33,7 +33,7 @@ class CommentAdapter(
 
         val tvUsername = view.findViewById<TextView>(R.id.tvUsername)
         val tvTime = view.findViewById<TextView>(R.id.tvTime)
-        val tvContent = view.findViewById<TextView>(R.id.tvContent)
+        val tvContent = view.findViewById<TextView>(R.id.tvComment)
         val btnLike = view.findViewById<ImageView>(R.id.btnLike)
         val tvLikeCount = view.findViewById<TextView>(R.id.tvLikeCount)
 
@@ -48,10 +48,10 @@ class CommentAdapter(
                 comment.likedUserIds?.contains(currentUserId) == true
 
         if (isLiked) {
-            btnLike.setImageResource(android.R.drawable.btn_star_big_on)
-            btnLike.setColorFilter(Color.parseColor("#FFD700"))
+            btnLike.setImageResource(R.drawable.ic_heart)
+            btnLike.setColorFilter(Color.RED)
         } else {
-            btnLike.setImageResource(android.R.drawable.btn_star_big_off)
+            btnLike.setImageResource(R.drawable.ic_heart)
             btnLike.setColorFilter(Color.GRAY)
         }
 
