@@ -3,6 +3,7 @@ package com.example.theherd
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import java.util.UUID
+import com.google.firebase.firestore.Query
 import Model.Post
 
 object PostRepository {
@@ -67,44 +68,51 @@ object PostRepository {
             .document(topicID)
             .collection("posts")
             .get()
-            .addOnSuccessListener { result  ->
+            .addOnSuccessListener { result ->
+
+                val sortedDocs = result.documents.sortedWith(
+                    compareByDescending<com.google.firebase.firestore.DocumentSnapshot> {
+                        it.getBoolean("isPinned") == true
+                    }.thenByDescending {
+                        it.getTimestamp("postDateTime")
+                            ?: it.getTimestamp("postedAt")
+                    }
+                )
+
                 val postsList = mutableListOf<Post>()
 
-                for(doc in result ){
-
+                for (doc in sortedDocs) {
                     val postID = doc.getString("postID") ?: doc.id
-                    val displayName = doc.getString("displayName")
-                        ?: doc.getString("posterID")
-                        ?: "Rambo"
-                    val postTitle = doc.getString("postTitle") ?: ""
-                    val postContents= doc.getString("postContents")
-                        ?: doc.getString("postText")
-                        ?: ""
 
+                    val rawName = doc.getString("displayName")
+                        ?: doc.getString("posterID")
+                        ?: "User"
+
+                    val displayName = if (rawName.contains("@")) {
+                        rawName.substringBefore("@")
+                    } else {
+                        rawName
+                    }
+
+                    val postTitle = doc.getString("postTitle") ?: ""
+
+                    val postContents = doc.getString("postContents")
+                        ?: doc.getString("postText")
+                        ?: doc.getString("content")
+                        ?: ""
 
                     val likeCount = doc.getLong("likeCount")?.toInt() ?: 0
 
-
-                    val post = Post(
-                        displayName,
-                        postID,
-                        postTitle,
-                        postContents,
-                        likeCount
-
+                    postsList.add(
+                        Post(displayName, postID, postTitle, postContents, likeCount)
                     )
-                    postsList.add(post)
                 }
-                onResult(postsList) // show post list of connected to fire base
 
+                onResult(postsList)
             }
             .addOnFailureListener {
-                onResult(emptyList()) // show empty list if connection is unavaiable
+                onResult(emptyList())
             }
-
-
-
-
     }
 
 }
