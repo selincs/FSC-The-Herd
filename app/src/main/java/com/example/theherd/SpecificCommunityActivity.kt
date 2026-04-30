@@ -1,8 +1,6 @@
 package com.example.theherd
 
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -15,7 +13,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import Model.Post
 
 class SpecificCommunityActivity : AppCompatActivity() {
 
@@ -25,18 +23,7 @@ class SpecificCommunityActivity : AppCompatActivity() {
 
     private val startCreatePost = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
-            val data = result.data
-            val title = data?.getStringExtra("POST_TITLE") ?: ""
-            val content = data?.getStringExtra("POST_CONTENT") ?: ""
-            val author = data?.getStringExtra("POST_AUTHOR") ?: PreferencesManager.getFullName(this)
-
-            val newPost = Post(title, content, author)
-            postsList.add(0, newPost)
-
-            postAdapter.notifyItemInserted(0)
-            findViewById<RecyclerView>(R.id.posts_recycler_view).scrollToPosition(0)
-
-            PreferencesManager.savePosts(this, communityName, postsList)
+           loadPostsFromFirestore()
         }
     }
 
@@ -99,81 +86,77 @@ class SpecificCommunityActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         setSupportActionBar(toolbar)
 
-        val backButton = findViewById<ImageButton>(R.id.btnBack)
-        backButton.visibility = View.VISIBLE
-        backButton.setOnClickListener {
-            finish() // Closes this page and goes back
-        }
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         toolbar.setNavigationOnClickListener { finish() }
 
         communityName = intent.getStringExtra("COMMUNITY_NAME") ?: "General"
+        //firestore path
+        val topicID = intent.getStringExtra("TOPIC_ID") ?: return
         findViewById<TextView>(R.id.specificCommunityTitle).text = communityName
 
-        postsList.clear()
-        val savedPosts = PreferencesManager.loadPosts(this, communityName)
-        postsList.addAll(savedPosts)
 
-        if (postsList.isEmpty()) {
-            postsList.add(Post("Welcome!", "This is the start of the $communityName board.", "Admin"))
-            PreferencesManager.savePosts(this, communityName, postsList)
-        }
 
         val recyclerView: RecyclerView = findViewById(R.id.posts_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        postAdapter = PostAdapter(postsList, communityName)
+        postAdapter = PostAdapter(postsList, communityName, topicID)
         recyclerView.adapter = postAdapter
+
+        loadPostsFromFirestore()
+
 
         findViewById<ExtendedFloatingActionButton>(R.id.fabAddPost).setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             intent.putExtra("COMMUNITY_NAME", communityName)
+            intent.putExtra("TOPIC_ID", topicID)
             startCreatePost.launch(intent)
         }
+
         setupJoinLeaveSystem()
     }
 
     private fun setupJoinLeaveSystem() {
-        val btnMembership = findViewById<Button>(R.id.btnJoinCommunity) ?: return
-        btnMembership.visibility = View.VISIBLE
+        val btnJoin = findViewById<Button>(R.id.btnJoinCommunity)
 
-        // 1. Define the color
-        val deepRed = Color.parseColor("#8B0000")
-
-        // 2. Force the tint mode to SRC_ATOP so it paints OVER any theme defaults
-        btnMembership.backgroundTintMode = android.graphics.PorterDuff.Mode.SRC_ATOP
-
-        // 3. Apply the color to the background tint
-        btnMembership.backgroundTintList = ColorStateList.valueOf(deepRed)
-
-        // 4. (Optional) If it's a MaterialButton, this ensures the stroke doesn't flicker green
-        btnMembership.setBackgroundColor(deepRed)
 
         val allClubs = PreferencesManager.loadAllCommunities(this)
         val currentClub = allClubs.find { it.name == communityName }
 
-        btnMembership.text = if (currentClub?.isJoined == true) "Leave" else "Join"
+        if (currentClub?.isJoined == true) {
 
-        btnMembership.setOnClickListener {
+            btnJoin.visibility = View.GONE
+        } else {
+            btnJoin.visibility = View.VISIBLE
+
+        }
+
+        btnJoin.setOnClickListener {
             val clubs = PreferencesManager.loadAllCommunities(this)
-            val club = clubs.find { it.name == communityName }
-
-            if (club?.isJoined == true) {
-                club.isJoined = false
-                btnMembership.text = "Join"
-                Toast.makeText(this, "Left $communityName", Toast.LENGTH_SHORT).show()
-            } else {
-                club?.isJoined = true
-                btnMembership.text = "Leave"
-                Toast.makeText(this, "Joined $communityName!", Toast.LENGTH_SHORT).show()
-            }
-
-            // Re-confirm the red color after the click event finishes
-            btnMembership.backgroundTintList = ColorStateList.valueOf(deepRed)
-
+            clubs.find { it.name == communityName }?.isJoined = true
             PreferencesManager.saveAllCommunities(this, clubs)
+
+            btnJoin.visibility = View.GONE
+
+            Toast.makeText(this, "Joined $communityName!", Toast.LENGTH_SHORT).show()
+        }
+
+
+
+
+    }
+    private fun loadPostsFromFirestore(){
+        postsList.clear()
+
+        val topicID = intent.getStringExtra("TOPIC_ID") ?: return
+
+        PostRepository.getPosts(topicID){ posts ->
+            postsList.clear()
+            postsList.addAll(posts)
+            postAdapter.notifyDataSetChanged()
+
         }
     }
 }

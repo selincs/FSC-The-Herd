@@ -4,6 +4,7 @@ import android.os.Build;
 
 import com.google.firebase.firestore.PropertyName;
 
+import java.security.IdentityScope;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -32,15 +33,15 @@ public class CommunityBoard {
     //What does being a moderator do? How to implement these powers?
 
     //Can a User filter posts in a specific CommBoard post? By name or user most likely... Needs own search bar in CB GUI
-
+    private String description;
 
     public CommunityBoard(String cbName, String createdByUID, String topicId) {
         this.cbName = cbName;
         this.createdByUID = createdByUID;
+        this.topicId = topicId;
         this.memberCt = 1;
         this.cbID = UUID.randomUUID().toString();
-        this.topicId = topicId;
-
+        this.description = ""; // default empty (important)
         this.boardPosts = new ArrayList<>();
         this.memberIDs = new ArrayList<>();
         memberIDs.add(createdByUID);
@@ -56,6 +57,10 @@ public class CommunityBoard {
     public void leaveCommunityBoard(String userID) {
         this.memberIDs.remove(userID);
         this.memberCt--;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public int showOnlineMembers() {
@@ -123,6 +128,27 @@ public class CommunityBoard {
 //                })
 //                .collect(Collectors.toList());
 //    }
+
+    public String getCbName() {
+        return cbName;
+    }
+
+    public String getCbID() {
+        return cbID;
+    }
+
+    public int getMemberCt() {
+        return memberCt;
+    }
+
+    public List<String> getMemberIDs() {
+        return memberIDs;
+    }
+
+    public String getCreatedByUID() {
+        return createdByUID;
+    }
+
 
 
 }

@@ -16,6 +16,8 @@ public class Comment {
     private String commContents;    //Contents of the comment
     private int likeCt; //Total # of likes
 
+    private List<String> likedUserIds;
+
     // This needs finesse if it's going to happen, or else it will double post from Post>commChain & here
 //    private List<Comment> replyChain; //Save reply chain of comments by ID?
 //    private boolean isReply; //if the comment is a reply to another COMMENT, this flag is set
@@ -38,14 +40,16 @@ public class Comment {
             String commentedByUID,
             String commContents,
             int likeCt,
-            String parentCommentID
+            String parentCommentID,
+            List<String> likedUserIds
     ) {
         this.commentID = commentID;
         this.commentedByUID = commentedByUID;
         this.commContents = commContents;
         this.likeCt = likeCt;
         this.parentCommentID = parentCommentID;
-        this.createdAt = LocalDateTime.now(); // or ignore for now
+        this.likedUserIds = likedUserIds;
+        this.createdAt = LocalDateTime.now();
     }
 
 
@@ -85,6 +89,14 @@ public class Comment {
 
     public void setLikeCt(int likeCt) {
         this.likeCt = likeCt;
+    }
+
+    public List<String> getLikedUserIds() {
+        return likedUserIds;
+    }
+
+    public void setLikedUserIds(List<String> likedUserIds) {
+        this.likedUserIds = likedUserIds;
     }
 
 //    public List<Comment> getReplyChain() {

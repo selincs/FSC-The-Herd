@@ -1,6 +1,7 @@
 package com.example.theherd
 
 import android.content.Intent
+import com.google.firebase.firestore.FirebaseFirestore
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -25,18 +26,83 @@ class CommunityBoardActivity : AppCompatActivity() {
 
     private val startCreateCommunity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
-            val name = result.data?.getStringExtra("COMMUNITY_NAME") ?: ""
-            val desc = result.data?.getStringExtra("COMMUNITY_DESC") ?: ""
+            //get  all the topics from topic collection
+            loadCommunitiesFromFirestore()
+        }
+    }
+    private fun loadCommunitiesFromFirestore(){
+        //clears the old list.
+        allCommunities.clear()
+        val userId = FirestoreAuthManager.currentUserId
+        if(userId == null){
+            filterList(searchView.query.toString())
+            return
+        }
+        FirebaseFirestore.getInstance()
+            .collection("topics")
+            .get()
+            .addOnSuccessListener{
+                result ->
+                if (result.isEmpty){
+                    filterList(searchView.query.toString())
+                    return@addOnSuccessListener
+                }
+                var remainingChecks = result.size()
 
-            if (name.isNotEmpty()) {
-                val newCommunity = Community(name, desc, isJoined = true)
-                allCommunities.add(0, newCommunity)
+                for( doc in result){
+                    val topicID = doc.id
+                    val name = doc.getString("topicName") ?: ""
+                    val desc = doc.getString("topicDesc") ?: ""
+                    val memberCount = doc.getLong("memberCount")?.toInt() ?: 0
 
-                PreferencesManager.saveAllCommunities(this, allCommunities)
 
+                    FirebaseFirestore.getInstance()
+                        .collection("topics")
+                        .document(topicID)
+                        .collection("members")
+                        .document(userId)
+                        .get()
+                        .addOnSuccessListener { memberDoc  ->
+                            val community = Community(
+                                topicID = topicID,
+                                name = name,
+                                description = desc,
+                                memberCount = memberCount,
+                                isJoined = memberDoc.exists()
+                            )
+                            allCommunities.add(community)
+
+                            remainingChecks --
+
+                            if( remainingChecks == 0){
+                                filterList(searchView.query.toString())
+                            }
+                        }
+                        .addOnFailureListener{
+                            val community = Community(
+                                topicID = topicID,
+                                name = name,
+                                description = desc,
+                                memberCount = memberCount,
+                                isJoined = false
+                            )
+
+                            allCommunities.add(community)
+
+                            remainingChecks--
+
+                            if(remainingChecks == 0 ){
+                                filterList(searchView.query.toString())
+                            }
+
+                        }
+
+
+
+
+                }
                 filterList(searchView.query.toString())
             }
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -127,14 +193,20 @@ class CommunityBoardActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.community_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = CommunityAdapter(displayList) { community ->
-            val intent = Intent(this, SpecificCommunityActivity::class.java)
-            intent.putExtra("COMMUNITY_NAME", community.name)
-            startActivity(intent)
-        }
+        adapter = CommunityAdapter(
+            displayList,  onCommunityClick  = { community ->
+                val intent = Intent(this, SpecificCommunityActivity::class.java)
+                intent.putExtra("COMMMUNITY_NAME", community.name)
+                intent.putExtra("TOPIC_ID", community.topicID)
+                startActivity(intent)
+            },
+            onJoinCLick =  { community ->
+                toggleJoinState(community)
+            }
+        )
         recyclerView.adapter = adapter
 
-        setupSampleData()
+
 
         searchView = findViewById(R.id.communitySearchView)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -180,15 +252,39 @@ class CommunityBoardActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupSampleData() {
-        if (allCommunities.isEmpty()) {
-            val savedList = PreferencesManager.loadAllCommunities(this)
-            if (savedList.isNotEmpty()) {
-                allCommunities.addAll(savedList)
+    private fun toggleJoinState(community: Community) {
+        if (!community.isJoined) {
+            TopicRepository.joinTopic(community.topicID) { success ->
+                runOnUiThread {
+                    if (success) {
+                        community.isJoined = true
+                        community.memberCount += 1
+                        adapter.notifyDataSetChanged()
+                        Toast.makeText(this, "Joined ${community.name}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Failed to join ${community.name}", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
-            filterList("")
+        } else {
+            TopicRepository.leaveTopic(community.topicID) { success ->
+                runOnUiThread {
+                    if (success) {
+                        community.isJoined = false
+                        if (community.memberCount > 0) {
+                            community.memberCount -= 1
+                        }
+                        adapter.notifyDataSetChanged()
+                        Toast.makeText(this, "Left ${community.name}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Failed to leave ${community.name}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
     }
+
+
 
     private fun filterList(query: String?) {
         displayList.clear()
@@ -259,9 +355,6 @@ class CommunityBoardActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val updatedList = PreferencesManager.loadAllCommunities(this)
-        allCommunities.clear()
-        allCommunities.addAll(updatedList)
-        filterList(searchView.query.toString())
+        loadCommunitiesFromFirestore()
     }
 }

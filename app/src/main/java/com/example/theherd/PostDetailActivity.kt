@@ -37,11 +37,6 @@ class PostDetailActivity : AppCompatActivity() {
 //            startActivity(intent)
 //        }
 
-        val backButton = findViewById<ImageButton>(R.id.btnBack)
-        backButton.visibility = View.VISIBLE
-        backButton.setOnClickListener {
-            finish() // Closes this page and goes back
-        }
 
         interestsButton.setOnClickListener {
             val intent = Intent(this, TopicsActivity::class.java)
@@ -71,7 +66,9 @@ class PostDetailActivity : AppCompatActivity() {
         }
 
         @Suppress("DEPRECATION")
-        val post = intent.getSerializableExtra("SELECTED_POST") as? Post
+        // gives detail on real ids,
+        val postID = intent.getStringExtra("POST_ID") ?: ""
+        val topicID = intent.getStringExtra("TOPIC_ID") ?: ""
 
         val communityName = intent.getStringExtra("COMMUNITY_NAME") ?: ""
 
@@ -80,66 +77,91 @@ class PostDetailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         toolbar.setNavigationOnClickListener { finish() }
 
-        val titleTextView = findViewById<TextView>(R.id.detailTitle)
-        val authorTextView = findViewById<TextView>(R.id.detailAuthor)
-        val contentTextView = findViewById<TextView>(R.id.detailContent)
 
-        if (post != null) {
-            titleTextView.text = post.title
-            authorTextView.text = "By: ${post.author}"
-            contentTextView.text = post.content
 
-            setupComments(post, communityName)
-        }
+        loadPostDetails(topicID, postID)
+        setupComments(topicID, postID)
     }
-    private fun setupComments(post: Post, communityName: String) {
-        if (post.comments == null) post.comments = ArrayList()
 
-        val displayList = ArrayList<String>()
+    private fun loadPostDetails(topicID: String, postID: String){
+        FirestoreDatabase
+            .topics
+            .document(topicID)
+            .collection("posts")
+            .document(postID)
+            .get()
+            .addOnSuccessListener { doc ->
+                val title = doc.getString("postTitle") ?: ""
+                val content = doc.getString("postContents")
+                    ?: doc.getString("postText")
+                    ?: ""
 
-        post.comments.forEach {
-            val timeLabel = formatTimestamp(it.timestamp)
-            displayList.add("[$timeLabel] ${it.author}: ${it.text}")
+                val author = doc.getString("displayName")
+                    ?: doc.getString("posterID")
+                    ?: "Rambo"
+
+                val timestamp = doc.getTimestamp("postDateTime")
+                    ?: doc.getTimestamp("postedAt")
+
+
+                val formattedTime = if (timestamp != null) {
+                    val sdf = java.text.SimpleDateFormat("MMM d, h:mm a", java.util.Locale.getDefault())
+                    sdf.format(timestamp.toDate())
+                } else {
+                    ""
+                }
+
+                findViewById<TextView>(R.id.detailTitle).text = title
+                findViewById<TextView>(R.id.detailAuthor).text = "By $author"
+                findViewById<TextView>(R.id.detailContent).text = content
+                findViewById<TextView>(R.id.detailTime).text = formattedTime
+            }
+
+    }
+    private fun setupComments(topicID: String, postID: String) {
+        val listView = findViewById<ListView>(R.id.commentsListView)
+        val commentInput = findViewById<EditText>(R.id.etCommentInput)
+        val btnSend = findViewById<ImageButton>(R.id.btnSendComment)
+
+        val commentsList = ArrayList<Model.Comment>()
+        lateinit var adapter: CommentAdapter
+
+        fun loadComments() {
+            CommentRepository.getComments(topicID, postID) { comments ->
+                commentsList.clear()
+                commentsList.addAll(comments)
+                adapter.notifyDataSetChanged()
+            }
         }
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, displayList)
-        val listView = findViewById<ListView>(R.id.commentsListView)
-        listView.adapter = adapter
+        adapter = CommentAdapter(this, commentsList) { comment ->
+            CommentRepository.toggleLikeComment(topicID, postID, comment.commentID) { success ->
+                if (success) {
+                    loadComments()
+                } else {
+                    Toast.makeText(this, "Failed to like comment", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
-        val btnSend = findViewById<ImageButton>(R.id.btnSendComment)
-        val commentInput = findViewById<EditText>(R.id.etCommentInput)
+        listView.adapter = adapter
+        loadComments()
 
         btnSend.setOnClickListener {
             val text = commentInput.text.toString().trim()
+
             if (text.isNotEmpty()) {
-                val currentUserName = PreferencesManager.getFullName(this)
-
-                val newComment = Comment(currentUserName, text)
-
-                post.comments.add(newComment)
-
-                val timeLabel = formatTimestamp(newComment.timestamp)
-                displayList.add("[$timeLabel] ${newComment.author}: ${text}")
-                adapter.notifyDataSetChanged()
-
-                commentInput.text.clear()
-                saveUpdatedPost(post, communityName)
+                CommentRepository.createComment(topicID, postID, text) { success ->
+                    if (success) {
+                        commentInput.text.clear()
+                        loadComments()
+                    } else {
+                        Toast.makeText(this, "failed to send comment", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }
 
-    private fun saveUpdatedPost(updatedPost: Post, communityName: String) {
-        val allPosts = PreferencesManager.loadPosts(this, communityName)
 
-        val index = allPosts.indexOfFirst { it.title == updatedPost.title && it.author == updatedPost.author }
-        if (index != -1) {
-            allPosts[index] = updatedPost
-            PreferencesManager.savePosts(this, communityName, allPosts)
-        }
-    }
-
-    private fun formatTimestamp(timeInMillis: Long): String {
-        val sdf = java.text.SimpleDateFormat("MMM d, h:mm a", java.util.Locale.getDefault())
-        return sdf.format(java.util.Date(timeInMillis))
-    }
 }

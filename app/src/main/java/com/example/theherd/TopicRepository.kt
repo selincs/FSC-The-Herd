@@ -37,6 +37,8 @@ object TopicRepository {
                     return@addOnSuccessListener
                 }
 
+//                val topicRef = db.collection("topics").document() old version of below 2 lines
+//                val topicID = topicRef.id
                 //Use Topic Name as Unique Identifier (Only 1 Topic of this name Exists)
                 //Topic Name is stored in the document for access purposes for ID (same values)
                 val topicID = topicName.trim().lowercase()
@@ -77,40 +79,21 @@ object TopicRepository {
                 )
                 batch.set(memberRef, memberData)
                 // ------------------------
-                // Update the User's joinedTopic's field, so that the list will be updated when the program returns to Topic
-                // ------------------------
-                val userJoinedRef = db.collection("users")
-                    .document(creatorID)
-                    .collection("joinedTopics")
-                    .document(topicID)
-
-                val joinedTopicData = hashMapOf(
-                    "topicID" to topicID,
-                    "joinedAt" to FieldValue.serverTimestamp()
-                )
-
-                batch.set(userJoinedRef, joinedTopicData)
-
-                // ------------------------
                 // Default Rules Post - "system - Community Rules : 1, 2, 3"
                 // ------------------------
                 val rulesPostData = hashMapOf(
-                    //add postID
-                    "postID" to postID,
                     "topicID" to topicID,
-//                    "posterID" to "Ram-Bo",     //postedByUID
-                    "postedByUID" to "Ram-Bo",     //postedByUID
+                    "postID" to postID,
+                    "postedByUID" to "Ram-Bo",
                     "postTitle" to "Community Rules",
-                    //postText -> postContents
-                    "postContents" to """       
-                    1. Be respectful
-                    2. Stay on topic
-                    3. No harassment
-                """.trimIndent(),
-                    "likeCount" to 0,
+                    "postContents" to """
+                        1. Be respectful
+                        2. Stay on topic
+                        3. No harassment
+                    """.trimIndent(),
+                    "likeCount" to 1,
                     "commentCount" to 1,
-//                    "postedAt" to FieldValue.serverTimestamp(), //postDateTime
-                    "postDateTime" to FieldValue.serverTimestamp(), //postDateTime
+                    "postDateTime" to FieldValue.serverTimestamp(),
                     "isPinned" to true
                 )
                 batch.set(rulesPostRef, rulesPostData)
@@ -118,16 +101,12 @@ object TopicRepository {
                 // Default Rules Comment Creation - "System - Have fun!"
                 // ------------------------
                 val rulesCommentData = hashMapOf(
-                    "commentID" to UUID.randomUUID().toString(), //commentID
-                    "commentedByEmail" to "Ram-Bo", //commentedByEmail -> Ram-Bo
                     "topicID" to topicID,
                     "postID" to postID,
-//                    "commenterID" to "Ram-Bo",  //commentedByUID
-                    "commentedByUID" to "Ram-Bo",  //commentedByUID
-//                    "commentText" to "Have fun!",   //commContents
-                    "commContents" to "Have fun!",   //commContents
-                    "parentCommentID" to null,  //not every comment is a reply
-                    "likeCt" to 0,   //like count changed to 0 from 1 for uniformity over program
+                    "commenterID" to "Ram-Bo",
+                    "commentText" to "Have fun!",
+                    "parentCommentID" to null,
+                    "likeCount" to 1,
                     "createdAt" to FieldValue.serverTimestamp()
                 )
                 batch.set(rulesCommentRef, rulesCommentData)
@@ -232,6 +211,7 @@ object TopicRepository {
         topicID: String,
         onDone: (Boolean) -> Unit
     ) {
+
         val userID = FirestoreAuthManager.currentUserId ?: return
         //Get Firestore current user id and authenticate
         if (userID == null) {
