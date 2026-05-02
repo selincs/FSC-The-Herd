@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class PostAdapterMain(private val posts: List<PostMain>) :
-    RecyclerView.Adapter<PostAdapterMain.PostViewHolder>() {
+class StatusAdapterMain(private val posts: List<Status>) :
+    RecyclerView.Adapter<StatusAdapterMain.PostViewHolder>() {
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val postContent: TextView = itemView.findViewById(R.id.postContent)
@@ -26,6 +26,7 @@ class PostAdapterMain(private val posts: List<PostMain>) :
         holder.postContent.text = post.content
         holder.postTime.text = formatTimestamp(post.timestamp)
     }
+
     private fun formatTimestamp(timestamp: Long): String {
         val now = System.currentTimeMillis()
         val diff = now - timestamp

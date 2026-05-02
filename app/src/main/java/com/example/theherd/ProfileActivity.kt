@@ -52,7 +52,7 @@ class ProfileActivity : AppCompatActivity() {
         )
         recyclerView.addItemDecoration(SpacingItemDecoration(24, true))
 
-        recyclerView.adapter = PostAdapterMain(PostRepositoryMain.posts)
+        recyclerView.adapter = StatusAdapterMain(StatusRepository.posts)
 
         statusPostsRecycler = findViewById(R.id.statusPostsRecycler)
         statusPostsRecycler.layoutManager =
@@ -263,7 +263,7 @@ class ProfileActivity : AppCompatActivity() {
         super.onResume()
 
         val recyclerView = findViewById<RecyclerView>(R.id.statusPostsRecycler)
-        recyclerView.adapter = PostAdapterMain(PostRepositoryMain.posts)
+        recyclerView.adapter = StatusAdapterMain(StatusRepository.posts)
     }
 
     private fun saveAvatarToFirestore(avatarName: String) {
@@ -484,5 +484,26 @@ class ProfileActivity : AppCompatActivity() {
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to load profile", Toast.LENGTH_LONG).show()
             }
+    }
+
+    private fun formatTimestamp(timestamp: Long): String {
+        val now = System.currentTimeMillis()
+        val diff = now - timestamp
+
+        val seconds = diff / 1000
+        val minutes = seconds / 60
+        val hours = minutes / 60
+        val days = hours / 24
+
+        return when {
+            seconds < 60 -> "Just now"
+            minutes < 60 -> "$minutes min ago"
+            hours < 24 -> "$hours hr ago"
+            days < 7 -> "$days day${if (days > 1) "s" else ""} ago"
+            else -> {
+                val sdf = java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault())
+                sdf.format(java.util.Date(timestamp))
+            }
+        }
     }
 }
