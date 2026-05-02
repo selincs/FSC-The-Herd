@@ -62,7 +62,7 @@ class FriendProfileActivity : AppCompatActivity() {
         val backButton = findViewById<ImageButton>(R.id.btnBack)
         backButton.visibility = View.VISIBLE
         backButton.setOnClickListener {
-            finish() // Closes this page and goes back
+            finish()
         }
 
         // button event listeners
@@ -142,8 +142,14 @@ class FriendProfileActivity : AppCompatActivity() {
                 .setTitle("Block $firstName?")
                 .setMessage("You will no longer see each other in the Herd.")
                 .setPositiveButton("Block") { _, _ ->
-                    MockFriendsRepo.removeFriendByName(friendName)
-                    Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show()
+                    val friendToBlock = MockFriendsRepo.getMockFriends().find { it.name == friendName }
+
+                    if (friendToBlock != null) {
+                        MockFriendsRepo.blockFriend(friendToBlock)
+                        Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        MockFriendsRepo.removeFriendByName(friendName)
+                    }
                     finish()
                 }
                 .setNegativeButton("Cancel", null)
