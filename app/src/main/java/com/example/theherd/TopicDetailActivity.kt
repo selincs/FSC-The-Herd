@@ -9,6 +9,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import android.widget.ImageButton
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import com.google.firebase.firestore.FirebaseFirestore
@@ -270,28 +271,83 @@ class TopicDetailActivity : AppCompatActivity() {
         grid.adapter = CalendarAdapter(this, days, eventsMap, currentMonth)
     }
 
-    private fun showEventDialog(day: Int) {
-        val editText = android.widget.EditText(this)
-        editText.hint = "Enter event name"
+//    private fun showEventDialog(day: Int) {
+//        val editText = android.widget.EditText(this)
+//        editText.hint = "Enter event name"
+//
+//        android.app.AlertDialog.Builder(this)
+//            .setTitle("Create Event on $day")
+//            .setView(editText)
+//            .setPositiveButton("Save") { _, _ ->
+//                val eventText = editText.text.toString()
+//                if (eventText.isNotEmpty()) {
+//                    saveEvent(day, eventText)
+//                }
+//            }
+//            .setNegativeButton("Cancel", null)
+//            .show()
+//    }
 
-        android.app.AlertDialog.Builder(this)
+    private fun showEventDialog(day: Int) {
+        val view = layoutInflater.inflate(R.layout.dialog_create_event, null)
+
+        val eventNameInput = view.findViewById<EditText>(R.id.etEventName)
+        val locationInput = view.findViewById<EditText>(R.id.etEventLocation)
+        val timeInput = view.findViewById<EditText>(R.id.etEventTime)
+
+        // Optional: Time picker
+        timeInput.setOnClickListener {
+            val calendar = java.util.Calendar.getInstance()
+
+            val timePicker = android.app.TimePickerDialog(
+                this,
+                { _, hour, minute ->
+                    val formatted = String.format("%02d:%02d", hour, minute)
+                    timeInput.setText(formatted)
+                },
+                calendar.get(java.util.Calendar.HOUR_OF_DAY),
+                calendar.get(java.util.Calendar.MINUTE),
+                false
+            )
+            timePicker.show()
+        }
+
+        val dialog = android.app.AlertDialog.Builder(this)
             .setTitle("Create Event on $day")
-            .setView(editText)
-            .setPositiveButton("Save") { _, _ ->
-                val eventText = editText.text.toString()
-                if (eventText.isNotEmpty()) {
-                    saveEvent(day, eventText)
-                }
-            }
+            .setView(view)
+            .setPositiveButton("Save", null) // override to validate
             .setNegativeButton("Cancel", null)
-            .show()
+            .create()
+
+        dialog.show()
+
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val name = eventNameInput.text.toString().trim()
+            val location = locationInput.text.toString().trim()
+            val time = timeInput.text.toString().trim()
+
+            if (name.isEmpty()) {
+                eventNameInput.error = "Event name required"
+                return@setOnClickListener
+            }
+
+            saveEvent(
+                day = day,
+                name = name,
+                location = location,
+                time = time
+            )
+
+            dialog.dismiss()
+        }
     }
 
     private fun getDateKey(day: Int): String {
         return "${currentMonth.year}-${currentMonth.monthValue}-%02d".format(day)
     }
 
-    private fun saveEvent(day: Int, event: String) {
+//    private fun saveEvent(day: Int, event: String) {
+    fun saveEvent(day: Int, name: String, location: String, time: String) {
         val key = getDateKey(day)
 
         if (!eventsMap.containsKey(key)) {
