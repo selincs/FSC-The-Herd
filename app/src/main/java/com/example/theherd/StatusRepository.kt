@@ -3,7 +3,6 @@ package com.example.theherd
 import com.google.firebase.firestore.FirebaseFirestore
 
 object StatusRepository {
-//    val posts = mutableListOf<Status>()
 
     fun addStatus(content: String) {
         val userId = SessionManager.requireUserId()
@@ -15,9 +14,6 @@ object StatusRepository {
             "content" to post.content,
             "timestamp" to post.timestamp
         )
-
-        // 1. Add locally for UI responsiveness
-//        posts.add(0, post)
 
         // Save to subcollection in User Document in Firestore
         db.collection("users")

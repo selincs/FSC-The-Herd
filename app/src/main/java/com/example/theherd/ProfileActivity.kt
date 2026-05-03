@@ -146,7 +146,6 @@ class ProfileActivity : AppCompatActivity() {
 
             if (isEditing) {
                 setEditMode(true)
-//                adapter.setEditMode(true)
                 editProfileButton.text = "Save Changes"
             } else {
                 saveAll(
@@ -155,7 +154,6 @@ class ProfileActivity : AppCompatActivity() {
                     bioInput,
                 )
                 setEditMode(false)
-//                adapter.setEditMode(false)
                 editProfileButton.text = "Edit Profile"
             }
         }
@@ -252,13 +250,6 @@ class ProfileActivity : AppCompatActivity() {
 
         builder.show()
     }
-
-//    override fun onResume() {
-//        super.onResume()
-//
-//        val recyclerView = findViewById<RecyclerView>(R.id.statusPostsRecycler)
-//        recyclerView.adapter = StatusAdapterMain(StatusRepository.posts)
-//    }
 
     private fun saveAvatarToFirestore(avatarName: String) {
         val user = FirebaseAuth.getInstance().currentUser ?: return

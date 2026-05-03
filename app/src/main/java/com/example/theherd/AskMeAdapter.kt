@@ -86,6 +86,7 @@ class AskMeAdapter(
 //                notifyItemRangeChanged(position, topics.size)
 //            }
 
+            //TODO: Is there any deleting of topics any more? Should just be the Topics they've joined now in the app. Verify.
             // Delete topic logic
             holder.deleteButton.setOnClickListener {
                 val pos = holder.bindingAdapterPosition
