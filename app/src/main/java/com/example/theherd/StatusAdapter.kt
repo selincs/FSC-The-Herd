@@ -28,9 +28,6 @@ class StatusAdapter(private val posts: MutableList<Status>) :
         println("Binding post: ${post.content}")
     }
 
-    //        holder.time.text = post.timestamp
-
-
     override fun getItemCount() = posts.size
     private fun formatTimestamp(timestamp: Long): String {
         val now = System.currentTimeMillis()
