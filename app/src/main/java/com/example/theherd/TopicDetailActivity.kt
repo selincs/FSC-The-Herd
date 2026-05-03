@@ -57,15 +57,21 @@ class TopicDetailActivity : AppCompatActivity() {
 //        setupEventButtons(edit2, rsvp2, send2) { event2.text.toString() }
 //        setupEventButtons(edit3, rsvp3, send3) { event3.text.toString() }
         setupEventButtons(edit1, rsvp1, send1) {
-            eventsMap[getDateKey(selectedDay ?: return@setupEventButtons null)]?.getOrNull(0)
+            selectedDay?.let { day ->
+                eventsMap[getDateKey(day)]?.getOrNull(0)
+            }
         }
 
         setupEventButtons(edit2, rsvp2, send2) {
-            eventsMap[getDateKey(selectedDay ?: return@setupEventButtons null)]?.getOrNull(1)
+            selectedDay?.let { day ->
+                eventsMap[getDateKey(day)]?.getOrNull(1)
+            }
         }
 
         setupEventButtons(edit3, rsvp3, send3) {
-            eventsMap[getDateKey(selectedDay ?: return@setupEventButtons null)]?.getOrNull(2)
+            selectedDay?.let { day ->
+                eventsMap[getDateKey(day)]?.getOrNull(2)
+            }
         }
 
         val addEventBtn = findViewById<ImageButton>(R.id.addEventBtn)
@@ -377,11 +383,25 @@ class TopicDetailActivity : AppCompatActivity() {
             eventsMap[key] = mutableListOf()
         }
 
-        val event = Event(name, location, time)
+        val event = Event(
+            name = name,
+            location = location,
+            time = time,
+            hostId = SessionManager.requireUserId()
+        )
 
+        // Local update (UI)
         eventsMap[key]?.add(event)
-
         updateUpcomingEvents()
+
+        // Firestore save
+        val topicId = intent.getStringExtra("topicID") ?: return
+
+        EventRepository.createEvent(topicId, key, event) { success ->
+            if (!success) {
+                Toast.makeText(this, "Failed to save event", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun updateUpcomingEvents() {
@@ -514,6 +534,9 @@ class TopicDetailActivity : AppCompatActivity() {
                 Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            //TODO: Allow event editing only to event's hosts
+//            if (event.hostId == currentUserId) { allow edit }
 
             val input = android.widget.EditText(this)
             input.setText(oldEvent.name)
