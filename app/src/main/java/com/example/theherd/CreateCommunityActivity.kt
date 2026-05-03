@@ -1,6 +1,6 @@
 package com.example.theherd
 
-import android.content.Intent
+
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -30,14 +30,30 @@ class CreateCommunityActivity : AppCompatActivity() {
             if (name.isEmpty() || description.isEmpty()) {
                 Toast.makeText(this, "Please fill out all fields!", Toast.LENGTH_SHORT).show()
             } else {
-                val resultIntent = Intent()
-                resultIntent.putExtra("COMMUNITY_NAME", name)
-                resultIntent.putExtra("COMMUNITY_DESC", description)
+                //get the user ID
+                val creatorID = FirestoreAuthManager.currentUserId
+                //null check
+                if(creatorID == null){
+                    Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
 
-                setResult(RESULT_OK, resultIntent)
+                //START THE REPPP CALL
+                TopicRepository.createTopic(
+                    name,
+                    description,
+                    null,
+                    creatorID,
+                    {
+                        _ ->
+                        Toast.makeText(this, "Community Created!", Toast.LENGTH_SHORT).show()
+                        finish()
+                    },
+                    {
+                        exception -> Toast.makeText(this, exception.message, Toast.LENGTH_SHORT).show()
+                    }
+                )
 
-                Toast.makeText(this, "Community Created!", Toast.LENGTH_SHORT).show()
-                finish()
             }
         }
     }

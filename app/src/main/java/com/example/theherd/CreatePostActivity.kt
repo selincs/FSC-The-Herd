@@ -1,6 +1,6 @@
 package com.example.theherd
 
-import android.content.Intent
+
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -14,7 +14,8 @@ class CreatePostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_post)
 
-        val communityName = intent.getStringExtra("COMMUNITY_NAME") ?: "General"
+
+        val topicID = intent.getStringExtra("TOPIC_ID") ?: ""
         val etTitle = findViewById<EditText>(R.id.etPostTitle)
         val etContent = findViewById<EditText>(R.id.etPostContent)
         val btnSubmit = findViewById<Button>(R.id.btnSubmitPost)
@@ -28,20 +29,27 @@ class CreatePostActivity : AppCompatActivity() {
             val title = etTitle.text.toString().trim()
             val content = etContent.text.toString().trim()
 
-            val authorName = PreferencesManager.getFullName(this)
 
-            if (title.isNotEmpty() && content.isNotEmpty()) {
-                val resultIntent = Intent()
-                resultIntent.putExtra("POST_TITLE", title)
-                resultIntent.putExtra("POST_CONTENT", content)
 
-                resultIntent.putExtra("POST_AUTHOR", authorName)
 
-                setResult(RESULT_OK, resultIntent)
-                finish()
-            } else {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                if(title.isNotEmpty() && content.isNotEmpty()){
+                    PostRepository.createPost(
+                        topicID,
+                        title,
+                        content
+                    ) {
+                        success -> if ( success){
+                            Toast.makeText(this, "Post created!", Toast.LENGTH_SHORT).show()
+                            setResult(RESULT_OK)
+                            finish()
+                    } else{
+                        Toast.makeText(this, "failed to create post", Toast.LENGTH_SHORT).show()
+                    }
+                    }
+
+                }else{
+                    Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
-}

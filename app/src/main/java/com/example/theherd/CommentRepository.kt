@@ -28,17 +28,20 @@ object CommentRepository{
 
         val commentID = UUID.randomUUID().toString()
 
+        val email = auth.currentUser?.email ?: "unknown"
+
+
         //comment data map
 
         val commentData = hashMapOf(
             "commentID" to commentID,
             "commentedByUID"  to userID,
+            "commentedByEmail" to email,
             "commContents" to commmContents,
-            "parentCommentID" to "", // not every comment is a reply,
+            "parentCommentID" to "",
             "likeCt" to 0,
+            "likedUserIds" to listOf<String>(),   // 👈 ADD THIS
             "createdAt" to FieldValue.serverTimestamp()
-
-
         )
         //firebase path subcollection
         FirestoreDatabase.topics
@@ -96,14 +99,23 @@ object CommentRepository{
                     val commentID = doc.getString("commentID") ?: continue
                     val commmContents = doc.getString("commContents") ?: ""
                     val commentedByUUID = doc.getString("commentedByUID") ?: continue
+                    val email = doc.getString("commentedByEmail") ?: ""
                     val parentCommentID = doc.getString("parentCommentID") ?: ""
                     val likeCt = doc.getLong("likeCt")?.toInt() ?: 0
+                    val likedUserIds = doc.get("likedUserIds") as? List<String> ?: emptyList()
+                    val displayName = if (email.contains("@")) {
+                        email.substringBefore("@")
+                    } else {
+                        commentedByUUID
+                    }
+
                     val comment = Comment(
                         commentID,
-                        commentedByUUID,
+                        displayName,
                         commmContents,
                         likeCt,
-                        parentCommentID
+                        parentCommentID,
+                        likedUserIds
                     )
                     //each documents gets turned into a comment object and stored into the list.
                     commentsList.add(comment)
@@ -118,6 +130,46 @@ object CommentRepository{
             .addOnFailureListener {
                 onResult(emptyList())
             }
+    }
+    fun toggleLikeComment(
+        topicID: String,
+        postID: String,
+        commentID: String,
+        onDone: (Boolean) -> Unit
+    ) {
+        val userID = auth.currentUser?.uid ?: return
+
+        val ref = FirestoreDatabase.topics
+            .document(topicID)
+            .collection("posts")
+            .document(postID)
+            .collection("comments")
+            .document(commentID)
+
+        ref.get().addOnSuccessListener { doc ->
+            val likedUsers = doc.get("likedUserIds") as? MutableList<String> ?: mutableListOf()
+
+            if (likedUsers.contains(userID)) {
+                // UNLIKE
+                ref.update(
+                    mapOf(
+                        "likedUserIds" to FieldValue.arrayRemove(userID),
+                        "likeCt" to FieldValue.increment(-1)
+                    )
+                ).addOnSuccessListener { onDone(true) }
+                    .addOnFailureListener { onDone(false) }
+
+            } else {
+                // LIKE
+                ref.update(
+                    mapOf(
+                        "likedUserIds" to FieldValue.arrayUnion(userID),
+                        "likeCt" to FieldValue.increment(1)
+                    )
+                ).addOnSuccessListener { onDone(true) }
+                    .addOnFailureListener { onDone(false) }
+            }
+        }
     }
 
 

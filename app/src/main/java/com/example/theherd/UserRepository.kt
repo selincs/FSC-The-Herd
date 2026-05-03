@@ -38,6 +38,7 @@ object UserRepository {
 
                 //data for the main user document in firestore.
                 //this stores basic account information.
+                //TODO: Add status post field, and any other needs for Friends list, Username field too? Or just email w.o farm
                 val userData = hashMapOf(
                     "userID" to userId,
                     "email" to email,

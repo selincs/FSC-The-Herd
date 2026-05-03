@@ -23,7 +23,7 @@ object SessionManager {
         currentProfile?.setOnlineStatus(OnlineStatus.ONLINE)   //Set user status to Online
         //Other on log in status change stuff can go here
         println("Session started for user: ${profile.userID}")
-        println(currentUserId)
+        println("Current userID= " + currentUserId)
     }
 
     //Logout clears session AND firebase auth

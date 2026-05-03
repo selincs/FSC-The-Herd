@@ -9,12 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 
 class CommunityAdapter(
     private val communities: List<Community>,
-    private val onClick: (Community) -> Unit
+    private val onCommunityClick: (Community) -> Unit,
+    private val onJoinCLick: (Community)  -> Unit
 ) : RecyclerView.Adapter<CommunityAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nameText: TextView = view.findViewById(R.id.communityNameText)
         val descText: TextView = view.findViewById(R.id.communityDescText)
+        val btnJoin: Button = view.findViewById(R.id.btnJoinCommunity)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): ViewHolder {
@@ -25,27 +27,18 @@ class CommunityAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val community = communities[position]
-        val context = holder.itemView.context
 
         holder.nameText.text = community.name
         holder.descText.text = community.description
 
-        val btnJoin = holder.itemView.findViewById<Button>(R.id.btnJoinCommunity)
-        updateJoinButtonUI(btnJoin, community.isJoined)
+        updateJoinButtonUI(holder.btnJoin, community.isJoined)
 
-        btnJoin.setOnClickListener {
-            community.isJoined = !community.isJoined
-            updateJoinButtonUI(btnJoin, community.isJoined)
-            PreferencesManager.saveAllCommunities(context, ArrayList(communities))
-            val currentJoinedNames = communities
-                .filter { it.isJoined }
-                .map { it.name }
-                .toSet()
-            PreferencesManager.saveJoinedClubs(context, currentJoinedNames)
+        holder.btnJoin.setOnClickListener {
+            onJoinCLick(community)
         }
 
         holder.itemView.setOnClickListener {
-            onClick(community)
+            onCommunityClick(community)
         }
     }
 

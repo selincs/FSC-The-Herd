@@ -8,17 +8,22 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import kotlin.jvm.java
 import android.widget.ImageButton
-import android.widget.PopupMenu
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class MainActivity : AppCompatActivity() {
 
     private var keepSplash = true
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: StatusAdapterMain
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -52,13 +57,20 @@ class MainActivity : AppCompatActivity() {
         //Set Welcome text to welcome user by first name
         val welcomeText = findViewById<TextView>(R.id.WelcomeText)
         SessionManager.getProfile()?.let { profile ->
-            welcomeText.text = "Welcome, ${profile.firstName}!"
+            welcomeText.text = "Welcome ${profile.firstName}!"
         }
 
         // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
         settingsButton.setOnClickListener { view ->
             SettingsMenuHelper.showSettingsMenu(this, view)
+        }
+
+        val createPostButton: Button = findViewById(R.id.create_post_button)
+
+        createPostButton.setOnClickListener {
+            val intent = Intent(this, CreateStatusActivity::class.java)
+            startActivity(intent)
         }
 
         // buttons
@@ -106,5 +118,36 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadPosts()
+    }
+
+    private fun loadPosts() {
+        val uid = SessionManager.requireUserId()
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("statusPosts")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                val posts = snapshot.documents.map { doc ->
+                    Status(
+                        doc.getString("content") ?: "",
+                        doc.getLong("timestamp") ?: 0L
+                    )
+                }
+
+                recyclerView = findViewById(R.id.post_container)
+                adapter = StatusAdapterMain(posts)
+
+                recyclerView.layoutManager = LinearLayoutManager(this)
+                recyclerView.adapter = adapter
+            }
     }
 }

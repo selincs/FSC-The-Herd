@@ -137,6 +137,7 @@ class SignUpActivity : AppCompatActivity() {
 
                     val graduationDate = "$selectedSeason $selectedYear"
 
+                    //Calls register() in user repo with the below parameters in constructor
                     UserRepository.register(
                         firstName = firstName,
                         lastName = lastName,

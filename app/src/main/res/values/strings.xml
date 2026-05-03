@@ -62,7 +62,7 @@
     <string name="bio_section">Bio</string>
     <string name="bio_hint">Write something about yourself...</string>
 
-    <string name="status_posts_section">Status Posts</string>
+    <string name="status_posts_section">Recent Status Updates</string>
     <string name="no_posts_yet">No posts yet.</string>
     <!-- Footer -->
     <string name="footer_text">© 2026 The Herd. All rights reserved.</string>
