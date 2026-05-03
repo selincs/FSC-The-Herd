@@ -94,22 +94,4 @@ class AccountSettingsActivity : AppCompatActivity() {
             }
         )
     }
-
-//    private fun setupBlockedList() {
-//        val blockedList = MockFriendsRepo.getBlockedFriends().toMutableList()
-//
-//        if (blockedList.isEmpty()) {
-//            recyclerView.visibility = View.GONE
-//            emptyStateText.visibility = View.VISIBLE
-//        } else {
-//            recyclerView.visibility = View.VISIBLE
-//            recyclerView.adapter = BlockedFriendsAdapter(blockedList) { friend ->
-//                MockFriendsRepo.unblockFriend(friend)
-//                if (MockFriendsRepo.getBlockedFriends().isEmpty()) {
-//                    recyclerView.visibility = View.GONE
-//                    emptyStateText.visibility = View.VISIBLE
-//                }
-//            }
-//        }
-//    }
 }

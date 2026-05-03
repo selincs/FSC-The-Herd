@@ -52,8 +52,19 @@ object BlockListRepository {
             .collection("friendRequests")
             .document(currentUserId)
 
+        val currentSentRequest = currentUserRef
+            .collection("sentFriendRequests")
+            .document(targetUserId)
+
+        val targetSentRequest = targetUserRef
+            .collection("sentFriendRequests")
+            .document(currentUserId)
+
+        //delete all requests that may be pending
         batch.delete(incomingRequest)
         batch.delete(outgoingRequest)
+        batch.delete(currentSentRequest)
+        batch.delete(targetSentRequest)
 
         // Commit everything atomically
         batch.commit()
