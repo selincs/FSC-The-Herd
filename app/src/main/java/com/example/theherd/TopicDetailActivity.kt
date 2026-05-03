@@ -83,6 +83,8 @@ class TopicDetailActivity : AppCompatActivity() {
 
         val topicID = intent.getStringExtra("topicID") ?: return
 
+        loadEventsFromFirestore(topicID)
+
         //Use the isJoined status from the query in TopicsAdapter, else default==false
         isJoined = intent.getBooleanExtra("isJoined", false)
         updateJoinUI(joinButton, isJoined)
@@ -144,7 +146,7 @@ class TopicDetailActivity : AppCompatActivity() {
         }
 
         updateCalendar()
-        updateUpcomingEvents()
+//        updateUpcomingEvents()   //loadEventFromFirestore calls this, so now it happens after backend data retrieved
 
         grid.setOnItemClickListener { _, _, position, _ ->
             val dayStr = days[position]
@@ -623,25 +625,30 @@ class TopicDetailActivity : AppCompatActivity() {
         updateUpcomingEvents()
     }
 
-//    private fun updateEvent(oldValue: String, newValue: String) {
-//        val day = selectedDay ?: return
-//        val key = getDateKey(day)
-//
-//        val list = eventsMap[key] ?: return
-//
-//        val index = list.indexOfFirst { event ->
-//            formatEventDisplay(event) == oldValue
-//        }
-//
-//        if (index != -1) {
-//            val oldEvent = list[index]
-//
-//            // Preserve location/time, only update name
-//            list[index] = oldEvent.copy(name = newValue)
-//
-//            updateUpcomingEvents()
-//        }
-//    }
+    private fun loadEventsFromFirestore(topicId: String) {
+        EventRepository.getEventsForTopic(
+            topicId,
+            onSuccess = { eventPairs ->
+
+                // clear old data to prevent duplicates
+                eventsMap.clear()
+
+                for ((dateKey, event) in eventPairs) {
+                    if (!eventsMap.containsKey(dateKey)) {
+                        eventsMap[dateKey] = mutableListOf()
+                    }
+                    eventsMap[dateKey]?.add(event)
+                }
+
+                // Refresh UI
+                updateCalendar()
+                updateUpcomingEvents()
+            },
+            onFailure = {
+                Toast.makeText(this, "Failed to load events", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
 
     private fun updateJoinUI(button: Button, isJoined: Boolean) {
         if (isJoined) {

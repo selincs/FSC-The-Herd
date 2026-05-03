@@ -27,4 +27,34 @@ object EventRepository {
             .addOnSuccessListener { onComplete(true) }
             .addOnFailureListener { onComplete(false) }
     }
+
+    fun getEventsForTopic(
+        topicId: String,
+        onSuccess: (List<Pair<String, Event>>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("topics")
+            .document(topicId)
+            .collection("events")
+            .get()
+            .addOnSuccessListener { result ->
+
+                val events = result.documents.mapNotNull { doc ->
+                    val name = doc.getString("name") ?: return@mapNotNull null
+                    val location = doc.getString("location") ?: ""
+                    val time = doc.getString("time") ?: ""
+                    val date = doc.getString("date") ?: return@mapNotNull null
+                    val hostId = doc.getString("hostId") ?: ""
+
+                    val event = Event(name, location, time, hostId)
+
+                    date to event // Pair(dateKey, Event)
+                }
+
+                onSuccess(events)
+            }
+            .addOnFailureListener { onFailure(it) }
+    }
 }
