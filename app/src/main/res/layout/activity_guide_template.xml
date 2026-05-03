@@ -203,7 +203,7 @@
                         android:id="@+id/thumbsDownButton"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
-                        android:src="@drawable/ic_thumbs_down"
+                        android:src="@drawable/ic_thumb_down"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/thumbs_down" />
                 </LinearLayout>

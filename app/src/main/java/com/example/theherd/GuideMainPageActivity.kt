@@ -1,162 +1,91 @@
 package com.example.theherd
 
-import Model.Guide
-import Model.GuideRepository
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.theherd.databinding.ActivityGuideMainBinding
-import com.example.theherd.GuidesAdapter
-
+import com.google.firebase.Timestamp
 
 class GuideMainPageActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityGuideMainBinding
+    private lateinit var questionsAdapter: QuestionsAdapter
+    private lateinit var categoryName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGuideMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupRecyclerView()
+        categoryName = intent.getStringExtra("CATEGORY_NAME") ?: "Navigation"
+        binding.tvCategoryTitle.text = "$categoryName Questions"
 
-        val eventsButton: Button = findViewById(R.id.events_button)
-        val motivationButton: Button = findViewById(R.id.motivation_button)
-        val friendsButton: Button = findViewById(R.id.friends_button)
-        val interestsButton: Button = findViewById(R.id.interests_button)
-        val communityButton: Button = findViewById(R.id.community_button)
-        val profileButton: Button = findViewById(R.id.profile_button)
-        val guideButton: Button = findViewById(R.id.guide_button)
+        setupBottomNavigation()
+        setupQuestionsList()
+    }
 
-        interestsButton.setOnClickListener {
-            val intent = Intent(this, TopicsActivity::class.java)
+    private fun setupQuestionsList() {
+        questionsAdapter = QuestionsAdapter(emptyList()) { question ->
+            val intent = Intent(this, GuideQuestionDetailActivity::class.java)
+            intent.putExtra("CATEGORY_NAME", categoryName)
+            intent.putExtra("QUESTION_ID", question["questionID"].toString())
+            intent.putExtra("QUESTION_TEXT", question["questionText"].toString())
             startActivity(intent)
         }
 
-        communityButton.setOnClickListener {
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
+        binding.rvQuestions.layoutManager = LinearLayoutManager(this)
+        binding.rvQuestions.adapter = questionsAdapter
+
+        // TEMP dummy questions so we can test the answer screen
+        val dummyQuestions = listOf(
+            mapOf(
+                "questionID" to "q1",
+                "username" to "student1",
+                "questionText" to "Where is the tutoring center?",
+                "createdAt" to Timestamp.now()
+            ),
+            mapOf(
+                "questionID" to "q2",
+                "username" to "student2",
+                "questionText" to "How do I register for classes?",
+                "createdAt" to Timestamp.now()
+            ),
+            mapOf(
+                "questionID" to "q3",
+                "username" to "student3",
+                "questionText" to "Where do I find financial aid help?",
+                "createdAt" to Timestamp.now()
+            )
+        )
+
+        questionsAdapter.updateData(dummyQuestions)
+    }
+
+    private fun setupBottomNavigation() {
+        findViewById<Button>(R.id.motivation_button).setOnClickListener {
+            startActivity(Intent(this, MotivationActivity::class.java))
         }
 
-        profileButton.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
+        findViewById<Button>(R.id.friends_button).setOnClickListener {
+            startActivity(Intent(this, FriendsListActivity::class.java))
         }
 
-        guideButton.setOnClickListener {
-            val intent = Intent(this, GuidesActivity::class.java)
-            startActivity(intent)
-        }
-        friendsButton.setOnClickListener {
-            val intent = Intent(this, FriendsListActivity::class.java)
-            startActivity(intent)
-        }
-        motivationButton.setOnClickListener {
-            val intent = Intent(this, MotivationActivity::class.java)
-            startActivity(intent)
+        findViewById<Button>(R.id.interests_button).setOnClickListener {
+            startActivity(Intent(this, TopicsActivity::class.java))
         }
 
-        val incomingCategory = intent.getStringExtra("CATEGORY_NAME")
+        findViewById<Button>(R.id.community_button).setOnClickListener {
+            startActivity(Intent(this, CommunityBoardActivity::class.java))
+        }
 
-        if(incomingCategory != null) {
-            when (incomingCategory) {
-                "Navigation", "Travel" -> {
-                    println("User is looking for: $incomingCategory -> Routing to Campus Services")
-                }
-                "Academic", "Financial Aid" -> {
-                    println("User is looking for: $incomingCategory -> Routing to Academic Services")
-                }
-                "Housing", "Clubs", "Health & Wellness" -> {
-                    println("User is looking for: $incomingCategory -> Routing to Housing Services")
-                }
-                "Miscellaneous" -> {
-                    println("User is looking for: $incomingCategory -> Routing to Miscellaneous Services")
-                }
+        findViewById<Button>(R.id.profile_button).setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
 
-            }
-
+        findViewById<Button>(R.id.guide_button).setOnClickListener {
+            startActivity(Intent(this, GuidesActivity::class.java))
         }
     }
-
-
-private fun setupRecyclerView() {
-    val allGuides = Model.GuideRepository.getAllGuides()
-    val incomingCategory = intent.getStringExtra("CATEGORY_NAME")
-
-    val displayedGuides = if (incomingCategory != null) {
-        allGuides.filter { it.category == incomingCategory }
-    } else {
-        allGuides
-    }
-
-
-    val campusGuides = displayedGuides.filter { it.category == "Navigation" || it.category == "Travel" }
-    val academicGuides = displayedGuides.filter { it.category == "Academic" || it.category == "Financial Aid" }
-    val studentLifeGuides = displayedGuides.filter { it.category == "Housing" || it.category == "Clubs" || it.category == "Health & Wellness" }
-    val otherGuides = displayedGuides.filter { it.category == "Miscellaneous" || it.category == "Other (specify below)" }
-
-    val campusAdapter = GuidesAdapter()
-    val academicAdapter = GuidesAdapter()
-    val studentLifeAdapter = GuidesAdapter()
-    val otherAdapter = GuidesAdapter()
-
-    binding.rvCampusServices.adapter = campusAdapter
-    binding.rvAcademicServices.adapter = academicAdapter
-    binding.rvStudentLife.adapter = studentLifeAdapter
-    binding.rvOther.adapter = otherAdapter
-
-    binding.rvCampusServices.layoutManager = GridLayoutManager(this, 2)
-    binding.rvAcademicServices.layoutManager = GridLayoutManager(this, 2)
-    binding.rvStudentLife.layoutManager = GridLayoutManager(this, 2)
-    binding.rvOther.layoutManager = GridLayoutManager(this, 2)
-
-    campusAdapter.submitList(campusGuides)
-    academicAdapter.submitList(academicGuides)
-    studentLifeAdapter.submitList(studentLifeGuides)
-    otherAdapter.submitList(otherGuides)
-
-    if (campusGuides.isEmpty()) {
-        binding.tvCampusHeader.visibility = android.view.View.GONE
-        binding.rvCampusServices.visibility = android.view.View.GONE
-    } else {
-        binding.tvCampusHeader.visibility = android.view.View.VISIBLE
-        binding.rvCampusServices.visibility = android.view.View.VISIBLE
-    }
-
-    if (academicGuides.isEmpty()) {
-        binding.tvAcademicHeader.visibility = android.view.View.GONE
-        binding.rvAcademicServices.visibility = android.view.View.GONE
-    } else {
-        binding.tvAcademicHeader.visibility = android.view.View.VISIBLE
-        binding.rvAcademicServices.visibility = android.view.View.VISIBLE
-    }
-
-    if (studentLifeGuides.isEmpty()) {
-        binding.tvStudentLifeHeader.visibility = android.view.View.GONE
-        binding.rvStudentLife.visibility = android.view.View.GONE
-    } else {
-        binding.tvStudentLifeHeader.visibility = android.view.View.VISIBLE
-        binding.rvStudentLife.visibility = android.view.View.VISIBLE
-    }
-
-    if (otherGuides.isEmpty()) {
-        binding.tvOtherHeader.visibility = android.view.View.GONE
-        binding.rvOther.visibility = android.view.View.GONE
-    } else {
-        binding.tvOtherHeader.visibility = android.view.View.VISIBLE
-        binding.rvOther.visibility = android.view.View.VISIBLE
-    }
-}
-
-
-    private fun showSuggestDialog() {
-        val builder = AlertDialog.Builder(this)
-        val dialogView = layoutInflater.inflate(R.layout.suggest_guide_dialogue, null)
-        builder.setView(dialogView).show()
-    }
-
-
 }

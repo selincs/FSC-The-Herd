@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Answer text -->
+    <TextView
+        android:id="@+id/tvAnswer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Answer text"
+        android:textSize="16sp"
+        android:textColor="#222222" />
+
+    <!-- Voting row -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- LIKE -->
+        <ImageButton
+            android:id="@+id/btnLike"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_thumb_up"
+            app:tint="#777777"
+            android:background="@android:color/transparent"
+            android:contentDescription="Like answer" />
+
+        <TextView
+            android:id="@+id/tvLikeCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="14sp"
+            android:textColor="#777777"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="12dp" />
+
+        <!-- DISLIKE -->
+        <ImageButton
+            android:id="@+id/btnDislike"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_thumb_down"
+            app:tint="#777777"
+            android:background="@android:color/transparent"
+            android:contentDescription="Dislike answer" />
+
+        <TextView
+            android:id="@+id/tvDislikeCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="14sp"
+            android:textColor="#777777"
+            android:layout_gravity="center_vertical" />
+
+    </LinearLayout>
+
+</LinearLayout>

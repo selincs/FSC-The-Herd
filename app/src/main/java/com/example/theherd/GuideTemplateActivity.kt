@@ -6,7 +6,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import Model.Guide
-import Model.GuideRepository
+
 import android.content.Intent
 import android.view.View
 import android.widget.Button
@@ -73,7 +73,7 @@ class GuideTemplateActivity : AppCompatActivity() {
 
         val incomingGuideId = intent.getStringExtra("GUIDE_ID")
 
-        val selectedGuide = GuideRepository.getGuideById(incomingGuideId)
+        val selectedGuide = getDatabaseGuides().find { it.id == incomingGuideId }
 
 
         if (selectedGuide != null) {
@@ -126,7 +126,9 @@ class GuideTemplateActivity : AppCompatActivity() {
             ),
         )
 
-        val adapter = QuestionsAdapter(dummyQuestions)
+        val adapter = QuestionsAdapter(dummyQuestions) { question ->
+            // do nothing for now
+        }
         rvQuestions.adapter = adapter
 
     }

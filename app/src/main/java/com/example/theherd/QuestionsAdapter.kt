@@ -7,8 +7,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.theherd.R
 import android.text.format.DateUtils
+import com.google.firebase.Timestamp
 
-class QuestionsAdapter(private var questionsList: List<Map<String, Any>>) :
+class QuestionsAdapter(
+    private var questionsList: List<Map<String,Any>>,
+    private val onQuestionClicked: (Map<String,Any>) -> Unit
+) :
     RecyclerView.Adapter<QuestionsAdapter.QuestionViewHolder>() {
 
 
@@ -32,21 +36,24 @@ class QuestionsAdapter(private var questionsList: List<Map<String, Any>>) :
         holder.tvText.text = data["questionText"]?.toString() ?: ""
 
 
-        val ts = data["timestamp"] as? Long ?: System.currentTimeMillis()
+        val createdAt = data["createdAt"] as? Timestamp
+        val ltimeMillis = createdAt?.toDate()?.time ?: System.currentTimeMillis()
+
         val relativeTime = DateUtils.getRelativeTimeSpanString(
-            ts,
+            ltimeMillis,
             System.currentTimeMillis(),
             DateUtils.MINUTE_IN_MILLIS
         )
         holder.tvTime.text = relativeTime
+        holder.itemView.setOnClickListener {
+            onQuestionClicked(data)
+        }
     }
 
     override fun getItemCount(): Int = questionsList.size
 
     fun updateData(newList: List<Map<String, Any>>) {
-        val oldSize = questionsList.size
         questionsList = newList
-        notifyItemRangeInserted(oldSize, newList.size)
-
+        notifyDataSetChanged()
     }
 }
