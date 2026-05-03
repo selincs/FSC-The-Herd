@@ -15,6 +15,8 @@ import kotlin.jvm.java
 import android.widget.ImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class MainActivity : AppCompatActivity() {
 
@@ -124,14 +126,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadPosts() {
-        recyclerView = findViewById(R.id.post_container)
+        val uid = SessionManager.requireUserId()
 
-        adapter = StatusAdapterMain(StatusRepository.posts)
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("statusPosts")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { snapshot ->
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+                val posts = snapshot.documents.map { doc ->
+                    Status(
+                        doc.getString("content") ?: "",
+                        doc.getLong("timestamp") ?: 0L
+                    )
+                }
 
-        // 🎯 Step 3: spacing between posts
-        recyclerView.addItemDecoration(SpacingItemDecoration(24))
+                recyclerView = findViewById(R.id.post_container)
+                adapter = StatusAdapterMain(posts)
+
+                recyclerView.layoutManager = LinearLayoutManager(this)
+                recyclerView.adapter = adapter
+            }
     }
 }
