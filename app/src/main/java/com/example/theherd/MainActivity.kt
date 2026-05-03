@@ -8,23 +8,22 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import kotlin.jvm.java
 import android.widget.ImageButton
-import android.widget.PopupMenu
-import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class MainActivity : AppCompatActivity() {
 
     private var keepSplash = true
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: PostAdapterMain
+    private lateinit var adapter: StatusAdapterMain
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -70,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         val createPostButton: Button = findViewById(R.id.create_post_button)
 
         createPostButton.setOnClickListener {
-            val intent = Intent(this, CreatePostActivityMain::class.java)
+            val intent = Intent(this, CreateStatusActivity::class.java)
             startActivity(intent)
         }
 
@@ -127,14 +126,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadPosts() {
-        recyclerView = findViewById(R.id.post_container)
+        val uid = SessionManager.requireUserId()
 
-        adapter = PostAdapterMain(PostRepositoryMain.posts)
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("statusPosts")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { snapshot ->
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+                val posts = snapshot.documents.map { doc ->
+                    Status(
+                        doc.getString("content") ?: "",
+                        doc.getLong("timestamp") ?: 0L
+                    )
+                }
 
-        // 🎯 Step 3: spacing between posts
-        recyclerView.addItemDecoration(SpacingItemDecoration(24))
+                recyclerView = findViewById(R.id.post_container)
+                adapter = StatusAdapterMain(posts)
+
+                recyclerView.layoutManager = LinearLayoutManager(this)
+                recyclerView.adapter = adapter
+            }
     }
 }

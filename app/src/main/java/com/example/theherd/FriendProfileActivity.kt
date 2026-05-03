@@ -42,7 +42,7 @@ class FriendProfileActivity : AppCompatActivity() {
 
         //TODO:currently no way to "create statuses" in app, auto create a welcome on signup? "Joined the Herd on $signUpDate?
         //loadStatusPosts - Loads up to 10 status posts ordered by creation date for the Friend Profile
-//        loadStatusPosts(friendId)
+        loadStatusPosts(friendId)
 
         //TODO: Remove final hardcoded values after hooking them up correctly/adding functionality
 //        val allCommunities = listOf("Android Devs", "Soccer Club", "Gaming", "IEEE", "Hackathon", "Math Club", "AI Research", "Coffee Lovers", "Chess")
@@ -233,15 +233,15 @@ class FriendProfileActivity : AppCompatActivity() {
         }
 
         //TODO: Change status posts to load from Firestore once we have data in Firestore
-        val statusPosts = listOf(
-            StatusPost("Fountain Fest was 10/10 today! 🎡", "3 hours ago"),
-            StatusPost("Looking for a study group for the CS Senior Project.", "Yesterday"),
-            StatusPost("Java recursion is making my brain melt. 🫠", "2 days ago")
-        )
-
-        val statusRecycler = findViewById<RecyclerView>(R.id.statusPostsRecycler)
-        statusRecycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        statusRecycler.adapter = StatusAdapter(statusPosts)
+//        val statusPosts = listOf(
+//            StatusPost("Fountain Fest was 10/10 today! 🎡", "3 hours ago"),
+//            StatusPost("Looking for a study group for the CS Senior Project.", "Yesterday"),
+//            StatusPost("Java recursion is making my brain melt. 🫠", "2 days ago")
+//        )
+//
+//        val statusRecycler = findViewById<RecyclerView>(R.id.statusPostsRecycler)
+//        statusRecycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+//        statusRecycler.adapter = StatusAdapter(statusPosts)
     }
 
     //Should this be in FriendsRepo? It does do Firestore getting, but for now make it work.
@@ -285,26 +285,27 @@ class FriendProfileActivity : AppCompatActivity() {
 
         db.collection("users")
             .document(friendId)
-            .collection("posts")
-            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .collection("statusPosts")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .limit(10)
             .get()
-            .addOnSuccessListener { docs ->
+            .addOnSuccessListener { snapshot ->
 
-                val posts = docs.map { doc ->
-                    //Format the timestamp of when the status post was made for readability
-                    val timestamp = doc.getTimestamp("createdAt")
+                val posts: MutableList<Status> = snapshot.documents.map { doc ->
+                    val content = doc.getString("content") ?: ""
+                    val timestamp = doc.getLong("timestamp") ?: 0L
 
-                    StatusPost(
-                        doc.getString("text") ?: "",
-                        formatTimestamp(timestamp)
-                    )
-                }
+                    Status(content, timestamp)
+                }.toMutableList()
 
                 val recycler = findViewById<RecyclerView>(R.id.statusPostsRecycler)
                 recycler.layoutManager =
                     LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
                 recycler.adapter = StatusAdapter(posts)
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load status posts", Toast.LENGTH_SHORT).show()
             }
     }
 

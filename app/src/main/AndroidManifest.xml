@@ -30,7 +30,7 @@
             android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".CreatePostActivityMain"
+            android:name=".CreateStatusActivity"
             android:exported="false"/>
         <activity
             android:name=".ProfileActivity"

@@ -39,10 +39,17 @@ object FriendsRepository {
 
                             val isOnline = userDoc.getString("onlineStatus") == "online"
 
+                            val latestStatusMap =
+                                userDoc.get("latestStatusPost") as? Map<String, Any>
+
+                            val latestStatusText =
+                                latestStatusMap?.get("content") as? String
+                                    ?: "No recent status"
+
                             val friend = Friend(
                                 id = friendID,
                                 name = fullName,
-                                statusText = "No recent status", // TODO: placeholder for now, add Firestore field
+                                statusText = latestStatusText,
                                 isOnline = isOnline,
                                 isFriend = true
                             )

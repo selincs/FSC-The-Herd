@@ -17,6 +17,7 @@ import android.view.View
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 
 class ProfileActivity : AppCompatActivity() {
@@ -24,7 +25,7 @@ class ProfileActivity : AppCompatActivity() {
     private val communities = mutableListOf<String>()
     private lateinit var statusPostsRecycler: RecyclerView
     private lateinit var statusAdapter: StatusAdapter
-    private val statusPosts = mutableListOf<StatusPost>()
+    private val statusPosts = mutableListOf<Status>()
     private lateinit var askMeRecycler: RecyclerView
     private lateinit var adapter: AskMeAdapter
     private val topics = mutableListOf<String>()
@@ -43,25 +44,21 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        val recyclerView = findViewById<RecyclerView>(R.id.statusPostsRecycler)
+        statusPostsRecycler = findViewById(R.id.statusPostsRecycler)
 
-        recyclerView.layoutManager = LinearLayoutManager(
+        statusPostsRecycler.layoutManager = LinearLayoutManager(
             this,
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        recyclerView.addItemDecoration(SpacingItemDecoration(24, true))
 
-        recyclerView.adapter = PostAdapterMain(PostRepositoryMain.posts)
-
-        statusPostsRecycler = findViewById(R.id.statusPostsRecycler)
-        statusPostsRecycler.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        statusPostsRecycler.addItemDecoration(SpacingItemDecoration(24, true))
 
         statusAdapter = StatusAdapter(statusPosts)
         statusPostsRecycler.adapter = statusAdapter
 
         loadStatusPostsFromFirestore()
+
 
         communitiesRecycler = findViewById(R.id.communitiesRecycler)
         communitiesRecycler.layoutManager = LinearLayoutManager(this)
@@ -210,10 +207,7 @@ class ProfileActivity : AppCompatActivity() {
             val intent = Intent(this, CommunityBoardActivity::class.java)
             startActivity(intent)
         }
-        profileButton.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        }
+
         guideButton.setOnClickListener {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
@@ -259,12 +253,12 @@ class ProfileActivity : AppCompatActivity() {
         builder.show()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        val recyclerView = findViewById<RecyclerView>(R.id.statusPostsRecycler)
-        recyclerView.adapter = PostAdapterMain(PostRepositoryMain.posts)
-    }
+//    override fun onResume() {
+//        super.onResume()
+//
+//        val recyclerView = findViewById<RecyclerView>(R.id.statusPostsRecycler)
+//        recyclerView.adapter = StatusAdapterMain(StatusRepository.posts)
+//    }
 
     private fun saveAvatarToFirestore(avatarName: String) {
         val user = FirebaseAuth.getInstance().currentUser ?: return
@@ -283,14 +277,14 @@ class ProfileActivity : AppCompatActivity() {
         FirebaseFirestore.getInstance()
             .collection("users")
             .document(uid)
-            .collection("communities")
+            .collection("joinedTopics")
             .get()
             .addOnSuccessListener { snapshot ->
 
                 communities.clear()
 
                 for (doc in snapshot.documents) {
-                    val name = doc.getString("name") ?: continue
+                    val name = doc.id
                     communities.add(name)
                 }
 
@@ -313,26 +307,29 @@ class ProfileActivity : AppCompatActivity() {
             .collection("users")
             .document(uid)
             .collection("statusPosts")
-            .orderBy("timestamp") // maybe idk
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { snapshot ->
 
-                statusPosts.clear()
-
-                for (doc in snapshot.documents) {
-
+                val newPosts: List<Status> = snapshot.documents.map { doc ->
                     val content = doc.getString("content") ?: ""
+                    val timestamp = doc.getLong("timestamp") ?: 0L
 
-                    // keep same format as FriendProfileActivity
-                    val timestamp = doc.getString("timestamp") ?: "Just now"
-
-                    statusPosts.add(StatusPost(content, timestamp))
+                    Status(content, timestamp)
                 }
 
-                statusAdapter.notifyDataSetChanged()
+                println("Status posts success in ProfileAct - loadStatusPostsfromFS")
+                statusAdapter.updateData(newPosts)
+
+                // handle empty state
+                if (newPosts.isEmpty()) {
+                    println("Status posts is empty in ProfileAct - loadStatusPostsfromFS")
+                    Toast.makeText(this, "No statuses yet", Toast.LENGTH_SHORT).show()
+                }
             }
-            .addOnFailureListener {
+            .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to load status posts", Toast.LENGTH_SHORT).show()
+                println("Error loading statuses: ${e.message}")
             }
     }
 
@@ -359,20 +356,6 @@ class ProfileActivity : AppCompatActivity() {
                 et.background = defaultFieldBackground
             }
         }
-
-        /*val checkboxes = listOf(
-            R.id.fitnessCheck,
-            R.id.codingCheck,
-            R.id.musicCheck,
-            R.id.gamingCheck,
-            R.id.artCheck
-        )
-
-        checkboxes.forEach {
-            findViewById<CheckBox>(it).isEnabled = isEditing
-        }
-
-         */
 
         findViewById<Button>(R.id.addTopicButton).visibility =
             if (isEditing) Button.VISIBLE else Button.GONE
@@ -473,7 +456,7 @@ class ProfileActivity : AppCompatActivity() {
                 findViewById<EditText>(R.id.bioInput)
                     .setText(document.getString("bio") ?: "")
 
-                val interests = document.get("interests") as? List<String> ?: emptyList()
+//                val interests = document.get("interests") as? List<String> ?: emptyList()
 
                 //Implement interests after other fields populate
 //                findViewById<TextView>(R.id.selectedInterestsText)
@@ -484,5 +467,26 @@ class ProfileActivity : AppCompatActivity() {
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to load profile", Toast.LENGTH_LONG).show()
             }
+    }
+
+    private fun formatTimestamp(timestamp: Long): String {
+        val now = System.currentTimeMillis()
+        val diff = now - timestamp
+
+        val seconds = diff / 1000
+        val minutes = seconds / 60
+        val hours = minutes / 60
+        val days = hours / 24
+
+        return when {
+            seconds < 60 -> "Just now"
+            minutes < 60 -> "$minutes min ago"
+            hours < 24 -> "$hours hr ago"
+            days < 7 -> "$days day${if (days > 1) "s" else ""} ago"
+            else -> {
+                val sdf = java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault())
+                sdf.format(java.util.Date(timestamp))
+            }
+        }
     }
 }
