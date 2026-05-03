@@ -134,12 +134,12 @@ class CommunityBoardActivity : AppCompatActivity() {
             val intent = Intent(this, MotivationActivity::class.java)
             startActivity(intent)
         }
-//
-//        friendsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
+
+        friendsButton.setOnClickListener {
+            val intent = Intent(this, FriendsListActivity::class.java)
+            startActivity(intent)
+        }
+
         interestsButton.setOnClickListener {
             val intent = Intent(this, TopicsActivity::class.java)
             startActivity(intent)

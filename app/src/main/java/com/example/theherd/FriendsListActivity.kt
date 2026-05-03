@@ -95,6 +95,10 @@ class FriendsListActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
+        // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
+        settingsButton.setOnClickListener { view ->
+            SettingsMenuHelper.showSettingsMenu(this, view)
+        }
 
         filterFriends("")
 

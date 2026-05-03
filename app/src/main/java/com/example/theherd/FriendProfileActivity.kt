@@ -110,6 +110,10 @@ class FriendProfileActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
+        // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
+        settingsButton.setOnClickListener { view ->
+            SettingsMenuHelper.showSettingsMenu(this, view)
+        }
 
         //Set the text of the action button
         when {
@@ -219,7 +223,7 @@ class FriendProfileActivity : AppCompatActivity() {
                 .setMessage("You will no longer see each other in the Herd.")
                 .setPositiveButton("Block") { _, _ ->
 
-                    FriendsRepository.blockUser(friendId) { success ->
+                    BlockListRepository.blockUser(friendId) { success ->
                         if (success) {
                             Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show()
                             finish()
