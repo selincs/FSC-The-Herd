@@ -20,7 +20,8 @@ class TopicDetailActivity : AppCompatActivity() {
     private lateinit var grid: GridView
     private lateinit var monthTitle: TextView
 
-    private val eventsMap = mutableMapOf<String, MutableList<String>>()
+//    private val eventsMap = mutableMapOf<String, MutableList<String>>()
+    private val eventsMap = mutableMapOf<String, MutableList<Event>>()
 
     private var selectedDay: Int? = null
 
@@ -52,9 +53,20 @@ class TopicDetailActivity : AppCompatActivity() {
         val send3 = findViewById<ImageButton>(R.id.sendEvent3)
 
 // Hook listeners ONCE
-        setupEventButtons(edit1, rsvp1, send1) { event1.text.toString() }
-        setupEventButtons(edit2, rsvp2, send2) { event2.text.toString() }
-        setupEventButtons(edit3, rsvp3, send3) { event3.text.toString() }
+//        setupEventButtons(edit1, rsvp1, send1) { event1.text.toString() }
+//        setupEventButtons(edit2, rsvp2, send2) { event2.text.toString() }
+//        setupEventButtons(edit3, rsvp3, send3) { event3.text.toString() }
+        setupEventButtons(edit1, rsvp1, send1) {
+            eventsMap[getDateKey(selectedDay ?: return@setupEventButtons null)]?.getOrNull(0)
+        }
+
+        setupEventButtons(edit2, rsvp2, send2) {
+            eventsMap[getDateKey(selectedDay ?: return@setupEventButtons null)]?.getOrNull(1)
+        }
+
+        setupEventButtons(edit3, rsvp3, send3) {
+            eventsMap[getDateKey(selectedDay ?: return@setupEventButtons null)]?.getOrNull(2)
+        }
 
         val addEventBtn = findViewById<ImageButton>(R.id.addEventBtn)
 
@@ -347,12 +359,25 @@ class TopicDetailActivity : AppCompatActivity() {
     }
 
 //    private fun saveEvent(day: Int, event: String) {
+//        val key = getDateKey(day)
+//
+//        if (!eventsMap.containsKey(key)) {
+//            eventsMap[key] = mutableListOf()
+//        }
+//
+//        eventsMap[key]?.add(event)
+//
+//        updateUpcomingEvents()
+//    }
+
     fun saveEvent(day: Int, name: String, location: String, time: String) {
         val key = getDateKey(day)
 
         if (!eventsMap.containsKey(key)) {
             eventsMap[key] = mutableListOf()
         }
+
+        val event = Event(name, location, time)
 
         eventsMap[key]?.add(event)
 
@@ -378,51 +403,86 @@ class TopicDetailActivity : AppCompatActivity() {
 
         val day = selectedDay
 
+        //No day selected
         if (day == null) {
             event1.text = "None"
             event2.text = ""
             event3.text = ""
 
-            toggleEventButtons("", edit1, rsvp1, send1)
-            toggleEventButtons("", edit2, rsvp2, send2)
-            toggleEventButtons("", edit3, rsvp3, send3)
+//            toggleEventButtons("", edit1, rsvp1, send1)
+//            toggleEventButtons("", edit2, rsvp2, send2)
+//            toggleEventButtons("", edit3, rsvp3, send3)
+            toggleEventButtons(null, edit1, rsvp1, send1)
+            toggleEventButtons(null, edit2, rsvp2, send2)
+            toggleEventButtons(null, edit3, rsvp3, send3)
             return
         }
 
         val key = getDateKey(day)
         val events = eventsMap[key]
 
+        //No events on day
         if (events.isNullOrEmpty()) {
             event1.text = "None"
             event2.text = ""
             event3.text = ""
 
-            toggleEventButtons("", edit1, rsvp1, send1)
-            toggleEventButtons("", edit2, rsvp2, send2)
-            toggleEventButtons("", edit3, rsvp3, send3)
+//            toggleEventButtons("", edit1, rsvp1, send1)
+//            toggleEventButtons("", edit2, rsvp2, send2)
+//            toggleEventButtons("", edit3, rsvp3, send3)
+            toggleEventButtons(null, edit1, rsvp1, send1)
+            toggleEventButtons(null, edit2, rsvp2, send2)
+            toggleEventButtons(null, edit3, rsvp3, send3)
             return
         }
 
-        val e1 = events.getOrNull(0) ?: ""
-        val e2 = events.getOrNull(1) ?: ""
-        val e3 = events.getOrNull(2) ?: ""
+        //Else, events found + display
+        //Get events
+        val e1 = events.getOrNull(0)
+        val e2 = events.getOrNull(1)
+        val e3 = events.getOrNull(2)
 
-        event1.text = e1
-        event2.text = e2
-        event3.text = e3
+//        event1.text = e1
+//        event2.text = e2
+//        event3.text = e3
 
+        //Display formatted event
+        event1.text = formatEventDisplay(e1)
+        event2.text = formatEventDisplay(e2)
+        event3.text = formatEventDisplay(e3)
+
+        //Toggle event buttons
         toggleEventButtons(e1, edit1, rsvp1, send1)
         toggleEventButtons(e2, edit2, rsvp2, send2)
         toggleEventButtons(e3, edit3, rsvp3, send3)
     }
 
+    private fun formatEventDisplay(event: Event?): String {
+        if (event == null) return ""
+
+        val parts = mutableListOf<String>()
+        parts.add(event.name)
+
+        if (event.location.isNotBlank()) {
+            parts.add("📍 ${event.location}")
+        }
+
+        if (event.time.isNotBlank()) {
+            parts.add("🕒 ${event.time}")
+        }
+
+        return parts.joinToString("\n")
+    }
+
     private fun toggleEventButtons(
-        eventText: String,
+//        eventText: String,
+        event: Event?,
         edit: ImageButton,
         rsvp: ImageButton,
         send: ImageButton
     ) {
-        val hasEvent = eventText.isNotBlank() && eventText != "None"
+//        val hasEvent = eventText.isNotBlank() && eventText != "None"
+        val hasEvent = event != null && event.name.isNotBlank()
 
         val visibility = if (hasEvent) {
             android.view.View.VISIBLE
@@ -439,26 +499,46 @@ class TopicDetailActivity : AppCompatActivity() {
         editBtn: ImageButton,
         rsvpBtn: ImageButton,
         sendBtn: ImageButton,
-        getEventText: () -> String
+//        getEventText: () -> String
+        getEvent: () -> Event?
     ) {
         editBtn.setOnClickListener {
-            val oldEvent = getEventText()
-            if (oldEvent.isBlank()) {
+//            val oldEvent = getEventText()
+            val oldEvent = getEvent()
+
+//            if (oldEvent.isBlank()) {
+//                Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
+//                return@setOnClickListener
+//            }
+            if (oldEvent == null || oldEvent.name.isBlank()) {
                 Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val input = android.widget.EditText(this)
-            input.setText(oldEvent)
+            input.setText(oldEvent.name)
+
+//            android.app.AlertDialog.Builder(this)
+//                .setTitle("Edit Event")
+//                .setView(input)
+//                .setPositiveButton("Save") { _, _ ->
+//                    val newText = input.text.toString()
+//
+//                    if (newText.isNotBlank()) {
+//                        updateEvent(oldEvent, newText)
+//                    }
+//                }
+//                .setNegativeButton("Cancel", null)
+//                .show()
 
             android.app.AlertDialog.Builder(this)
-                .setTitle("Edit Event")
+                .setTitle("Edit Event Name")
                 .setView(input)
                 .setPositiveButton("Save") { _, _ ->
-                    val newText = input.text.toString()
+                    val newName = input.text.toString().trim()
 
-                    if (newText.isNotBlank()) {
-                        updateEvent(oldEvent, newText)
+                    if (newName.isNotBlank()) {
+                        updateEventName(oldEvent, newName)
                     }
                 }
                 .setNegativeButton("Cancel", null)
@@ -466,18 +546,27 @@ class TopicDetailActivity : AppCompatActivity() {
         }
 
         rsvpBtn.setOnClickListener {
-            val event = getEventText()
-            if (event.isBlank() || event == "None") {
+//            val event = getEventText()
+            val event = getEvent()
+
+
+//            if (event.isBlank() || event == "None") {
+            if (event == null || event.name.isBlank()) {
                 Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            //TODO: Implement event RSVP in backend here
 
             Toast.makeText(this, "RSVP'd to: $event", Toast.LENGTH_SHORT).show()
         }
 
         sendBtn.setOnClickListener {
-            val event = getEventText()
-            if (event.isBlank() || event == "None") {
+//            val event = getEventText()
+            val event = getEvent()
+
+//            if (event.isBlank() || event == "None") {
+            if (event == null || event.name.isBlank()) {
                 Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -493,18 +582,43 @@ class TopicDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateEvent(oldValue: String, newValue: String) {
-        val day = selectedDay ?: return
-        val key = getDateKey(day)
+//    private fun updateEvent(oldValue: String, newValue: String) {
+//        val day = selectedDay ?: return
+//        val key = getDateKey(day)
+//
+//        val list = eventsMap[key] ?: return
+//        val index = list.indexOf(oldValue)
+//
+//        if (index != -1) {
+//            list[index] = newValue
+//            updateUpcomingEvents()
+//        }
+//    }
 
-        val list = eventsMap[key] ?: return
-        val index = list.indexOf(oldValue)
-
-        if (index != -1) {
-            list[index] = newValue
-            updateUpcomingEvents()
-        }
+    private fun updateEventName(event: Event, newName: String) {
+        event.name = newName
+        updateUpcomingEvents()
     }
+
+//    private fun updateEvent(oldValue: String, newValue: String) {
+//        val day = selectedDay ?: return
+//        val key = getDateKey(day)
+//
+//        val list = eventsMap[key] ?: return
+//
+//        val index = list.indexOfFirst { event ->
+//            formatEventDisplay(event) == oldValue
+//        }
+//
+//        if (index != -1) {
+//            val oldEvent = list[index]
+//
+//            // Preserve location/time, only update name
+//            list[index] = oldEvent.copy(name = newValue)
+//
+//            updateUpcomingEvents()
+//        }
+//    }
 
     private fun updateJoinUI(button: Button, isJoined: Boolean) {
         if (isJoined) {
