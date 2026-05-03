@@ -3,6 +3,7 @@ package com.example.theherd
 import com.google.firebase.firestore.FirebaseFirestore
 
 object EventRepository {
+
     fun createEvent(
         topicId: String,
         dateKey: String,
@@ -10,6 +11,14 @@ object EventRepository {
         onComplete: (Boolean) -> Unit
     ) {
         val db = FirebaseFirestore.getInstance()
+
+        val docRef = db.collection("topics")
+            .document(topicId)
+            .collection("events")
+            .document() // generate document ID first for the new Event
+
+        // assign the eventID to the local Event object
+        event.id = docRef.id
 
         val data = hashMapOf(
             "name" to event.name,
@@ -20,10 +29,8 @@ object EventRepository {
             "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
         )
 
-        db.collection("topics")
-            .document(topicId)
-            .collection("events")
-            .add(data)
+        //Save data to new Event document
+        docRef.set(data)
             .addOnSuccessListener { onComplete(true) }
             .addOnFailureListener { onComplete(false) }
     }
@@ -48,13 +55,36 @@ object EventRepository {
                     val date = doc.getString("date") ?: return@mapNotNull null
                     val hostId = doc.getString("hostId") ?: ""
 
-                    val event = Event(name, location, time, hostId)
+                    val event = Event(
+                        id = doc.id,
+                        name = name,
+                        location = location,
+                        time = time,
+                        hostId = hostId
+                    )
 
-                    date to event // Pair(dateKey, Event)
+                    date to event
                 }
 
                 onSuccess(events)
             }
             .addOnFailureListener { onFailure(it) }
+    }
+
+    fun updateEventName(
+        topicId: String,
+        eventId: String,
+        newName: String,
+        onComplete: (Boolean) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("topics")
+            .document(topicId)
+            .collection("events")
+            .document(eventId)
+            .update("name", newName)
+            .addOnSuccessListener { onComplete(true) }
+            .addOnFailureListener { onComplete(false) }
     }
 }

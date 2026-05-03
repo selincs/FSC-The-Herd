@@ -620,9 +620,35 @@ class TopicDetailActivity : AppCompatActivity() {
 //        }
 //    }
 
+    //Working, commented out for FS impl
+//    private fun updateEventName(event: Event, newName: String) {
+//        event.name = newName
+//        updateUpcomingEvents()
+//    }
+
     private fun updateEventName(event: Event, newName: String) {
+        val topicId = intent.getStringExtra("topicID") ?: return
+
+        val oldName = event.name
+
+        // UI update
         event.name = newName
         updateUpcomingEvents()
+
+        // Firestore update
+        EventRepository.updateEventName(
+            topicId,
+            event.id,
+            newName
+        ) { success ->
+            if (!success) {
+                // rollback if failure
+                event.name = oldName
+                updateUpcomingEvents()
+
+                Toast.makeText(this, "Failed to update event", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun loadEventsFromFirestore(topicId: String) {
