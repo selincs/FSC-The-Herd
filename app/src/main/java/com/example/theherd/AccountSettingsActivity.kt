@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import android.app.AlertDialog
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +29,7 @@ class AccountSettingsActivity : AppCompatActivity() {
         // toolbar
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         val homeButton: ImageButton = findViewById(R.id.homeButton)
+        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
         setSupportActionBar(toolbar)
 
         val backButton = findViewById<ImageButton>(R.id.btnBack)
@@ -44,6 +46,11 @@ class AccountSettingsActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
+        }
+
+        // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
+        settingsButton.setOnClickListener { view ->
+            Toast.makeText(this, "Exit Account Settings if you wish to log out.", Toast.LENGTH_SHORT).show()
         }
     }
 
