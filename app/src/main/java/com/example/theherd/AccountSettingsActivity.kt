@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import android.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -52,20 +53,63 @@ class AccountSettingsActivity : AppCompatActivity() {
     }
 
     private fun setupBlockedList() {
-        val blockedList = MockFriendsRepo.getBlockedFriends().toMutableList()
+        BlockListRepository.getBlockedUsers(
+            onSuccess = { blockedList ->
 
-        if (blockedList.isEmpty()) {
-            recyclerView.visibility = View.GONE
-            emptyStateText.visibility = View.VISIBLE
-        } else {
-            recyclerView.visibility = View.VISIBLE
-            recyclerView.adapter = BlockedFriendsAdapter(blockedList) { friend ->
-                MockFriendsRepo.unblockFriend(friend)
-                if (MockFriendsRepo.getBlockedFriends().isEmpty()) {
+                if (blockedList.isEmpty()) {
                     recyclerView.visibility = View.GONE
                     emptyStateText.visibility = View.VISIBLE
+                } else {
+                    recyclerView.visibility = View.VISIBLE
+                    emptyStateText.visibility = View.GONE
+
+                    recyclerView.adapter = BlockedFriendsAdapter(
+                        blockedList.toMutableList()
+                    ) { friend ->
+
+                        AlertDialog.Builder(this)
+                            .setTitle("Unblock ${friend.name}?")
+                            .setMessage("They will be able to interact with you again.")
+                            .setPositiveButton("Unblock") { _, _ ->
+
+                                BlockListRepository.unblockUser(friend.id) { success ->
+                                    if (success) {
+                                        val adapter = recyclerView.adapter as BlockedFriendsAdapter
+
+                                        if (adapter.itemCount == 0) {
+                                            recyclerView.visibility = View.GONE
+                                            emptyStateText.visibility = View.VISIBLE
+                                        }
+                                    }
+                                }
+                            }
+                            .setNegativeButton("Cancel", null)
+                            .show()
+                    }
                 }
+            },
+            onFailure = {
+                emptyStateText.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
             }
-        }
+        )
     }
+
+//    private fun setupBlockedList() {
+//        val blockedList = MockFriendsRepo.getBlockedFriends().toMutableList()
+//
+//        if (blockedList.isEmpty()) {
+//            recyclerView.visibility = View.GONE
+//            emptyStateText.visibility = View.VISIBLE
+//        } else {
+//            recyclerView.visibility = View.VISIBLE
+//            recyclerView.adapter = BlockedFriendsAdapter(blockedList) { friend ->
+//                MockFriendsRepo.unblockFriend(friend)
+//                if (MockFriendsRepo.getBlockedFriends().isEmpty()) {
+//                    recyclerView.visibility = View.GONE
+//                    emptyStateText.visibility = View.VISIBLE
+//                }
+//            }
+//        }
+//    }
 }

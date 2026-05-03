@@ -219,7 +219,7 @@ class FriendProfileActivity : AppCompatActivity() {
                 .setMessage("You will no longer see each other in the Herd.")
                 .setPositiveButton("Block") { _, _ ->
 
-                    FriendsRepository.blockUser(friendId) { success ->
+                    BlockListRepository.blockUser(friendId) { success ->
                         if (success) {
                             Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show()
                             finish()
