@@ -13,11 +13,12 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class FriendProfileActivity : AppCompatActivity() {
+class FriendProfileActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_friend_profile)
+        setupNavigation() // sets up all buttons in the tool/nav bar
 
         val friendName = intent.getStringExtra("FRIEND_NAME") ?: "Ram User"
         val username = intent.getStringExtra("USERNAME") ?: "@${friendName.replace(" ", "_").lowercase()}"
@@ -43,58 +44,6 @@ class FriendProfileActivity : AppCompatActivity() {
         val btnBlock = findViewById<Button>(R.id.btnBlockUser)
         val emptyText = findViewById<TextView>(R.id.emptyCommunitiesText)
         val moreText = findViewById<TextView>(R.id.moreCommunitiesText)
-
-        // buttons
-        val eventsButton: Button = findViewById(R.id.events_button)
-        val motivationButton: Button = findViewById(R.id.motivation_button)
-        val friendsButton: Button = findViewById(R.id.friends_button)
-        val interestsButton: Button = findViewById(R.id.interests_button)
-        val communityButton: Button = findViewById(R.id.community_button)
-        val profileButton: Button = findViewById(R.id.profile_button)
-        val guideButton: Button = findViewById(R.id.guide_button)
-        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
-
-        // toolbar
-        val toolbar: Toolbar = findViewById(R.id.topToolbar)
-        val homeButton: ImageButton = findViewById(R.id.homeButton)
-        setSupportActionBar(toolbar)
-
-        val backButton = findViewById<ImageButton>(R.id.btnBack)
-        backButton.visibility = View.VISIBLE
-        backButton.setOnClickListener {
-            finish() // Closes this page and goes back
-        }
-
-        // button event listeners
-        motivationButton.setOnClickListener {
-            val intent = Intent(this, MotivationActivity::class.java)
-            startActivity(intent)
-        }
-
-        friendsButton.setOnClickListener {
-            val intent = Intent(this, FriendsListActivity::class.java)
-            startActivity(intent)
-        }
-
-        interestsButton.setOnClickListener {
-            val intent = Intent(this, TopicsActivity::class.java)
-            startActivity(intent)
-        }
-
-        communityButton.setOnClickListener {
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
-        }
-
-        profileButton.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        }
-
-        guideButton.setOnClickListener {
-            val intent = Intent(this, GuidesActivity::class.java)
-            startActivity(intent)
-        }
 
         tvName.text = "$firstName $lastName".trim()
         tvUsername.text = username
@@ -130,6 +79,10 @@ class FriendProfileActivity : AppCompatActivity() {
         actionButton.setOnClickListener {
             if (isFriend) {
                 Toast.makeText(this, "Opening Chat...", Toast.LENGTH_SHORT).show()
+                intent.putExtra("FRIEND_NAME", tvName.text.toString())
+                intent.putExtra("ONLINE_STATUS", "Online")
+                val intent = Intent(this, MessageActivity::class.java)
+                startActivity(intent)
             } else {
                 actionButton.text = "Request Pending"
                 actionButton.isEnabled = false
@@ -142,8 +95,12 @@ class FriendProfileActivity : AppCompatActivity() {
                 .setTitle("Block $firstName?")
                 .setMessage("You will no longer see each other in the Herd.")
                 .setPositiveButton("Block") { _, _ ->
-                    MockFriendsRepo.removeFriendByName(friendName)
-                    Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show()
+                    val blockedUserID = intent.getStringExtra("FRIEND_ID") ?: ""
+                    FriendsRepository.blockUser(blockedUserID) { // Argument type mismatch: actual type is 'String?', but 'String' was expected.
+
+                    }
+                    /* MockFriendsRepo.removeFriendByName(friendName)
+                    Toast.makeText(this, "$firstName has been blocked.", Toast.LENGTH_SHORT).show() */
                     finish()
                 }
                 .setNegativeButton("Cancel", null)

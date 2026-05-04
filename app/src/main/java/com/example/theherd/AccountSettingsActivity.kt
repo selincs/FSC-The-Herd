@@ -5,12 +5,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class AccountSettingsActivity : AppCompatActivity() {
+class AccountSettingsActivity : BaseActivity() {
 
 
     private lateinit var recyclerView: RecyclerView
@@ -19,6 +20,7 @@ class AccountSettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account_settings)
+        setupNavigation() // sets up all buttons in the tool/nav bar
 
         recyclerView = findViewById(R.id.blockedUsersRecyclerView)
         emptyStateText = findViewById(R.id.tvNoBlockedUsers)
@@ -52,7 +54,27 @@ class AccountSettingsActivity : AppCompatActivity() {
     }
 
     private fun setupBlockedList() {
-        val blockedList = MockFriendsRepo.getBlockedFriends().toMutableList()
+        FriendsRepository.getBlockedUsers(
+            onSuccess = { blockedList ->
+                if (blockedList.isEmpty()) {
+                    recyclerView.visibility = View.GONE
+                    emptyStateText.visibility = View.VISIBLE
+                } else {
+                    recyclerView.visibility = View.VISIBLE
+                    emptyStateText.visibility = View.GONE
+                    recyclerView.adapter = BlockedFriendsAdapter(blockedList.toMutableList()) { friend ->
+                        FriendsRepository.unblockUser(friend.id) { success ->
+                            if (success) {
+                                setupBlockedList()
+                            }
+                        }
+                    }
+                }
+            }, onFailure = {
+                Toast.makeText(this, "ERROR: Blocked user list can't be loaded", Toast.LENGTH_SHORT).show()
+            }
+        )
+        /* val blockedList = MockFriendsRepo.getBlockedFriends().toMutableList()
 
         if (blockedList.isEmpty()) {
             recyclerView.visibility = View.GONE
@@ -66,6 +88,6 @@ class AccountSettingsActivity : AppCompatActivity() {
                     emptyStateText.visibility = View.VISIBLE
                 }
             }
-        }
+        } */
     }
 }

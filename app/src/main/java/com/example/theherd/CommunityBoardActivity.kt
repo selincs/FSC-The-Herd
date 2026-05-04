@@ -15,7 +15,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Locale
 
-class CommunityBoardActivity : AppCompatActivity() {
+class CommunityBoardActivity : BaseActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: CommunityAdapter
     private lateinit var searchView: SearchView
@@ -108,87 +108,7 @@ class CommunityBoardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_community_board)
-
-        // buttons
-        val eventsButton: Button = findViewById(R.id.events_button)
-        val motivationButton: Button = findViewById(R.id.motivation_button)
-        val friendsButton: Button = findViewById(R.id.friends_button)
-        val interestsButton: Button = findViewById(R.id.interests_button)
-        val communityButton: Button = findViewById(R.id.community_button)
-        val profileButton: Button = findViewById(R.id.profile_button)
-        val guideButton: Button = findViewById(R.id.guide_button)
-        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
-
-        // toolbar
-        val toolbar: Toolbar = findViewById(R.id.topToolbar)
-        val homeButton: ImageButton = findViewById(R.id.homeButton)
-        setSupportActionBar(toolbar)
-
-        // event listeners
-//        eventsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
-        motivationButton.setOnClickListener {
-            val intent = Intent(this, MotivationActivity::class.java)
-            startActivity(intent)
-        }
-
-        friendsButton.setOnClickListener {
-            val intent = Intent(this, FriendsListActivity::class.java)
-            startActivity(intent)
-        }
-
-        interestsButton.setOnClickListener {
-            val intent = Intent(this, TopicsActivity::class.java)
-            startActivity(intent)
-        }
-
-        communityButton.setOnClickListener {
-            println("In MainActivity: communityButton onclick listener")
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
-        }
-
-        profileButton.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        }
-
-        guideButton.setOnClickListener {
-            val intent = Intent(this, GuidesActivity::class.java)
-            startActivity(intent)
-        }
-
-
-        // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
-        settingsButton.setOnClickListener { view ->
-            SettingsMenuHelper.showSettingsMenu(this, view)
-        }
-
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
-
-        homeButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-        }
-
-
-        setupMenuButtons()
-
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-        setupNavigationButtons(toolbar)
-
-        val backButton = findViewById<ImageButton>(R.id.btnBack)
-        backButton.visibility = View.VISIBLE
-        backButton.setOnClickListener {
-            finish() // Closes this page and goes back
-        }
+        setupNavigation() // sets up all buttons in the tool/nav bar
 
         recyclerView = findViewById(R.id.community_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)

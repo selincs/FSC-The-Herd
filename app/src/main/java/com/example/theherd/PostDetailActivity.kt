@@ -6,64 +6,12 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 
-class PostDetailActivity : AppCompatActivity() {
+class PostDetailActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post_detail)
-
-        // buttons
-        val eventsButton: Button = findViewById(R.id.events_button)
-        val motivationButton: Button = findViewById(R.id.motivation_button)
-        val friendsButton: Button = findViewById(R.id.friends_button)
-        val interestsButton: Button = findViewById(R.id.interests_button)
-        val communityButton: Button = findViewById(R.id.community_button)
-        val profileButton: Button = findViewById(R.id.profile_button)
-        val guideButton: Button = findViewById(R.id.guide_button)
-
-        // event listeners
-//        eventsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
-//        motivationButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
-//        friendsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-
-
-        interestsButton.setOnClickListener {
-            val intent = Intent(this, TopicsActivity::class.java)
-            startActivity(intent)
-        }
-
-        communityButton.setOnClickListener {
-            println("In MainActivity: communityButton onclick listener")
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
-        }
-
-        profileButton.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        }
-
-        guideButton.setOnClickListener {
-            val intent = Intent(this, GuidesActivity::class.java)
-            startActivity(intent)
-        }
-
-        // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
-        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
-        settingsButton.setOnClickListener { view ->
-            SettingsMenuHelper.showSettingsMenu(this, view)
-        }
+        setupNavigation() // sets up all buttons in the tool/nav bar
 
         @Suppress("DEPRECATION")
         // gives detail on real ids,

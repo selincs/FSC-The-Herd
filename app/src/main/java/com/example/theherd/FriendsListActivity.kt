@@ -1,16 +1,11 @@
 package com.example.theherd
 
-import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -18,16 +13,14 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 
-class FriendsListActivity : AppCompatActivity() {
+class FriendsListActivity : BaseActivity() {
 
     private lateinit var adapter: FriendsAdapter
-//    private val repo = MockFriendsRepo
     private val repo = FriendsRepository
 
     private lateinit var searchInput: TextInputEditText
+    private lateinit var filterSpinner: Spinner
     private var currentTab = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,75 +28,25 @@ class FriendsListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_friends_list)
 
         searchInput = findViewById(R.id.searchInput)
+        filterSpinner = findViewById(R.id.searchFilterSpinner)
+
         val recyclerView = findViewById<RecyclerView>(R.id.friendsRecyclerView)
         val tabLayout = findViewById<TabLayout>(R.id.friendsTabLayout)
         val btnAddFriend = findViewById<MaterialButton>(R.id.btnAddFriend)
+        setupNavigation()
 
-        // buttons
-//        val eventsButton: Button = findViewById(R.id.events_button)
-        val motivationButton: Button = findViewById(R.id.motivation_button)
-        val friendsButton: Button = findViewById(R.id.friends_button)
-        val interestsButton: Button = findViewById(R.id.interests_button)
-        val communityButton: Button = findViewById(R.id.community_button)
-        val profileButton: Button = findViewById(R.id.profile_button)
-        val guideButton: Button = findViewById(R.id.guide_button)
-        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
-
-        // toolbar
-        val toolbar: Toolbar = findViewById(R.id.topToolbar)
-        val homeButton: ImageButton = findViewById(R.id.homeButton)
-        setSupportActionBar(toolbar)
-
-        val backButton = findViewById<ImageButton>(R.id.btnBack)
-        backButton.visibility = View.VISIBLE
-        backButton.setOnClickListener {
-            finish() // Closes this page and goes back
+        ArrayAdapter.createFromResource(
+            this,
+            R.array.search_filters,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            filterSpinner.adapter = adapter
         }
-
-        // button event listeners
-//        eventsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-
-        motivationButton.setOnClickListener {
-            val intent = Intent(this, MotivationActivity::class.java)
-            startActivity(intent)
-        }
-
-//        friendsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-
-        interestsButton.setOnClickListener {
-            val intent = Intent(this, TopicsActivity::class.java)
-            startActivity(intent)
-        }
-
-        communityButton.setOnClickListener {
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
-        }
-
-        profileButton.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        }
-
-        guideButton.setOnClickListener {
-            val intent = Intent(this, GuidesActivity::class.java)
-            startActivity(intent)
-        }
-        homeButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-        }
-
-        filterFriends("")
 
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        loadTabData("")
 
         btnAddFriend.setOnClickListener {
             showAddFriendDialog()
@@ -112,57 +55,45 @@ class FriendsListActivity : AppCompatActivity() {
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 currentTab = tab?.position ?: 0
-                filterFriends(searchInput.text.toString())
+                loadTabData(searchInput.text.toString())
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
-        searchInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                filterFriends(s.toString())
+        searchInput.setOnEditorActionListener { _, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)) {
+
+                val query = searchInput.text.toString().trim()
+                val selectedFilter = filterSpinner.selectedItem.toString()
+
+                if (query.isNotEmpty()) {
+                    performGlobalSearch(query, selectedFilter)
+                } else {
+                    loadTabData("")
+                }
+                true
+            } else {
+                false
             }
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        }
     }
 
-    //Tabs - 0 = Friends List, 1 = Online Friends Filtering, 2 = Friend Requests Tab
-    private fun filterFriends(query: String) {
+    private fun loadTabData(query: String) {
         if (currentTab == 2) {
-            FriendsRepository.getAllRequests { requestList ->
-                val filtered = if (query.isEmpty()) {
-                    requestList
-                } else {
-                    requestList.filter {
-                        it.name.contains(query, ignoreCase = true)
-                    }
-                }
-
-                val sorted = filtered.sortedByDescending { it.isOnline }
-                updateRecycler(sorted)
+            repo.getAllRequests { requestList ->
+                val filtered = if (query.isEmpty()) requestList
+                else requestList.filter { it.name.contains(query, ignoreCase = true) }
+                updateRecycler(filtered.sortedByDescending { it.isOnline })
             }
-            return
-        }
-        else {
-            // Friends / Online tabs
+        } else {
             repo.loadFriends(
                 onSuccess = { friends ->
-
-                    val baseList = if (currentTab == 1) {
-                        friends.filter { it.isOnline }
-                    } else {
-                        friends
-                    }
-
-                    val filtered = if (query.isEmpty()) {
-                        baseList
-                    } else {
-                        baseList.filter { it.name.contains(query, ignoreCase = true) }
-                    }
-
-                    val sorted = filtered.sortedByDescending { it.isOnline }
-                    updateRecycler(sorted)
+                    val baseList = if (currentTab == 1) friends.filter { it.isOnline } else friends
+                    val filtered = if (query.isEmpty()) baseList
+                    else baseList.filter { it.name.contains(query, ignoreCase = true) }
+                    updateRecycler(filtered.sortedByDescending { it.isOnline })
                 },
                 onFailure = {
                     Toast.makeText(this, "Failed to load friends", Toast.LENGTH_SHORT).show()
@@ -171,73 +102,50 @@ class FriendsListActivity : AppCompatActivity() {
         }
     }
 
-// Is friendToRemove still needed below?
-    private fun updateRecycler(newList: List<Friend>) {
-        adapter = FriendsAdapter(newList.toMutableList()) { friendToRemove ->
-
-            // 1. remove friend from repo
-//            repo.removeFriend(friendToRemove)
-
-            //should remove friends be done here or in adapter?
-//            repo.removeFriend(friendToRemove.id) { success ->
-//                if (success) {
-//                    Toast.makeText(this, "${friendToRemove.name} removed", Toast.LENGTH_SHORT).show()
-//                } else {
-//                    Toast.makeText(this, "Failed to remove friend", Toast.LENGTH_SHORT).show()
-//                }
-
-                // refresh UI either way
-//                filterFriends(searchInput.text.toString())
-//            }
-
-            // 2. refresh to ensure that the removed friend is no longer displayed
-            filterFriends(searchInput.text.toString())
+    private fun performGlobalSearch(query: String, filter: String) {
+        repo.searchGlobalUsers(query, filter) { results ->
+            if (results.isEmpty()) {
+                Toast.makeText(this, "No users found in the Herd", Toast.LENGTH_SHORT).show()
+            }
+            updateRecycler(results)
         }
+    }
 
+    private fun updateRecycler(newList: List<Friend>) {
+        adapter = FriendsAdapter(newList.toMutableList()) { _ ->
+            loadTabData(searchInput.text.toString())
+        }
         findViewById<RecyclerView>(R.id.friendsRecyclerView).adapter = adapter
     }
 
-    //User types email or username -> if username, normalizeEmail() -> email string -> Firestore query(users)
-    //Write to users/{targetUserID}/friendRequests/{currentUserID}
     private fun showAddFriendDialog() {
         val dialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.dialog_add_friend, null)
-
         val btnSend = view.findViewById<MaterialButton>(R.id.btnSendRequest)
-        val btnCancel = view.findViewById<MaterialButton>(R.id.btnCancelAddFriend)
         val etInput = view.findViewById<TextInputEditText>(R.id.etAddFriendInput)
         val inputLayout = view.findViewById<TextInputLayout>(R.id.addFriendInputLayout)
 
         btnSend.setOnClickListener {
             val input = etInput.text.toString().trim()
-
-            inputLayout.error = null
-
             if (input.isNotEmpty()) {
-                FriendsRepository.sendFriendRequest(
-                    input,
+                repo.sendFriendRequest(input,
                     onSuccess = {
-                        Toast.makeText(this, "Friend request sent!", Toast.LENGTH_SHORT).show()
-                        filterFriends(searchInput.text.toString())
+                        Toast.makeText(this, "Request sent!", Toast.LENGTH_SHORT).show()
+                        loadTabData("")
                         dialog.dismiss()
                     },
-                    onFailure = { e ->
-                        inputLayout.error = e.message ?: "Failed to send request"
-                    }
+                    onFailure = { e -> inputLayout.error = e.message }
                 )
-
             } else {
-                inputLayout.error = "Email or username required"
+                inputLayout.error = "Input required"
             }
         }
-
-        btnCancel.setOnClickListener { dialog.dismiss() }
         dialog.setContentView(view)
         dialog.show()
     }
 
     override fun onResume() {
         super.onResume()
-        filterFriends(searchInput.text.toString())
+        loadTabData(searchInput.text.toString())
     }
 }
