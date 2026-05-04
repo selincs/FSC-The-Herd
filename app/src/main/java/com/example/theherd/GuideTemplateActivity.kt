@@ -126,7 +126,17 @@ class GuideTemplateActivity : AppCompatActivity() {
             ),
         )
 
-        val adapter = QuestionsAdapter(dummyQuestions)
+        val adapter = QuestionsAdapter(dummyQuestions) { question ->
+
+            val intent = Intent(this, AnswerActivity::class.java)
+
+            intent.putExtra("questionText", question["questionText"].toString())
+            intent.putExtra("username", question["username"].toString())
+            intent.putExtra("timestamp", question["timestamp"] as Long)
+
+            startActivity(intent)
+        }
+
         rvQuestions.adapter = adapter
 
     }

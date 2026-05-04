@@ -8,11 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.theherd.R
 import android.text.format.DateUtils
 
-class QuestionsAdapter(private var questionsList: List<Map<String, Any>>) :
-    RecyclerView.Adapter<QuestionsAdapter.QuestionViewHolder>() {
+class QuestionsAdapter(
+    private var questionsList: List<Map<String, Any>>,
+    private val onQuestionClick: (Map<String, Any>) -> Unit
+) : RecyclerView.Adapter<QuestionsAdapter.QuestionViewHolder>(){
 
 
-    class QuestionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class QuestionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvUser: TextView = itemView.findViewById(R.id.tvQuestionUser)
         val tvText: TextView = itemView.findViewById(R.id.tvQuestionText)
         val tvTime: TextView = itemView.findViewById(R.id.tvQuestionTime)
@@ -39,6 +41,9 @@ class QuestionsAdapter(private var questionsList: List<Map<String, Any>>) :
             DateUtils.MINUTE_IN_MILLIS
         )
         holder.tvTime.text = relativeTime
+        holder.itemView.setOnClickListener {
+            onQuestionClick(data)
+        }
     }
 
     override fun getItemCount(): Int = questionsList.size
