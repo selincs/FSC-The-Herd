@@ -100,45 +100,68 @@ object EventRepository {
             .addOnFailureListener { onComplete(false) }
     }
 
-    //AVNOOR EVENTS CODE BELOW:
+    fun updateRsvp(
+        topicId: String,
+        eventId: String,
+        userIds: List<String>,
+        count: Int,
+        onComplete: (Boolean) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("topics")
+            .document(topicId)
+            .collection("events")
+            .document(eventId)
+            .update(
+                mapOf(
+                    "rsvpUserIds" to userIds,
+                    "rsvpCount" to count
+                )
+            )
+            .addOnSuccessListener { onComplete(true) }
+            .addOnFailureListener { onComplete(false) }
+    }
+
+    //REMOVED AVNOOR EVENTS CODE BELOW, ONLY SAVED FOR POSTERITY IN COMMENTED OUT FORM NOT BEING USED:
     // key = "topicId_YYYY-MM-DD"
-    private val events = mutableMapOf<String, MutableList<String>>()
-
-    fun addEvent(topicId: String, dateKey: String, event: String) {
-        val fullKey = "${topicId}_$dateKey"
-
-        if (!events.containsKey(fullKey)) {
-            events[fullKey] = mutableListOf()
-        }
-        events[fullKey]?.add(event)
-    }
-
-    fun getEventsForTopic(topicId: String): List<Pair<String, String>> {
-        val result = mutableListOf<Pair<String, String>>()
-
-        events.forEach { (key, eventList) ->
-            if (key.startsWith(topicId)) {
-                val date = key.removePrefix("${topicId}_")
-                eventList.forEach { event ->
-                    result.add(date to event)
-                }
-            }
-        }
-
-        return result
-    }
-
-    fun updateEvent(topicId: String, date: String, oldEvent: String, newEvent: String) {
-        val key = "${topicId}_$date"
-        val list = events[key] ?: return
-
-        val index = list.indexOf(oldEvent)
-        if (index != -1) {
-            list[index] = newEvent
-        }
-    }
-
-    fun getEventsForDay(topicId: String, dateKey: String): List<String> {
-        return events["${topicId}_$dateKey"] ?: emptyList()
-    }
+//    private val events = mutableMapOf<String, MutableList<String>>()
+//
+//    fun addEvent(topicId: String, dateKey: String, event: String) {
+//        val fullKey = "${topicId}_$dateKey"
+//
+//        if (!events.containsKey(fullKey)) {
+//            events[fullKey] = mutableListOf()
+//        }
+//        events[fullKey]?.add(event)
+//    }
+//
+//    fun getEventsForTopic(topicId: String): List<Pair<String, String>> {
+//        val result = mutableListOf<Pair<String, String>>()
+//
+//        events.forEach { (key, eventList) ->
+//            if (key.startsWith(topicId)) {
+//                val date = key.removePrefix("${topicId}_")
+//                eventList.forEach { event ->
+//                    result.add(date to event)
+//                }
+//            }
+//        }
+//
+//        return result
+//    }
+//
+//    fun updateEvent(topicId: String, date: String, oldEvent: String, newEvent: String) {
+//        val key = "${topicId}_$date"
+//        val list = events[key] ?: return
+//
+//        val index = list.indexOf(oldEvent)
+//        if (index != -1) {
+//            list[index] = newEvent
+//        }
+//    }
+//
+//    fun getEventsForDay(topicId: String, dateKey: String): List<String> {
+//        return events["${topicId}_$dateKey"] ?: emptyList()
+//    }
 }

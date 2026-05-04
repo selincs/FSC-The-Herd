@@ -182,10 +182,10 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         // button event listeners
-//        eventsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        eventsButton.setOnClickListener {
+            val intent = Intent(this, EventsActivity::class.java)
+            startActivity(intent)
+        }
 
         motivationButton.setOnClickListener {
             val intent = Intent(this, MotivationActivity::class.java)

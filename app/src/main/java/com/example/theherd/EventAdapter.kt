@@ -7,10 +7,11 @@ import android.widget.ImageButton
 import android.view.ViewGroup
 import android.view.LayoutInflater
 class EventAdapter(
-    private val events: MutableList<Pair<String, String>>,
-    private val onEdit: (Pair<String, String>) -> Unit,
-    private val onRsvp: (Pair<String, String>) -> Unit,
-    private val onSend: (Pair<String, String>) -> Unit
+//    private val events: MutableList<Pair<String, String>>,
+    private val events: List<Event>,
+    private val onEdit: (Event) -> Unit,
+    private val onRsvp: (Event) -> Unit,
+    private val onSend: (Event) -> Unit
 ) : RecyclerView.Adapter<EventAdapter.EventViewHolder>() {
 
     inner class EventViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -29,19 +30,36 @@ class EventAdapter(
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
 
-        val (date, event) = events[position]
+        val event = events[position]
 
-        holder.name.text = event
-        holder.date.text = formatDate(date)
+        holder.name.text = event.name
+        holder.date.text = formatDate(event.date)
 
-        holder.edit.setOnClickListener { onEdit(events[position]) }
-        holder.rsvp.setOnClickListener { onRsvp(events[position]) }
-        holder.send.setOnClickListener { onSend(events[position]) }
+        holder.edit.setOnClickListener { onEdit(event) }
+        holder.rsvp.setOnClickListener { onRsvp(event) }
+        holder.send.setOnClickListener { onSend(event) }
     }
+
+//    private fun formatDate(raw: String): String {
+//        val parts = raw.split("-")
+//        val year = parts[0]
+//        val month = parts[1].toInt()
+//        val day = parts[2]
+//
+//        val monthName = java.time.Month.of(month)
+//            .name.lowercase()
+//            .replaceFirstChar { it.uppercase() }
+//
+//        return "$monthName $day, $year"
+//    }
+
     private fun formatDate(raw: String): String {
         val parts = raw.split("-")
+
+        if (parts.size != 3) return raw // safety guard
+
         val year = parts[0]
-        val month = parts[1].toInt()
+        val month = parts[1].toIntOrNull() ?: return raw
         val day = parts[2]
 
         val monthName = java.time.Month.of(month)

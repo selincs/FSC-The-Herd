@@ -19,13 +19,12 @@ import androidx.recyclerview.widget.RecyclerView
 class TopicDetailActivity : AppCompatActivity() {
     private lateinit var eventsRecycler: RecyclerView
     private lateinit var eventAdapter: EventAdapter
-    private var currentEvents = mutableListOf<Pair<String, String>>()
+    private var currentEvents = mutableListOf<Event>()
+    private val eventsMap = mutableMapOf<String, MutableList<Event>>()
 
     private var currentMonth: YearMonth = YearMonth.now()
     private lateinit var grid: GridView
     private lateinit var monthTitle: TextView
-
-    private val eventsMap = mutableMapOf<String, MutableList<String>>()
 
     private var selectedDay: Int? = null
     private var isJoined = false
@@ -39,6 +38,7 @@ class TopicDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_topic_detail)
 
         val topicID = intent.getStringExtra("topicID") ?: return
+        loadEventsFromFirestore(topicID)
 
         // ----------------------------
         // JOIN STATE
@@ -85,17 +85,16 @@ class TopicDetailActivity : AppCompatActivity() {
             onEdit = { event ->
 
                 val input = android.widget.EditText(this)
-                input.setText(event.second)
+                input.setText(event.name)
 
                 android.app.AlertDialog.Builder(this)
-                    .setTitle("Edit Event")
+                    .setTitle("Edit Event Name")
                     .setView(input)
                     .setPositiveButton("Save") { _, _ ->
-                        val newText = input.text.toString()
-                        if (newText.isNotBlank()) {
+                        val newName = input.text.toString().trim()
 
-                            val (date, oldName) = event
-                            updateEvent(date, oldName, newText)
+                        if (newName.isNotBlank()) {
+                            updateEventName(event, newName)
                         }
                     }
                     .setNegativeButton("Cancel", null)
@@ -103,11 +102,11 @@ class TopicDetailActivity : AppCompatActivity() {
             },
 
             onRsvp = { event ->
-                Toast.makeText(this, "RSVP'd to: $event", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "RSVP'd to: ${event.name}", Toast.LENGTH_SHORT).show()
             },
 
             onSend = { event ->
-                Toast.makeText(this, "Sent: $event", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Sent: ${event.name}", Toast.LENGTH_SHORT).show()
             }
         )
 
@@ -271,11 +270,7 @@ class TopicDetailActivity : AppCompatActivity() {
         currentEvents.clear()
 
         if (!events.isNullOrEmpty()) {
-            currentEvents.addAll(
-                events.map { event ->
-                    key to event
-                }
-            )
+            currentEvents.addAll(events)
         }
 
         eventAdapter.notifyDataSetChanged()
@@ -284,30 +279,55 @@ class TopicDetailActivity : AppCompatActivity() {
     // ----------------------------
     // EVENT STORAGE
     // ----------------------------
-    private fun saveEvent(day: Int, event: String) {
+    private fun saveEvent(day: Int, name: String) {
         val key = getDateKey(day)
+        val topicID = intent.getStringExtra("topicID") ?: return
 
         if (!eventsMap.containsKey(key)) {
             eventsMap[key] = mutableListOf()
         }
 
+        val event = Event(
+            name = name,
+            location = "",
+            time = "",
+            hostId = SessionManager.requireUserId(),
+            date = key,
+            rsvpCount = 0,
+            topicId = topicID
+        )
+
         eventsMap[key]?.add(event)
-
-        val topicID = intent.getStringExtra("topicID") ?: return
-        EventRepository.addEvent(topicID, key, event)
-
         updateUpcomingEvents()
+
+        EventRepository.createEvent(topicID, key, event) { success ->
+            if (!success) {
+                Toast.makeText(this, "Failed to save event", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
-    private fun updateEvent(date: String, oldValue: String, newValue: String) {
-        val key = getDateKey(selectedDay ?: return)
+    private fun updateEventName(event: Event, newName: String) {
+        val topicId = intent.getStringExtra("topicID") ?: return
 
-        val list = eventsMap[key] ?: return
-        val index = list.indexOf(oldValue)
+        val oldName = event.name
 
-        if (index != -1) {
-            list[index] = newValue
-            updateUpcomingEvents()
+        // UI update
+        event.name = newName
+        updateUpcomingEvents()
+
+        // Firestore update
+        EventRepository.updateEventName(
+            topicId,
+            event.id,
+            newName
+        ) { success ->
+            if (!success) {
+                event.name = oldName
+                updateUpcomingEvents()
+
+                Toast.makeText(this, "Failed to update event", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -379,5 +399,28 @@ class TopicDetailActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    private fun loadEventsFromFirestore(topicId: String) {
+        EventRepository.getEventsForTopic(
+            topicId,
+            onSuccess = { eventPairs ->
+
+                eventsMap.clear()
+
+                for ((dateKey, event) in eventPairs) {
+                    if (!eventsMap.containsKey(dateKey)) {
+                        eventsMap[dateKey] = mutableListOf()
+                    }
+                    eventsMap[dateKey]?.add(event)
+                }
+
+                updateCalendar()
+                updateUpcomingEvents()
+            },
+            onFailure = {
+                Toast.makeText(this, "Failed to load events", Toast.LENGTH_SHORT).show()
+            }
+        )
     }
 }

@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 class EventsActivity : AppCompatActivity() {
     private lateinit var recycler: RecyclerView
     private lateinit var adapter: EventAdapter
-    private var currentEvents = mutableListOf<Pair<String, String>>()
+    private var currentEvents = mutableListOf<Event>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,38 +26,23 @@ class EventsActivity : AppCompatActivity() {
 
         val topicID = intent.getStringExtra("topicID") ?: return
 
-        val events = EventRepository.getEventsForTopic(topicID)
-
-        // flatten list
-        currentEvents.clear()
-        currentEvents.addAll(events)
-
         adapter = EventAdapter(
             currentEvents,
 
-            onEdit = { item ->
-
-                val (date, event) = item
+            onEdit = { event ->
 
                 val input = EditText(this)
-                input.setText(event)
+                input.setText(event.name)
 
                 AlertDialog.Builder(this)
                     .setTitle("Edit Event")
-                    .setMessage("Date: $date")
+                    .setMessage("Date: ${event.date}")
                     .setView(input)
                     .setPositiveButton("Save") { _, _ ->
-                        val newText = input.text.toString()
+                        val newName = input.text.toString().trim()
 
-                        if (newText.isNotBlank()) {
-
-                            EventRepository.updateEvent(topicID, date, event, newText)
-
-                            val index = currentEvents.indexOf(item)
-                            if (index != -1) {
-                                currentEvents[index] = date to newText
-                                adapter.notifyItemChanged(index)
-                            }
+                        if (newName.isNotBlank()) {
+                            updateEventName(topicID, event, newName)
                         }
                     }
                     .setNegativeButton("Cancel", null)
@@ -65,16 +50,18 @@ class EventsActivity : AppCompatActivity() {
             },
 
             onRsvp = { event ->
-                Toast.makeText(this, "RSVP'd to: $event", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "RSVP'd to: $event.name", Toast.LENGTH_SHORT).show()
             },
 
             onSend = { event ->
-                Toast.makeText(this, "Sent: $event", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Sent: $event.name", Toast.LENGTH_SHORT).show()
             }
         )
 
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = adapter
+
+        loadEvents(topicID)
 
         // ----------------------------
         // NAV BAR BUTTONS + TOOLBAR
@@ -137,6 +124,80 @@ class EventsActivity : AppCompatActivity() {
 
         toolbar.setNavigationOnClickListener {
             finish()
+        }
+    }
+
+    //Helper fncs below
+    private fun loadEvents(topicId: String) {
+        EventRepository.getEventsForTopic(
+            topicId,
+            onSuccess = { eventPairs ->
+
+                currentEvents.clear()
+
+                val userId = SessionManager.requireUserId()
+
+                // Only RSVP’d events
+                for ((_, event) in eventPairs) {
+//                    if (event.rsvpUserIds.contains(userId)) {
+                        currentEvents.add(event)
+//                    }
+                }
+
+                adapter.notifyDataSetChanged()
+            },
+            onFailure = {
+                Toast.makeText(this, "Failed to load events", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    private fun updateEventName(topicId: String, event: Event, newName: String) {
+        val oldName = event.name
+
+        event.name = newName
+        adapter.notifyDataSetChanged()
+
+        EventRepository.updateEventName(
+            topicId,
+            event.id,
+            newName
+        ) { success ->
+            if (!success) {
+                event.name = oldName
+                adapter.notifyDataSetChanged()
+                Toast.makeText(this, "Failed to update event", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun handleRsvp(topicId: String, event: Event) {
+        val userId = SessionManager.requireUserId()
+
+        val alreadyRsvpd = event.rsvpUserIds.contains(userId)
+
+        if (alreadyRsvpd) {
+            Toast.makeText(this, "Already RSVP’d", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        event.rsvpUserIds.add(userId)
+        event.rsvpCount += 1
+        adapter.notifyDataSetChanged()
+
+        EventRepository.updateRsvp(
+            topicId,
+            event.id,
+            event.rsvpUserIds,
+            event.rsvpCount
+        ) { success ->
+            if (!success) {
+                event.rsvpUserIds.remove(userId)
+                event.rsvpCount -= 1
+                adapter.notifyDataSetChanged()
+
+                Toast.makeText(this, "Failed to RSVP", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
