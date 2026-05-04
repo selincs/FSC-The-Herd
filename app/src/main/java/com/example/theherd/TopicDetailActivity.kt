@@ -380,6 +380,7 @@ class TopicDetailActivity : AppCompatActivity() {
 
     fun saveEvent(day: Int, name: String, location: String, time: String) {
         val key = getDateKey(day)
+        val topicId = intent.getStringExtra("topicID") ?: return
 
         if (!eventsMap.containsKey(key)) {
             eventsMap[key] = mutableListOf()
@@ -389,7 +390,10 @@ class TopicDetailActivity : AppCompatActivity() {
             name = name,
             location = location,
             time = time,
-            hostId = SessionManager.requireUserId()
+            hostId = SessionManager.requireUserId(),
+            date = key,
+            rsvpCount = 0,
+            topicId = topicId
         )
 
         // Local update (UI)
@@ -397,8 +401,6 @@ class TopicDetailActivity : AppCompatActivity() {
         updateUpcomingEvents()
 
         // Firestore save
-        val topicId = intent.getStringExtra("topicID") ?: return
-
         EventRepository.createEvent(topicId, key, event) { success ->
             if (!success) {
                 Toast.makeText(this, "Failed to save event", Toast.LENGTH_SHORT).show()

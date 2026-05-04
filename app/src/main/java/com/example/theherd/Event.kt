@@ -5,9 +5,9 @@ data class Event(
     var name: String,
     var location: String = "",
     var time: String = "",
-    var hostId: String = ""
-    //month of event
-    //day of event
-    //year of event
-    //rsvpCount
+    var hostId: String = "",
+    var date: String = "", //year/month/day of event == date of event as a string--dateKey == YYYY-M-D
+    var rsvpCount: Int = 0,
+    var rsvpUserIds: MutableList<String> = mutableListOf(),
+    var topicId: String = "" //topicName, which is equivalent to topicID
 )

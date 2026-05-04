@@ -19,6 +19,7 @@ object EventRepository {
 
         // assign the eventID to the local Event object
         event.id = docRef.id
+        event.topicId = topicId
 
         val data = hashMapOf(
             "name" to event.name,
@@ -26,6 +27,9 @@ object EventRepository {
             "time" to event.time,
             "date" to dateKey,
             "hostId" to event.hostId,
+            "rsvpCount" to event.rsvpCount,
+            "rsvpUserIds" to event.rsvpUserIds,
+            "topicId" to event.topicId,
             "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
         )
 
@@ -54,13 +58,21 @@ object EventRepository {
                     val time = doc.getString("time") ?: ""
                     val date = doc.getString("date") ?: return@mapNotNull null
                     val hostId = doc.getString("hostId") ?: ""
+                    val rsvpCount = doc.getLong("rsvpCount")?.toInt() ?: 0
+                    val topicIdFromDoc = doc.getString("topicId") ?: ""
+
+                    val rsvpUserIds = doc.get("rsvpUserIds") as? List<String> ?: emptyList()
 
                     val event = Event(
                         id = doc.id,
                         name = name,
                         location = location,
                         time = time,
-                        hostId = hostId
+                        hostId = hostId,
+                        date = date,
+                        rsvpCount = rsvpCount,
+                        rsvpUserIds = rsvpUserIds.toMutableList(),
+                        topicId = topicIdFromDoc
                     )
 
                     date to event
