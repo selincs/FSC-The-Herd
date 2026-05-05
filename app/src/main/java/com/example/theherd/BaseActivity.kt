@@ -46,6 +46,7 @@ abstract class BaseActivity : AppCompatActivity() {
         setupNavButton(R.id.profile_button, ProfileActivity::class.java)
         setupNavButton(R.id.guide_button, GuidesActivity::class.java)
         setupNavButton(R.id.motivation_button, MotivationActivity::class.java)
+        setupNavButton(R.id.events_button, EventsActivity::class.java)
     }
 
     private fun setupNavButton(id: Int, cls: Class<*>) {
