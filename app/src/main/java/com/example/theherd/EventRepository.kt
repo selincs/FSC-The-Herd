@@ -155,5 +155,4 @@ object EventRepository {
             }
             .addOnFailureListener { onFailure(it) }
     }
-
 }
