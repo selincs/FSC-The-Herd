@@ -7,7 +7,6 @@ import android.widget.ImageButton
 import android.view.ViewGroup
 import android.view.LayoutInflater
 class EventAdapter(
-//    private val events: MutableList<Pair<String, String>>,
     private val events: List<Event>,
     private val onEdit: (Event) -> Unit,
     private val onRsvp: (Event) -> Unit,
@@ -17,6 +16,9 @@ class EventAdapter(
     inner class EventViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val date: TextView = view.findViewById(R.id.eventDate)
         val name: TextView = view.findViewById(R.id.eventName)
+        val time: TextView = view.findViewById(R.id.eventTime)
+        val location: TextView = view.findViewById(R.id.eventLocation)
+        val rsvpCount: TextView = view.findViewById(R.id.eventRsvpCount)
         val edit: ImageButton = view.findViewById(R.id.editBtn)
         val rsvp: ImageButton = view.findViewById(R.id.rsvpBtn)
         val send: ImageButton = view.findViewById(R.id.sendBtn)
@@ -34,24 +36,16 @@ class EventAdapter(
 
         holder.name.text = event.name
         holder.date.text = formatDate(event.date)
+        holder.time.text = if (event.time.isNotBlank()) "🕒 ${event.time}" else ""
+        holder.location.text = if (event.location.isNotBlank()) "📍 ${event.location}" else ""
+        holder.rsvpCount.text = "${event.rsvpCount} going"
 
         holder.edit.setOnClickListener { onEdit(event) }
         holder.rsvp.setOnClickListener { onRsvp(event) }
         holder.send.setOnClickListener { onSend(event) }
-    }
 
-//    private fun formatDate(raw: String): String {
-//        val parts = raw.split("-")
-//        val year = parts[0]
-//        val month = parts[1].toInt()
-//        val day = parts[2]
-//
-//        val monthName = java.time.Month.of(month)
-//            .name.lowercase()
-//            .replaceFirstChar { it.uppercase() }
-//
-//        return "$monthName $day, $year"
-//    }
+
+    }
 
     private fun formatDate(raw: String): String {
         val parts = raw.split("-")

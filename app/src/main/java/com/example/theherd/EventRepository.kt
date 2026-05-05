@@ -33,6 +33,8 @@ object EventRepository {
             "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
         )
 
+        println("Created event with Topic ID : ${event.topicId}")
+
         //Save data to new Event document
         docRef.set(data)
             .addOnSuccessListener { onComplete(true) }
@@ -123,45 +125,35 @@ object EventRepository {
             .addOnFailureListener { onComplete(false) }
     }
 
-    //REMOVED AVNOOR EVENTS CODE BELOW, ONLY SAVED FOR POSTERITY IN COMMENTED OUT FORM NOT BEING USED:
-    // key = "topicId_YYYY-MM-DD"
-//    private val events = mutableMapOf<String, MutableList<String>>()
-//
-//    fun addEvent(topicId: String, dateKey: String, event: String) {
-//        val fullKey = "${topicId}_$dateKey"
-//
-//        if (!events.containsKey(fullKey)) {
-//            events[fullKey] = mutableListOf()
-//        }
-//        events[fullKey]?.add(event)
-//    }
-//
-//    fun getEventsForTopic(topicId: String): List<Pair<String, String>> {
-//        val result = mutableListOf<Pair<String, String>>()
-//
-//        events.forEach { (key, eventList) ->
-//            if (key.startsWith(topicId)) {
-//                val date = key.removePrefix("${topicId}_")
-//                eventList.forEach { event ->
-//                    result.add(date to event)
-//                }
-//            }
-//        }
-//
-//        return result
-//    }
-//
-//    fun updateEvent(topicId: String, date: String, oldEvent: String, newEvent: String) {
-//        val key = "${topicId}_$date"
-//        val list = events[key] ?: return
-//
-//        val index = list.indexOf(oldEvent)
-//        if (index != -1) {
-//            list[index] = newEvent
-//        }
-//    }
-//
-//    fun getEventsForDay(topicId: String, dateKey: String): List<String> {
-//        return events["${topicId}_$dateKey"] ?: emptyList()
-//    }
+    fun getSingleEvent(
+        topicId: String,
+        eventId: String,
+        onSuccess: (Event) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        FirebaseFirestore.getInstance()
+            .collection("topics")
+            .document(topicId)
+            .collection("events")
+            .document(eventId)
+            .get()
+            .addOnSuccessListener { doc ->
+
+                val event = Event(
+                    id = doc.id,
+                    name = doc.getString("name") ?: "",
+                    location = doc.getString("location") ?: "",
+                    time = doc.getString("time") ?: "",
+                    hostId = doc.getString("hostId") ?: "",
+                    date = doc.getString("date") ?: "",
+                    rsvpCount = doc.getLong("rsvpCount")?.toInt() ?: 0,
+                    rsvpUserIds = (doc.get("rsvpUserIds") as? List<String>)?.toMutableList() ?: mutableListOf(),
+                    topicId = doc.getString("topicId") ?: ""
+                )
+
+                onSuccess(event)
+            }
+            .addOnFailureListener { onFailure(it) }
+    }
+
 }

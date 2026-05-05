@@ -67,21 +67,6 @@ class TopicsActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Sample topics - Hardcoded - Make Real Topics out of these later before removing
-//        topicsList = mutableListOf(
-//            Topic("Gym Buddies", "user123", "Connect with fellow gym goers", R.drawable.gym.toString()),
-//            Topic("Chess Club", "user456", "Join the strategy fun!", R.drawable.chess.toString()),
-//            Topic("Hiking Lovers", "user789", "Explore trails together", R.drawable.hiking.toString()),
-//            Topic("Foodies", "user321", "Share recipes and restaurants", R.drawable.food.toString())
-//        )
-//        topicsList = mutableListOf()
-//
-//        //Adapter with sample topics
-//        adapter = TopicsAdapter(topicsList)
-//        recyclerView.adapter = adapter
-//
-//        //Call loadTopics helper in TopicsActivity to load Firestore Topics
-//        loadTopics()
         //Get the list of topics a user has joined from Firestore as joinedIDs
         TopicRepository.getUserJoinedTopicIDs(
             onSuccess = { joinedIDs ->
@@ -245,7 +230,9 @@ class TopicsActivity : AppCompatActivity() {
             val intent = Intent(this, FriendsListActivity::class.java)
             startActivity(intent)
         }
-
+        eventsButton.setOnClickListener {
+            startActivity(Intent(this, EventsActivity::class.java))
+        }
         // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
         settingsButton.setOnClickListener { view ->
             SettingsMenuHelper.showSettingsMenu(this, view)

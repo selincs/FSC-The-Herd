@@ -9,6 +9,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import android.widget.ImageButton
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import com.google.firebase.firestore.FirebaseFirestore
@@ -102,6 +103,7 @@ class TopicDetailActivity : AppCompatActivity() {
             },
 
             onRsvp = { event ->
+                handleRsvp(topicID, event)
                 Toast.makeText(this, "RSVP'd to: ${event.name}", Toast.LENGTH_SHORT).show()
             },
 
@@ -233,10 +235,7 @@ class TopicDetailActivity : AppCompatActivity() {
         }
 
         eventsButton.setOnClickListener {
-            startActivity(
-                Intent(this, EventsActivity::class.java)
-                    .putExtra("topicID", topicID)
-            )
+            startActivity(Intent(this, EventsActivity::class.java))
         }
 
         settingsButton.setOnClickListener { view ->
@@ -279,7 +278,7 @@ class TopicDetailActivity : AppCompatActivity() {
     // ----------------------------
     // EVENT STORAGE
     // ----------------------------
-    private fun saveEvent(day: Int, name: String) {
+    private fun saveEvent(day: Int, name: String, location: String, time: String) {
         val key = getDateKey(day)
         val topicID = intent.getStringExtra("topicID") ?: return
 
@@ -289,8 +288,8 @@ class TopicDetailActivity : AppCompatActivity() {
 
         val event = Event(
             name = name,
-            location = "",
-            time = "",
+            location = location,
+            time = time,
             hostId = SessionManager.requireUserId(),
             date = key,
             rsvpCount = 0,
@@ -306,6 +305,33 @@ class TopicDetailActivity : AppCompatActivity() {
             }
         }
     }
+//    private fun saveEvent(day: Int, name: String) {
+//        val key = getDateKey(day)
+//        val topicID = intent.getStringExtra("topicID") ?: return
+//
+//        if (!eventsMap.containsKey(key)) {
+//            eventsMap[key] = mutableListOf()
+//        }
+//
+//        val event = Event(
+//            name = name,
+//            location = "",
+//            time = "",
+//            hostId = SessionManager.requireUserId(),
+//            date = key,
+//            rsvpCount = 0,
+//            topicId = topicID
+//        )
+//
+//        eventsMap[key]?.add(event)
+//        updateUpcomingEvents()
+//
+//        EventRepository.createEvent(topicID, key, event) { success ->
+//            if (!success) {
+//                Toast.makeText(this, "Failed to save event", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//    }
 
     private fun updateEventName(event: Event, newName: String) {
         val topicId = intent.getStringExtra("topicID") ?: return
@@ -383,22 +409,52 @@ class TopicDetailActivity : AppCompatActivity() {
     }
 
     private fun showEventDialog(day: Int) {
+        val view = layoutInflater.inflate(R.layout.dialog_create_event, null)
 
-        val editText = android.widget.EditText(this)
-        editText.hint = "Enter event name"
+        val eventNameInput = view.findViewById<EditText>(R.id.etEventName)
+        val locationInput = view.findViewById<EditText>(R.id.etEventLocation)
+        val timeInput = view.findViewById<EditText>(R.id.etEventTime)
 
-        android.app.AlertDialog.Builder(this)
+        // Time picker
+        timeInput.setOnClickListener {
+            val calendar = java.util.Calendar.getInstance()
+
+            val timePicker = android.app.TimePickerDialog(
+                this,
+                { _, hour, minute ->
+                    val formatted = String.format("%02d:%02d", hour, minute)
+                    timeInput.setText(formatted)
+                },
+                calendar.get(java.util.Calendar.HOUR_OF_DAY),
+                calendar.get(java.util.Calendar.MINUTE),
+                false
+            )
+            timePicker.show()
+        }
+
+        val dialog = android.app.AlertDialog.Builder(this)
             .setTitle("Create Event on $day")
-            .setView(editText)
-            .setPositiveButton("Save") { _, _ ->
-                val eventText = editText.text.toString()
-
-                if (eventText.isNotEmpty()) {
-                    saveEvent(day, eventText)
-                }
-            }
+            .setView(view)
+            .setPositiveButton("Save", null)
             .setNegativeButton("Cancel", null)
-            .show()
+            .create()
+
+        dialog.show()
+
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val name = eventNameInput.text.toString().trim()
+            val location = locationInput.text.toString().trim()
+            val time = timeInput.text.toString().trim()
+
+            if (name.isEmpty()) {
+                eventNameInput.error = "Event name required"
+                return@setOnClickListener
+            }
+
+            saveEvent(day, name, location, time)
+
+            dialog.dismiss()
+        }
     }
 
     private fun loadEventsFromFirestore(topicId: String) {
@@ -422,5 +478,63 @@ class TopicDetailActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed to load events", Toast.LENGTH_SHORT).show()
             }
         )
+    }
+
+    private fun handleRsvp(topicId: String, event: Event) {
+        val userId = SessionManager.requireUserId()
+
+        val alreadyRsvpd = event.rsvpUserIds.contains(userId)
+        event.topicId = topicId
+
+        if (alreadyRsvpd) {
+            // ----------------------------
+            // UN-RSVP
+            // ----------------------------
+            event.rsvpUserIds.remove(userId)
+            event.rsvpCount -= 1
+            eventAdapter.notifyDataSetChanged()
+
+            EventRepository.updateRsvp(
+                topicId,
+                event.id,
+                event.rsvpUserIds,
+                event.rsvpCount
+            ) { success ->
+                if (!success) {
+                    // rollback
+                    event.rsvpUserIds.add(userId)
+                    event.rsvpCount += 1
+                    eventAdapter.notifyDataSetChanged()
+                    Toast.makeText(this, "Failed to un-RSVP", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            UserRepository.removeUserEvent(userId, event.id)
+
+        } else {
+            // ----------------------------
+            // RSVP
+            // ----------------------------
+            event.rsvpUserIds.add(userId)
+            event.rsvpCount += 1
+            eventAdapter.notifyDataSetChanged()
+
+            EventRepository.updateRsvp(
+                topicId,
+                event.id,
+                event.rsvpUserIds,
+                event.rsvpCount
+            ) { success ->
+                if (!success) {
+                    // rollback
+                    event.rsvpUserIds.remove(userId)
+                    event.rsvpCount -= 1
+                    eventAdapter.notifyDataSetChanged()
+                    Toast.makeText(this, "Failed to RSVP", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            UserRepository.addUserEvent(userId, event)
+        }
     }
 }

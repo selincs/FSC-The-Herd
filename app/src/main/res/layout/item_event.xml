@@ -4,28 +4,54 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <!-- DATE (BIG + BOLD) -->
+    <!-- EVENT NAME (PRIMARY) -->
     <TextView
-        android:id="@+id/eventDate"
+        android:id="@+id/eventName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="18sp"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- DATE -->
+    <TextView
+        android:id="@+id/eventDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginBottom="2dp"/>
+
+    <!-- TIME -->
+    <TextView
+        android:id="@+id/eventTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginBottom="2dp"/>
+
+    <!-- LOCATION -->
+    <TextView
+        android:id="@+id/eventLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- RSVP COUNT -->
+    <TextView
+        android:id="@+id/eventRsvpCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:textStyle="italic"
         android:layout_marginBottom="6dp"/>
 
-    <!-- EVENT ROW -->
+    <!-- BUTTON ROW -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:id="@+id/eventName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="16sp"/>
+        android:gravity="end">
 
         <ImageButton
             android:id="@+id/editBtn"
@@ -48,5 +74,4 @@
             android:src="@android:drawable/ic_menu_share"
             android:background="?attr/selectableItemBackgroundBorderless"/>
     </LinearLayout>
-
 </LinearLayout>

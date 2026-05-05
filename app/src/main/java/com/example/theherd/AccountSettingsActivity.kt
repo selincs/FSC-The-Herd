@@ -43,11 +43,10 @@ class AccountSettingsActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         // event listeners
-//        eventsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)  //Change to EventsActivity or w.e it is named
-//            startActivity(intent)
-//        }
-//
+        eventsButton.setOnClickListener {
+            startActivity(Intent(this, EventsActivity::class.java))
+        }
+
         motivationButton.setOnClickListener {
             val intent = Intent(this, MotivationActivity::class.java)
             startActivity(intent)

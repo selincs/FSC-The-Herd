@@ -40,7 +40,10 @@ class GuideMainPageActivity : AppCompatActivity() {
             val intent = Intent(this, CommunityBoardActivity::class.java)
             startActivity(intent)
         }
-
+        eventsButton.setOnClickListener {
+            val intent = Intent(this, EventsActivity::class.java)
+            startActivity(intent)
+        }
         profileButton.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
