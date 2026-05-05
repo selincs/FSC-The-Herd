@@ -105,6 +105,10 @@ class FriendsAdapter(
         holder.btnMessage.setOnClickListener {
             val intent = Intent(context, MessageActivity::class.java)
             intent.putExtra("FRIEND_NAME", friend.name)
+            intent.putExtra("FRIEND_ID", friend.id)
+            intent.putExtra("ONLINE_STATUS", "Online")
+            println("Friend Name = ${friend.name}")
+            println("Friend ID = ${friend.id}")
             context.startActivity(intent)
         }
 

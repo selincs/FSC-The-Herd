@@ -15,6 +15,6 @@ data class Friend(
     val gradDate: String = "Spring 2026",
     val username: String = "ram_user",
     val bio: String = "No bio yet.",
-    val sharedTopics: List<String> = listOf(),  //Needs implementation
-    val allTopics: List<String> = listOf()  //Do we want to display all topics?
+    val sharedTopics: List<String> = listOf(),
+    val allTopics: List<String> = listOf()
 )

@@ -13,6 +13,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 
 class MessageActivity : AppCompatActivity() {
+    private lateinit var myId: String
+    private lateinit var friendId: String
+    private lateinit var convoId: String
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var messageInput: TextInputEditText
@@ -24,6 +27,19 @@ class MessageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_messaging)
+
+        myId = SessionManager.requireUserId()
+//        friendId = intent.getStringExtra("FRIEND_ID") ?: return
+        friendId = intent.getStringExtra("FRIEND_ID") ?: run {
+            println("ERROR: FRIEND_ID is null")
+            finish()
+            return
+        }
+
+        println("myID = $myId")
+        println("friendId = $friendId")
+
+        convoId = MessageRepository.getConversationId(myId, friendId)
 
         val friendName = intent.getStringExtra("FRIEND_NAME") ?: "Jane Doe"
         val friendStatus = intent.getStringExtra("ONLINE_STATUS") ?: "Online"
@@ -43,18 +59,34 @@ class MessageActivity : AppCompatActivity() {
         sendButton = findViewById(R.id.btnSendMessage)
 
         chatAdapter = MessageAdapter(messages)
-        recyclerView.layoutManager = LinearLayoutManager(this).apply {
-            stackFromEnd = true
-        }
-        recyclerView.adapter = chatAdapter
+//        recyclerView.layoutManager = LinearLayoutManager(this).apply {
+//            stackFromEnd = true
+//        }
+        val layoutManager = LinearLayoutManager(this)
+        layoutManager.stackFromEnd = true
+        layoutManager.reverseLayout = false
 
-        // mock message
-        addMessage(Message("1", "friend", "Hey! Ready for the Hackathon?", isFromMe = false))
+        recyclerView.layoutManager = layoutManager
+
+        recyclerView.adapter = chatAdapter
 
         sendButton.setOnClickListener {
             val text = messageInput.text.toString().trim()
+            println("Sending message $text")
             if (text.isNotEmpty()) {
-                handleUserMessage(text)
+                val msg = Message(
+                    senderId = myId,
+                    receiverId = friendId,
+                    text = text
+                )
+
+                MessageRepository.sendMessage(convoId, msg)
+
+                messages.forEach {
+                    println("MSG: ${it.text} | ${it.timestamp}")
+                }
+
+                messageInput.text?.clear()
             }
         }
 
@@ -63,32 +95,21 @@ class MessageActivity : AppCompatActivity() {
         btnViewProfile.setOnClickListener {
             // will open friend profile activity
         }
-    }
 
-    private fun handleUserMessage(text: String) {
-        val userMsg = Message(
-            senderId = "me",
-            receiverId = "friend",
-            text = text,
-            isFromMe = true
-        )
-        addMessage(userMsg)
-        messageInput.text?.clear()
+        MessageRepository.listenForMessages(convoId) { newMessages ->
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val reply = Message(
-                senderId = "friend",
-                receiverId = "me",
-                text = "Messaging is working!.",
-                isFromMe = false
-            )
-            addMessage(reply)
-        }, 1500)
-    }
+            println("MESSAGES SIZE: ${newMessages.size}")
 
-    private fun addMessage(chatMessage: Message) {
-        messages.add(chatMessage)
-        chatAdapter.notifyItemInserted(messages.size - 1)
-        recyclerView.smoothScrollToPosition(messages.size - 1)
+            messages.clear()
+            messages.addAll(newMessages)
+
+            chatAdapter.notifyDataSetChanged()
+
+            if (messages.isNotEmpty()) {
+                recyclerView.post {
+                    recyclerView.scrollToPosition(messages.size - 1)
+                }
+            }
+        }
     }
 }

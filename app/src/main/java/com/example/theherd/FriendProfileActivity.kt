@@ -21,6 +21,7 @@ class FriendProfileActivity : BaseActivity() {
         setupNavigation() // sets up all buttons in the tool/nav bar
 
         val friendName = intent.getStringExtra("FRIEND_NAME") ?: "Ram User"
+        val friendId = intent.getStringExtra("FRIEND_ID") ?: "Missing Friend ID"
         val username = intent.getStringExtra("USERNAME") ?: "@${friendName.replace(" ", "_").lowercase()}"
         val gradYear = intent.getStringExtra("GRAD_YEAR") ?: "2026"
         val isFriend = intent.getBooleanExtra("IS_FRIEND", false)
@@ -79,9 +80,13 @@ class FriendProfileActivity : BaseActivity() {
         actionButton.setOnClickListener {
             if (isFriend) {
                 Toast.makeText(this, "Opening Chat...", Toast.LENGTH_SHORT).show()
-                intent.putExtra("FRIEND_NAME", tvName.text.toString())
-                intent.putExtra("ONLINE_STATUS", "Online")
+
                 val intent = Intent(this, MessageActivity::class.java)
+                intent.putExtra("FRIEND_NAME", friendName)
+                intent.putExtra("FRIEND_ID", friendId)
+                intent.putExtra("ONLINE_STATUS", "Online")
+                println("Friend Name, frProfAct = $friendName")
+                println("Friend ID, frProfAct = $friendId")
                 startActivity(intent)
             } else {
                 actionButton.text = "Request Pending"

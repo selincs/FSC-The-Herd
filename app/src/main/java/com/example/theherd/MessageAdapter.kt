@@ -13,7 +13,12 @@ class MessageAdapter(private val messageList: List<Message>) :
     private val VIEW_TYPE_THEM = 2
 
     override fun getItemViewType(position: Int): Int {
-        return if (messageList[position].isFromMe) VIEW_TYPE_ME else VIEW_TYPE_THEM
+        val msg = messageList[position]
+        return if (msg.senderId == SessionManager.requireUserId()) {
+            VIEW_TYPE_ME
+        } else {
+            VIEW_TYPE_THEM
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

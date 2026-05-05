@@ -1,9 +1,12 @@
 package com.example.theherd
 
+import com.google.firebase.Timestamp
+
 data class Message(
-    val senderId: String,
-    val receiverId: String,
-    val text: String,
-    val timestamp: Long = System.currentTimeMillis(),
-    val isFromMe: Boolean
+    val id: String = "",
+    val senderId: String = "",
+    val receiverId: String = "",
+    val text: String = "",
+    val timestamp: Timestamp? = null    //server side time stamps to guarantee message history order
 )
+
