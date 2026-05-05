@@ -125,6 +125,14 @@ class FriendProfileActivity : AppCompatActivity() {
 
                 actionButton.setOnClickListener {
                     Toast.makeText(this, "Opening Chat...", Toast.LENGTH_SHORT).show()
+
+                    val intent = Intent(this, MessageActivity::class.java)
+                    intent.putExtra("FRIEND_NAME", friendName)
+                    intent.putExtra("FRIEND_ID", friendId)
+                    intent.putExtra("ONLINE_STATUS", "Online")
+                    println("Friend Name, frProfAct = $friendName")
+                    println("Friend ID, frProfAct = $friendId")
+                    startActivity(intent)
                 }
             }
 
