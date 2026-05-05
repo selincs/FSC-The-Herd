@@ -17,7 +17,7 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class TopicDetailActivity : AppCompatActivity() {
+class TopicDetailActivity : BaseActivity() {
     private lateinit var eventsRecycler: RecyclerView
     private lateinit var eventAdapter: EventAdapter
     private var currentEvents = mutableListOf<Event>()
@@ -37,6 +37,7 @@ class TopicDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_topic_detail)
+        setupNavigation()
 
         val topicID = intent.getStringExtra("topicID") ?: return
         loadEventsFromFirestore(topicID)

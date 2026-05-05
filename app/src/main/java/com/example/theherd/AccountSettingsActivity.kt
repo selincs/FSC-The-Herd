@@ -19,10 +19,6 @@ class AccountSettingsActivity : BaseActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyStateText: TextView
 
-
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var emptyStateText: TextView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account_settings)
@@ -54,9 +50,10 @@ class AccountSettingsActivity : BaseActivity() {
         }
 
         // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
-        settingsButton.setOnClickListener { view ->
-            Toast.makeText(this, "Exit Account Settings if you wish to log out.", Toast.LENGTH_SHORT).show()
-        }
+//        settingsButton.setOnClickListener {
+//            Toast.makeText(this, "Exit Account Settings if you wish to log out.", Toast.LENGTH_SHORT).show()
+//        }
+
     }
 
     override fun onResume() {
