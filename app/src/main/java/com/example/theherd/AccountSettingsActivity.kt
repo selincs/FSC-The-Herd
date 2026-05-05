@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import android.app.AlertDialog
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -12,6 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class AccountSettingsActivity : BaseActivity() {
+
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var emptyStateText: TextView
 
 
     private lateinit var recyclerView: RecyclerView
@@ -46,6 +52,11 @@ class AccountSettingsActivity : BaseActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
+
+        // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
+        settingsButton.setOnClickListener { view ->
+            Toast.makeText(this, "Exit Account Settings if you wish to log out.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onResume() {
@@ -54,40 +65,45 @@ class AccountSettingsActivity : BaseActivity() {
     }
 
     private fun setupBlockedList() {
-        FriendsRepository.getBlockedUsers(
+        BlockListRepository.getBlockedUsers(
             onSuccess = { blockedList ->
+
                 if (blockedList.isEmpty()) {
                     recyclerView.visibility = View.GONE
                     emptyStateText.visibility = View.VISIBLE
                 } else {
                     recyclerView.visibility = View.VISIBLE
                     emptyStateText.visibility = View.GONE
-                    recyclerView.adapter = BlockedFriendsAdapter(blockedList.toMutableList()) { friend ->
-                        FriendsRepository.unblockUser(friend.id) { success ->
-                            if (success) {
-                                setupBlockedList()
+
+                    recyclerView.adapter = BlockedFriendsAdapter(
+                        blockedList.toMutableList()
+                    ) { friend ->
+
+                        AlertDialog.Builder(this)
+                            .setTitle("Unblock ${friend.name}?")
+                            .setMessage("They will be able to interact with you again.")
+                            .setPositiveButton("Unblock") { _, _ ->
+
+                                BlockListRepository.unblockUser(friend.id) { success ->
+                                    if (success) {
+                                        val adapter = recyclerView.adapter as BlockedFriendsAdapter
+
+                                        if (adapter.itemCount == 0) {
+                                            recyclerView.visibility = View.GONE
+                                            emptyStateText.visibility = View.VISIBLE
+                                        }
+                                    }
+                                }
                             }
-                        }
+                            .setNegativeButton("Cancel", null)
+                            .show()
                     }
                 }
-            }, onFailure = {
-                Toast.makeText(this, "ERROR: Blocked user list can't be loaded", Toast.LENGTH_SHORT).show()
+            },
+            onFailure = {
+                emptyStateText.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
             }
         )
-        /* val blockedList = MockFriendsRepo.getBlockedFriends().toMutableList()
-
-        if (blockedList.isEmpty()) {
-            recyclerView.visibility = View.GONE
-            emptyStateText.visibility = View.VISIBLE
-        } else {
-            recyclerView.visibility = View.VISIBLE
-            recyclerView.adapter = BlockedFriendsAdapter(blockedList) { friend ->
-                MockFriendsRepo.unblockFriend(friend)
-                if (MockFriendsRepo.getBlockedFriends().isEmpty()) {
-                    recyclerView.visibility = View.GONE
-                    emptyStateText.visibility = View.VISIBLE
-                }
-            }
-        } */
     }
 }

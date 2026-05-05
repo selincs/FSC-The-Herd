@@ -9,10 +9,12 @@ import android.widget.TextView
 import java.time.LocalDate
 import java.time.YearMonth
 
+
 class CalendarAdapter(
     private val context: Context,
     private val days: List<String>,
-    private val eventsMap: Map<String, MutableList<String>>,
+//    private val eventsMap: Map<String, MutableList<String>>,
+    private val eventsMap: Map<String, MutableList<Event>>,
     private val currentMonth: YearMonth
 ) : BaseAdapter() {
 

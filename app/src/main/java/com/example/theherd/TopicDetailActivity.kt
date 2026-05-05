@@ -9,62 +9,42 @@ import java.time.LocalDate
 import java.time.YearMonth
 import android.widget.ImageButton
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import com.google.firebase.firestore.FirebaseFirestore
 import android.widget.LinearLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class TopicDetailActivity : AppCompatActivity() {
+    private lateinit var eventsRecycler: RecyclerView
+    private lateinit var eventAdapter: EventAdapter
+    private var currentEvents = mutableListOf<Event>()
+    private val eventsMap = mutableMapOf<String, MutableList<Event>>()
+
     private var currentMonth: YearMonth = YearMonth.now()
     private lateinit var grid: GridView
     private lateinit var monthTitle: TextView
 
-    private val eventsMap = mutableMapOf<String, MutableList<String>>()
-
     private var selectedDay: Int? = null
-
     private var isJoined = false
     private var memberCount: Int = 0
-
     private var days = mutableListOf<String>()
+
+    private var selectedPosition = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_topic_detail)
 
-        // Event TextViews
-        val event1 = findViewById<TextView>(R.id.event1)
-        val event2 = findViewById<TextView>(R.id.event2)
-        val event3 = findViewById<TextView>(R.id.event3)
-
-// Buttons
-        val edit1 = findViewById<ImageButton>(R.id.editEvent1)
-        val rsvp1 = findViewById<ImageButton>(R.id.rsvpEvent1)
-        val send1 = findViewById<ImageButton>(R.id.sendEvent1)
-
-        val edit2 = findViewById<ImageButton>(R.id.editEvent2)
-        val rsvp2 = findViewById<ImageButton>(R.id.rsvpEvent2)
-        val send2 = findViewById<ImageButton>(R.id.sendEvent2)
-
-        val edit3 = findViewById<ImageButton>(R.id.editEvent3)
-        val rsvp3 = findViewById<ImageButton>(R.id.rsvpEvent3)
-        val send3 = findViewById<ImageButton>(R.id.sendEvent3)
-
-// Hook listeners ONCE
-        setupEventButtons(edit1, rsvp1, send1) { event1.text.toString() }
-        setupEventButtons(edit2, rsvp2, send2) { event2.text.toString() }
-        setupEventButtons(edit3, rsvp3, send3) { event3.text.toString() }
-
-        val addEventBtn = findViewById<ImageButton>(R.id.addEventBtn)
-
-        val joinButton = findViewById<Button>(R.id.joinButton)
-//        val name = intent.getStringExtra("topicName")
-//        val desc = intent.getStringExtra("topicDesc")
-//        val members = intent.getIntExtra("memberCount", 0)
-
         val topicID = intent.getStringExtra("topicID") ?: return
+        loadEventsFromFirestore(topicID)
 
-        //Use the isJoined status from the query in TopicsAdapter, else default==false
+        // ----------------------------
+        // JOIN STATE
+        // ----------------------------
+        val joinButton = findViewById<Button>(R.id.joinButton)
         isJoined = intent.getBooleanExtra("isJoined", false)
         updateJoinUI(joinButton, isJoined)
 
@@ -75,34 +55,69 @@ class TopicDetailActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    //If document exists for this topicID, load the needed fields from Firestore
+
                     val name = document.getString("topicName") ?: ""
                     val desc = document.getString("topicDesc") ?: ""
                     memberCount = document.getLong("memberCount")?.toInt() ?: 0
                     val timestamp = document.getTimestamp("createdAt")
 
-                    // Convert Firestore timestamp into a readable string for creation date field
                     val formattedDate = if (timestamp != null) {
-                        val sdf = java.text.SimpleDateFormat("MMM dd, yyyy hh:mm a", java.util.Locale.getDefault())
+                        val sdf = java.text.SimpleDateFormat(
+                            "MMM dd, yyyy hh:mm a",
+                            java.util.Locale.getDefault()
+                        )
                         sdf.format(timestamp.toDate())
-                    } else {
-                        "Unknown"
-                    }
+                    } else "Unknown"
 
-                    // Update TopicDetails GUI
                     findViewById<TextView>(R.id.detailTopicName).text = name
                     findViewById<TextView>(R.id.detailDescription).text = desc
                     findViewById<TextView>(R.id.detailMembers).text = "$memberCount members"
                     findViewById<TextView>(R.id.detailCreatedAt).text = formattedDate
-                    println("TopicDetails success in listener, Document FOUND: ${document.id}")
-                    //join button GUI updates called in the listener for the button
                 }
             }
-            .addOnFailureListener {
-                println("TopicDetailsActivity listener failure for $topicID")
-                Toast.makeText(this, "Failed to load topic", Toast.LENGTH_SHORT).show()
-            }
 
+        // ----------------------------
+        // RECYCLER VIEW (EVENTS)
+        // ----------------------------
+        eventsRecycler = findViewById(R.id.eventsRecycler)
+
+        eventAdapter = EventAdapter(
+            currentEvents,
+            onEdit = { event ->
+
+                val input = android.widget.EditText(this)
+                input.setText(event.name)
+
+                android.app.AlertDialog.Builder(this)
+                    .setTitle("Edit Event Name")
+                    .setView(input)
+                    .setPositiveButton("Save") { _, _ ->
+                        val newName = input.text.toString().trim()
+
+                        if (newName.isNotBlank()) {
+                            updateEventName(event, newName)
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            },
+
+            onRsvp = { event ->
+                handleRsvp(topicID, event)
+                Toast.makeText(this, "RSVP'd to: ${event.name}", Toast.LENGTH_SHORT).show()
+            },
+
+            onSend = { event ->
+                Toast.makeText(this, "Sent: ${event.name}", Toast.LENGTH_SHORT).show()
+            }
+        )
+
+        eventsRecycler.layoutManager = LinearLayoutManager(this)
+        eventsRecycler.adapter = eventAdapter
+
+        // ----------------------------
+        // CALENDAR SETUP
+        // ----------------------------
         grid = findViewById(R.id.calendarGrid)
         monthTitle = findViewById(R.id.monthTitle)
 
@@ -116,7 +131,7 @@ class TopicDetailActivity : AppCompatActivity() {
             updateCalendar()
         }
 
-        addEventBtn.setOnClickListener {
+        findViewById<ImageButton>(R.id.addEventBtn).setOnClickListener {
             if (selectedDay == null) {
                 Toast.makeText(this, "Select a day first", Toast.LENGTH_SHORT).show()
             } else {
@@ -124,73 +139,192 @@ class TopicDetailActivity : AppCompatActivity() {
             }
         }
 
-        updateCalendar()
-        updateUpcomingEvents()
-
         grid.setOnItemClickListener { _, _, position, _ ->
+
             val dayStr = days[position]
 
             if (dayStr.isNotEmpty()) {
-                val day = dayStr.toInt()
-                selectedDay = day
 
+                selectedDay = dayStr.toInt()
+                selectedPosition = position
+
+                // update calendar highlight
                 val adapter = grid.adapter as CalendarAdapter
                 adapter.setSelectedPosition(position)
 
                 updateUpcomingEvents()
 
-                Toast.makeText(this, "Selected day: $day", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Selected day: $selectedDay", Toast.LENGTH_SHORT).show()
             }
         }
 
-        //join button logic, initial state set near top of onCreate
+        updateCalendar()
+        updateUpcomingEvents()
+
+        // ----------------------------
+        // JOIN BUTTON
+        // ----------------------------
         joinButton.setOnClickListener {
-                //on join button click
-                if (!isJoined) {   //&& user is !joined on this Topic, call join Topic in Firestore to add them
-                    TopicRepository.joinTopic(topicID) { success ->
-                        //If joinTopic==success, set isJoined==true and change button UI state, increment memberCt
-                        if (success) {
-                            //need to update member count probably
-                            isJoined = true
-                            memberCount += 1    //increment and update member count
-                            findViewById<TextView>(R.id.detailMembers).text = "$memberCount members"
-
-                            updateJoinUI(joinButton, isJoined)
-                            Toast.makeText(this, "You joined $topicID!", Toast.LENGTH_SHORT).show()
-                        } else { //If join fails for some reason
-                            Toast.makeText(this, "Failed to join", Toast.LENGTH_SHORT).show()
-                            println("join failed in Join btn press on success")
-                        }
-                    }
-                    //If user has already joined this Topic, call leaveTopic in Firestore
-                } else {    //set isJoined = false,
-                    TopicRepository.leaveTopic(topicID) { success ->
-                        if (success) {  //If user leaves topic successfully, set isJoined==false and update button UI
-                            //decrement memberCt
-                            isJoined = false
-                            memberCount -= 1    //decrement and update member count
-                            findViewById<TextView>(R.id.detailMembers).text = "$memberCount members"
-
-                            updateJoinUI(joinButton, isJoined)
-                            Toast.makeText(this, "You left $topicID!", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(this, "Failed to leave", Toast.LENGTH_SHORT).show()
-                            println("leave failed in Join btn press on success")
-                        }
+            if (!isJoined) {
+                TopicRepository.joinTopic(topicID) { success ->
+                    if (success) {
+                        isJoined = true
+                        memberCount++
+                        findViewById<TextView>(R.id.detailMembers).text = "$memberCount members"
+                        updateJoinUI(joinButton, isJoined)
                     }
                 }
+            } else {
+                TopicRepository.leaveTopic(topicID) { success ->
+                    if (success) {
+                        isJoined = false
+                        memberCount--
+                        findViewById<TextView>(R.id.detailMembers).text = "$memberCount members"
+                        updateJoinUI(joinButton, isJoined)
+                    }
+
+                }
+            }
         }
+        // ----------------------------
+        // NAV BAR BUTTONS + TOOLBAR
+        // ----------------------------
 
 
 
-        //Enter Community Button in Topics Activity - Not the one in the NavBar
         val enterCommunityBtn = findViewById<Button>(R.id.communityBoardButton)
 
         enterCommunityBtn.setOnClickListener {
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, CommunityBoardActivity::class.java))
         }
     }
+
+    // ----------------------------
+    // RECYCLER UPDATE LOGIC
+    // ----------------------------
+    private fun updateUpcomingEvents() {
+        val day = selectedDay ?: run {
+            currentEvents.clear()
+            eventAdapter.notifyDataSetChanged()
+            return
+        }
+
+        val key = getDateKey(day)
+        val events = eventsMap[key]
+
+        currentEvents.clear()
+
+        if (!events.isNullOrEmpty()) {
+            currentEvents.addAll(events)
+        }
+
+        eventAdapter.notifyDataSetChanged()
+    }
+
+    // ----------------------------
+    // EVENT STORAGE
+    // ----------------------------
+    private fun saveEvent(day: Int, name: String, location: String, time: String) {
+        val key = getDateKey(day)
+        val topicID = intent.getStringExtra("topicID") ?: return
+
+        if (!eventsMap.containsKey(key)) {
+            eventsMap[key] = mutableListOf()
+        }
+
+        val event = Event(
+            name = name,
+            location = location,
+            time = time,
+            hostId = SessionManager.requireUserId(),
+            date = key,
+            rsvpCount = 0,
+            topicId = topicID
+        )
+
+        eventsMap[key]?.add(event)
+        updateUpcomingEvents()
+
+        EventRepository.createEvent(topicID, key, event) { success ->
+            if (!success) {
+                Toast.makeText(this, "Failed to save event", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+//    private fun saveEvent(day: Int, name: String) {
+//        val key = getDateKey(day)
+//        val topicID = intent.getStringExtra("topicID") ?: return
+//
+//        if (!eventsMap.containsKey(key)) {
+//            eventsMap[key] = mutableListOf()
+//        }
+//
+//        val event = Event(
+//            name = name,
+//            location = "",
+//            time = "",
+//            hostId = SessionManager.requireUserId(),
+//            date = key,
+//            rsvpCount = 0,
+//            topicId = topicID
+//        )
+//
+//        eventsMap[key]?.add(event)
+//        updateUpcomingEvents()
+//
+//        EventRepository.createEvent(topicID, key, event) { success ->
+//            if (!success) {
+//                Toast.makeText(this, "Failed to save event", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//    }
+
+    private fun updateEventName(event: Event, newName: String) {
+        val topicId = intent.getStringExtra("topicID") ?: return
+
+        val oldName = event.name
+
+        // UI update
+        event.name = newName
+        updateUpcomingEvents()
+
+        // Firestore update
+        EventRepository.updateEventName(
+            topicId,
+            event.id,
+            newName
+        ) { success ->
+            if (!success) {
+                event.name = oldName
+                updateUpcomingEvents()
+
+                Toast.makeText(this, "Failed to update event", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // ----------------------------
+    // DATE KEY
+    // ----------------------------
+    private fun getDateKey(day: Int): String {
+        return "${currentMonth.year}-${currentMonth.monthValue}-%02d".format(day)
+    }
+
+    // ----------------------------
+    // JOIN UI
+    // ----------------------------
+    private fun updateJoinUI(button: Button, isJoined: Boolean) {
+        if (isJoined) {
+            button.text = "Leave"
+            button.setBackgroundColor(android.graphics.Color.GRAY)
+        } else {
+            button.text = "Join"
+            button.setBackgroundColor(android.graphics.Color.parseColor("#2F442F"))
+        }
+
+        button.setTextColor(android.graphics.Color.WHITE)
+    }
+
     private fun updateCalendar() {
 
         days.clear()
@@ -198,11 +332,9 @@ class TopicDetailActivity : AppCompatActivity() {
         val firstDay = currentMonth.atDay(1)
         val totalDays = currentMonth.lengthOfMonth()
 
-        // Month title
         monthTitle.text =
             "${currentMonth.month.name.lowercase().replaceFirstChar { it.uppercase() }} ${currentMonth.year}"
 
-        // correct weekday offset (Sun = 0)
         val startOffset = firstDay.dayOfWeek.value % 7
 
         for (i in 0 until startOffset) {
@@ -213,199 +345,142 @@ class TopicDetailActivity : AppCompatActivity() {
             days.add(day.toString())
         }
 
-        grid.adapter = CalendarAdapter(this, days, eventsMap, currentMonth)
+        val adapter = CalendarAdapter(this, days, eventsMap, currentMonth)
+        grid.adapter = adapter
+
+        // restore selection after month change
+        if (selectedPosition != -1) {
+            adapter.setSelectedPosition(selectedPosition)
+        }
     }
 
     private fun showEventDialog(day: Int) {
-        val editText = android.widget.EditText(this)
-        editText.hint = "Enter event name"
+        val view = layoutInflater.inflate(R.layout.dialog_create_event, null)
 
-        android.app.AlertDialog.Builder(this)
+        val eventNameInput = view.findViewById<EditText>(R.id.etEventName)
+        val locationInput = view.findViewById<EditText>(R.id.etEventLocation)
+        val timeInput = view.findViewById<EditText>(R.id.etEventTime)
+
+        // Time picker
+        timeInput.setOnClickListener {
+            val calendar = java.util.Calendar.getInstance()
+
+            val timePicker = android.app.TimePickerDialog(
+                this,
+                { _, hour, minute ->
+                    val formatted = String.format("%02d:%02d", hour, minute)
+                    timeInput.setText(formatted)
+                },
+                calendar.get(java.util.Calendar.HOUR_OF_DAY),
+                calendar.get(java.util.Calendar.MINUTE),
+                false
+            )
+            timePicker.show()
+        }
+
+        val dialog = android.app.AlertDialog.Builder(this)
             .setTitle("Create Event on $day")
-            .setView(editText)
-            .setPositiveButton("Save") { _, _ ->
-                val eventText = editText.text.toString()
-                if (eventText.isNotEmpty()) {
-                    saveEvent(day, eventText)
-                }
-            }
+            .setView(view)
+            .setPositiveButton("Save", null)
             .setNegativeButton("Cancel", null)
-            .show()
-    }
+            .create()
 
-    private fun getDateKey(day: Int): String {
-        return "${currentMonth.year}-${currentMonth.monthValue}-%02d".format(day)
-    }
+        dialog.show()
 
-    private fun saveEvent(day: Int, event: String) {
-        val key = getDateKey(day)
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val name = eventNameInput.text.toString().trim()
+            val location = locationInput.text.toString().trim()
+            val time = timeInput.text.toString().trim()
 
-        if (!eventsMap.containsKey(key)) {
-            eventsMap[key] = mutableListOf()
-        }
-
-        eventsMap[key]?.add(event)
-
-        updateUpcomingEvents()
-    }
-
-    private fun updateUpcomingEvents() {
-        val event1 = findViewById<TextView>(R.id.event1)
-        val event2 = findViewById<TextView>(R.id.event2)
-        val event3 = findViewById<TextView>(R.id.event3)
-
-        val edit1 = findViewById<ImageButton>(R.id.editEvent1)
-        val rsvp1 = findViewById<ImageButton>(R.id.rsvpEvent1)
-        val send1 = findViewById<ImageButton>(R.id.sendEvent1)
-
-        val edit2 = findViewById<ImageButton>(R.id.editEvent2)
-        val rsvp2 = findViewById<ImageButton>(R.id.rsvpEvent2)
-        val send2 = findViewById<ImageButton>(R.id.sendEvent2)
-
-        val edit3 = findViewById<ImageButton>(R.id.editEvent3)
-        val rsvp3 = findViewById<ImageButton>(R.id.rsvpEvent3)
-        val send3 = findViewById<ImageButton>(R.id.sendEvent3)
-
-        val day = selectedDay
-
-        if (day == null) {
-            event1.text = "None"
-            event2.text = ""
-            event3.text = ""
-
-            toggleEventButtons("", edit1, rsvp1, send1)
-            toggleEventButtons("", edit2, rsvp2, send2)
-            toggleEventButtons("", edit3, rsvp3, send3)
-            return
-        }
-
-        val key = getDateKey(day)
-        val events = eventsMap[key]
-
-        if (events.isNullOrEmpty()) {
-            event1.text = "None"
-            event2.text = ""
-            event3.text = ""
-
-            toggleEventButtons("", edit1, rsvp1, send1)
-            toggleEventButtons("", edit2, rsvp2, send2)
-            toggleEventButtons("", edit3, rsvp3, send3)
-            return
-        }
-
-        val e1 = events.getOrNull(0) ?: ""
-        val e2 = events.getOrNull(1) ?: ""
-        val e3 = events.getOrNull(2) ?: ""
-
-        event1.text = e1
-        event2.text = e2
-        event3.text = e3
-
-        toggleEventButtons(e1, edit1, rsvp1, send1)
-        toggleEventButtons(e2, edit2, rsvp2, send2)
-        toggleEventButtons(e3, edit3, rsvp3, send3)
-    }
-
-    private fun toggleEventButtons(
-        eventText: String,
-        edit: ImageButton,
-        rsvp: ImageButton,
-        send: ImageButton
-    ) {
-        val hasEvent = eventText.isNotBlank() && eventText != "None"
-
-        val visibility = if (hasEvent) {
-            android.view.View.VISIBLE
-        } else {
-            android.view.View.GONE
-        }
-
-        edit.visibility = visibility
-        rsvp.visibility = visibility
-        send.visibility = visibility
-    }
-
-    private fun setupEventButtons(
-        editBtn: ImageButton,
-        rsvpBtn: ImageButton,
-        sendBtn: ImageButton,
-        getEventText: () -> String
-    ) {
-        editBtn.setOnClickListener {
-            val oldEvent = getEventText()
-            if (oldEvent.isBlank()) {
-                Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
+            if (name.isEmpty()) {
+                eventNameInput.error = "Event name required"
                 return@setOnClickListener
             }
 
-            val input = android.widget.EditText(this)
-            input.setText(oldEvent)
+            saveEvent(day, name, location, time)
 
-            android.app.AlertDialog.Builder(this)
-                .setTitle("Edit Event")
-                .setView(input)
-                .setPositiveButton("Save") { _, _ ->
-                    val newText = input.text.toString()
+            dialog.dismiss()
+        }
+    }
 
-                    if (newText.isNotBlank()) {
-                        updateEvent(oldEvent, newText)
+    private fun loadEventsFromFirestore(topicId: String) {
+        EventRepository.getEventsForTopic(
+            topicId,
+            onSuccess = { eventPairs ->
+
+                eventsMap.clear()
+
+                for ((dateKey, event) in eventPairs) {
+                    if (!eventsMap.containsKey(dateKey)) {
+                        eventsMap[dateKey] = mutableListOf()
                     }
+                    eventsMap[dateKey]?.add(event)
                 }
-                .setNegativeButton("Cancel", null)
-                .show()
-        }
 
-        rsvpBtn.setOnClickListener {
-            val event = getEventText()
-            if (event.isBlank() || event == "None") {
-                Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                updateCalendar()
+                updateUpcomingEvents()
+            },
+            onFailure = {
+                Toast.makeText(this, "Failed to load events", Toast.LENGTH_SHORT).show()
             }
-
-            Toast.makeText(this, "RSVP'd to: $event", Toast.LENGTH_SHORT).show()
-        }
-
-        sendBtn.setOnClickListener {
-            val event = getEventText()
-            if (event.isBlank() || event == "None") {
-                Toast.makeText(this, "No event here", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            //TODO Add logic to send event to a friend
-            Toast.makeText(this, "Sent Friend request for: $event", Toast.LENGTH_SHORT).show()
-
-            /*val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/plain"
-            intent.putExtra(Intent.EXTRA_TEXT, "Check out this event: $event")
-            startActivity(Intent.createChooser(intent, "Send via"))
-             */
-        }
+        )
     }
 
-    private fun updateEvent(oldValue: String, newValue: String) {
-        val day = selectedDay ?: return
-        val key = getDateKey(day)
+    private fun handleRsvp(topicId: String, event: Event) {
+        val userId = SessionManager.requireUserId()
 
-        val list = eventsMap[key] ?: return
-        val index = list.indexOf(oldValue)
+        val alreadyRsvpd = event.rsvpUserIds.contains(userId)
+        event.topicId = topicId
 
-        if (index != -1) {
-            list[index] = newValue
-            updateUpcomingEvents()
-        }
-    }
+        if (alreadyRsvpd) {
+            // ----------------------------
+            // UN-RSVP
+            // ----------------------------
+            event.rsvpUserIds.remove(userId)
+            event.rsvpCount -= 1
+            eventAdapter.notifyDataSetChanged()
 
-    private fun updateJoinUI(button: Button, isJoined: Boolean) {
-        if (isJoined) {
-            button.text = "Leave"
-            button.setBackgroundColor(android.graphics.Color.GRAY)
+            EventRepository.updateRsvp(
+                topicId,
+                event.id,
+                event.rsvpUserIds,
+                event.rsvpCount
+            ) { success ->
+                if (!success) {
+                    // rollback
+                    event.rsvpUserIds.add(userId)
+                    event.rsvpCount += 1
+                    eventAdapter.notifyDataSetChanged()
+                    Toast.makeText(this, "Failed to un-RSVP", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            UserRepository.removeUserEvent(userId, event.id)
+
         } else {
-            button.text = "Join"
-            button.setBackgroundColor(android.graphics.Color.parseColor("#2F442F"))
-        }
-        //set text color to white regardless of join button status
-        button.setTextColor(android.graphics.Color.WHITE)
-    }
+            // ----------------------------
+            // RSVP
+            // ----------------------------
+            event.rsvpUserIds.add(userId)
+            event.rsvpCount += 1
+            eventAdapter.notifyDataSetChanged()
 
+            EventRepository.updateRsvp(
+                topicId,
+                event.id,
+                event.rsvpUserIds,
+                event.rsvpCount
+            ) { success ->
+                if (!success) {
+                    // rollback
+                    event.rsvpUserIds.remove(userId)
+                    event.rsvpCount -= 1
+                    eventAdapter.notifyDataSetChanged()
+                    Toast.makeText(this, "Failed to RSVP", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            UserRepository.addUserEvent(userId, event)
+        }
+    }
 }

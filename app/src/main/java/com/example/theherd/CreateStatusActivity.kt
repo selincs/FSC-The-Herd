@@ -8,7 +8,7 @@ import android.widget.ImageButton
 import androidx.appcompat.widget.Toolbar
 import android.view.View
 
-class CreatePostActivityMain : AppCompatActivity() {
+class CreateStatusActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +50,7 @@ class CreatePostActivityMain : AppCompatActivity() {
             val text = postInput.text.toString()
 
             if (text.isNotBlank()) {
-                PostRepositoryMain.addPost(text)
+                StatusRepository.addStatus(text)
                 finish() // return to MainActivity
             }
         }
