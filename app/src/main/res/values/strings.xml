@@ -125,4 +125,9 @@
         <item>Newest</item>
         <item>Oldest</item>
     </string-array>
+    <string-array name="search_filters">
+        <item>First Name</item>
+        <item>Last Name</item>
+        <item>Email</item>
+    </string-array>
 </resources>

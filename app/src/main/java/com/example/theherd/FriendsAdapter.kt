@@ -103,11 +103,13 @@ class FriendsAdapter(
 
         //TODO: What is btnMessage? Made some edits to make it message button, unimplemented
         holder.btnMessage.setOnClickListener {
-            Toast.makeText(context, "Message your friend!", Toast.LENGTH_SHORT).show()
-            //commented until messageactivity impl
-//            val intent = Intent(context, MessageActivity::class.java)
-//            intent.putExtra("FRIEND_NAME", friend.name)
-//            context.startActivity(intent)
+            val intent = Intent(context, MessageActivity::class.java)
+            intent.putExtra("FRIEND_NAME", friend.name)
+            intent.putExtra("FRIEND_ID", friend.id)
+            intent.putExtra("ONLINE_STATUS", "Online")
+            println("Friend Name = ${friend.name}")
+            println("Friend ID = ${friend.id}")
+            context.startActivity(intent)
         }
 
         //Button Remove logic

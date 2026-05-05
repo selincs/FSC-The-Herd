@@ -37,6 +37,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <Spinner
+            android:id="@+id/searchFilterSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp" />
+
         <!-- Search field -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/searchLayout"
@@ -44,7 +50,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Search friends..."
+            android:hint="Search for friends..."
             app:startIconDrawable="@drawable/ic_search_24"
             app:boxCornerRadiusTopStart="24dp"
             app:boxCornerRadiusTopEnd="24dp"

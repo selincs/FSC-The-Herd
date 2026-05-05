@@ -83,6 +83,10 @@
         <activity
             android:name=".FriendProfileActivity"
             android:exported="false"/>
+        <activity
+            android:name=".MessageActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

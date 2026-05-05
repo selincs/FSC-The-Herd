@@ -190,66 +190,12 @@ class TopicDetailActivity : AppCompatActivity() {
         // NAV BAR BUTTONS + TOOLBAR
         // ----------------------------
 
-        val eventsButton: Button = findViewById(R.id.events_button)
-        val motivationButton: Button = findViewById(R.id.motivation_button)
-        val friendsButton: Button = findViewById(R.id.friends_button)
-        val interestsButton: Button = findViewById(R.id.interests_button)
-        val communityButton: Button = findViewById(R.id.community_button)
-        val profileButton: Button = findViewById(R.id.profile_button)
-        val guideButton: Button = findViewById(R.id.guide_button)
-        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
+
 
         val enterCommunityBtn = findViewById<Button>(R.id.communityBoardButton)
 
         enterCommunityBtn.setOnClickListener {
             startActivity(Intent(this, CommunityBoardActivity::class.java))
-        }
-
-        val toolbar: Toolbar = findViewById(R.id.topToolbar)
-        val homeButton: ImageButton = findViewById(R.id.homeButton)
-
-        setSupportActionBar(toolbar)
-
-        interestsButton.setOnClickListener {
-            startActivity(Intent(this, TopicsActivity::class.java))
-        }
-
-        communityButton.setOnClickListener {
-            startActivity(Intent(this, CommunityBoardActivity::class.java))
-        }
-
-        profileButton.setOnClickListener {
-            startActivity(Intent(this, ProfileActivity::class.java))
-        }
-
-        guideButton.setOnClickListener {
-            startActivity(Intent(this, GuidesActivity::class.java))
-        }
-
-        friendsButton.setOnClickListener {
-            startActivity(Intent(this, FriendsListActivity::class.java))
-        }
-
-        motivationButton.setOnClickListener {
-            startActivity(Intent(this, MotivationActivity::class.java))
-        }
-
-        eventsButton.setOnClickListener {
-            startActivity(Intent(this, EventsActivity::class.java))
-        }
-
-        settingsButton.setOnClickListener { view ->
-            SettingsMenuHelper.showSettingsMenu(this, view)
-        }
-
-        homeButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-        }
-
-        toolbar.setNavigationOnClickListener {
-            finish()
         }
     }
 

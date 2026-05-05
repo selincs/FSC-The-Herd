@@ -535,4 +535,44 @@ object FriendsRepository {
             .addOnSuccessListener { onComplete(true) }
             .addOnFailureListener { onComplete(false) }
     }
+
+    fun searchGlobalUsers(
+        query: String,
+        filterType: String,
+        onResult: (List<Friend>) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+        val currentUserId = SessionManager.requireUserId()
+
+        // dropdown fields will be matched to FS document field
+        val field = when (filterType) {
+            "First Name" -> "firstName"
+            "Last Name" -> "lastName"
+            "Email" -> "email"
+            else -> "firstName"
+        }
+
+        val normalizedQuery = query.lowercase().trim()
+
+        db.collection("users")
+            .whereEqualTo(field, normalizedQuery)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val userList = querySnapshot.documents.mapNotNull { doc ->
+                    if (doc.id == currentUserId) return@mapNotNull null // Skip yourself
+
+                    Friend(
+                        id = doc.id,
+                        name = "${doc.getString("firstName")} ${doc.getString("lastName")}".trim(),
+                        statusText = doc.getString("major") ?: "Student",
+                        isOnline = doc.getString("onlineStatus") == "online",
+                        isFriend = false
+                    )
+                }
+                onResult(userList)
+            }
+            .addOnFailureListener {
+                onResult(emptyList())
+            }
+    }
 }

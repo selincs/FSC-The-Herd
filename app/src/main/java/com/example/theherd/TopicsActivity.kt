@@ -21,7 +21,7 @@ import android.net.Uri
 import android.widget.TextView
 
 
-class TopicsActivity : AppCompatActivity() {
+class TopicsActivity : BaseActivity() {
 
     private lateinit var adapter: TopicsAdapter
     private lateinit var topicsList: MutableList<Topic>
@@ -37,30 +37,7 @@ class TopicsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_topics)
-
-        // buttons
-        val eventsButton: Button = findViewById(R.id.events_button)
-        val motivationButton: Button = findViewById(R.id.motivation_button)
-        val friendsButton: Button = findViewById(R.id.friends_button)
-        val interestsButton: Button = findViewById(R.id.interests_button)
-        val communityButton: Button = findViewById(R.id.community_button)
-        val profileButton: Button = findViewById(R.id.profile_button)
-        val guideButton: Button = findViewById(R.id.guide_button)
-        val settingsButton: ImageButton = findViewById(R.id.settingsButton)
-
-        // toolbar
-        val toolbar = findViewById<Toolbar>(R.id.includedToolbar)
-//        val toolbar: Toolbar = findViewById(R.id.topToolbar)
-
-        setSupportActionBar(toolbar)
-        val homeButton: ImageButton = findViewById(R.id.homeButton)
-        setSupportActionBar(toolbar)
-
-        val backButton = findViewById<ImageButton>(R.id.btnBack)
-        backButton.visibility = View.VISIBLE
-        backButton.setOnClickListener {
-            finish() // Closes this page and goes back
-        }
+        setupNavigation() // sets up all buttons in the tool/nav bar
 
         val recyclerView = findViewById<RecyclerView>(R.id.topicsRecyclerView)
         val searchBar = findViewById<EditText>(R.id.searchTopics)
@@ -199,56 +176,6 @@ class TopicsActivity : AppCompatActivity() {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
-
-
-        interestsButton.setOnClickListener {
-            val intent = Intent(this, TopicsActivity::class.java)
-            startActivity(intent)
-        }
-
-        communityButton.setOnClickListener {
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
-        }
-
-        profileButton.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        }
-
-        guideButton.setOnClickListener {
-            val intent = Intent(this, GuidesActivity::class.java)
-            startActivity(intent)
-        }
-
-        motivationButton.setOnClickListener {
-            val intent = Intent(this, MotivationActivity::class.java)
-            startActivity(intent)
-        }
-
-        friendsButton.setOnClickListener {
-            val intent = Intent(this, FriendsListActivity::class.java)
-            startActivity(intent)
-        }
-        eventsButton.setOnClickListener {
-            startActivity(Intent(this, EventsActivity::class.java))
-        }
-        // settings button code lives in SettingsMenuHelper->TopBarHelper for all listeners eventually?
-        settingsButton.setOnClickListener { view ->
-            SettingsMenuHelper.showSettingsMenu(this, view)
-        }
-
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
-
-        homeButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-        }
-
-
     }
 
     //Topic currently does not update on createTopic()

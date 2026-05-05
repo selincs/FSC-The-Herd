@@ -9,6 +9,24 @@ object MockFriendsRepo {
         Friend("4", "Alex Rivera", "In the library", false, isFriend = true)
     )
 
+    private val globalDatabase = listOf(
+        Friend("1", "Jane Doe", "Studying...", true, isFriend = true),
+        Friend("2", "John Smith", "At the RAM gym", false, isFriend = true),
+        Friend("3", "Chloee-Gabrielle", "Working on The Herd", true, isFriend = true),
+        Friend("4", "Alex Rivera", "In the library", false, isFriend = true),
+        Friend("10", "Marcus Brown", "FSC Senior", true, isFriend = false),
+        Friend("11", "Sarah Lee", "Nursing Major", false, isFriend = false),
+        Friend("12", "David Chen", "Basketball courts", true, isFriend = false),
+        Friend("13", "Riley Taylor", "Heading to Lupton Hall", false, isFriend = false)
+    )
+
+    fun searchGlobalUsers(query: String, onResult: (List<Friend>) -> Unit) {
+        val results = globalDatabase.filter {
+            it.name.contains(query, ignoreCase = true)
+        }
+        onResult(results)
+    }
+
     private val blockedFriends = mutableListOf<Friend>()
 
     private val myRequests = mutableListOf(

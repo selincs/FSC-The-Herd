@@ -9,91 +9,24 @@
     tools:context=".SignUpActivity">
 
     <!-- Top bar -->
-    <androidx.appcompat.widget.Toolbar
+    <include
         android:id="@+id/topToolbar"
+        layout="@layout/layout_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#2F442F"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Logo image on left -->
-        <ImageView
-            android:id="@+id/logoImage"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/ic_launcher"
-            android:contentDescription="@string/logo_desc"
-            android:layout_marginStart="8dp"
-            android:layout_gravity="start|center_vertical" />
-
-        <!-- Title the herd next to logo -->
-        <TextView
-            android:id="@+id/appTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/toolbar_title"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:layout_marginStart="20dp"
-            android:layout_gravity="start|center_vertical" />
-
-        <!-- Spacer -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <!-- Settings button -->
-        <ImageButton
-            android:id="@+id/settingsButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_settings"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/settings_desc"
-            app:tint="@android:color/white"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"
-            android:visibility="gone"/>
-
-        <!-- Home button -->
-        <ImageButton
-            android:id="@+id/homeButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_home"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/home_desc"
-            app:tint="@android:color/white"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="8dp"
-            android:visibility="gone"/>
-    </androidx.appcompat.widget.Toolbar>
     <!-- Footer -->
-    <LinearLayout
+    <include
         android:id="@+id/footerLayout"
+        layout="@layout/layout_footer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="12dp"
-        android:background="#2F442F"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:id="@+id/footerText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/footer_text"
-            android:textColor="#FCF5FD"
-            android:textSize="12sp"/>
-    </LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Signup form -->
     <ScrollView
