@@ -45,7 +45,10 @@ class GuideTemplateActivity : AppCompatActivity() {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
-
+        eventsButton.setOnClickListener {
+            val intent = Intent(this, EventsActivity::class.java)
+            startActivity(intent)
+        }
         guideButton.setOnClickListener {
             val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)

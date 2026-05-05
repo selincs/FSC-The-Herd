@@ -1,6 +1,7 @@
 package com.example.theherd
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 //this repository handles user registration and login logic.
@@ -128,6 +129,54 @@ object UserRepository {
             }
     }
 
+    fun addUserEvent(userId: String, event: Event) {
+        val db = FirebaseFirestore.getInstance()
 
+        println("Adding user RSVP to event ${event.topicId}")
+
+        val data = hashMapOf(
+            "eventId" to event.id,
+            "topicId" to event.topicId,
+            "date" to event.date
+        )
+
+        db.collection("users")
+            .document(userId)
+            .collection("eventRSVPs")
+            .document(event.id)
+            .set(data)
+    }
+
+    fun getUserEvents(
+        userId: String,
+        onSuccess: (List<Pair<String, String>>) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("users")
+            .document(userId)
+            .collection("eventRSVPs")
+            .get()
+            .addOnSuccessListener { result ->
+                val refs = result.documents.mapNotNull {
+                    val topicId = it.getString("topicId")
+                    val eventId = it.getString("eventId")
+                    if (topicId != null && eventId != null) {
+                        topicId to eventId
+                    } else null
+                }
+                onSuccess(refs)
+            }
+    }
+
+    fun removeUserEvent(userId: String, eventId: String) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("users")
+            .document(userId)
+            .collection("eventRSVPs")
+            .document(eventId)
+            .delete()
+    }
 
 }

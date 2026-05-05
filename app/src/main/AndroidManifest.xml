@@ -54,6 +54,9 @@
             android:name=".TopicDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".EventsActivity"
+            android:exported="false"/>
+        <activity
             android:name=".CreateCommunityActivity"
             android:exported="false"/>
         <activity

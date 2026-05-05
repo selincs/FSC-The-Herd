@@ -83,16 +83,14 @@ class MainActivity : AppCompatActivity() {
         val guideButton: Button = findViewById(R.id.guide_button)
 
         // event listeners
-//        eventsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
+        eventsButton.setOnClickListener {
+            val intent = Intent(this, EventsActivity::class.java)
+            startActivity(intent)
+        }
         motivationButton.setOnClickListener {
             val intent = Intent(this, MotivationActivity::class.java)
             startActivity(intent)
         }
-//
         friendsButton.setOnClickListener {
             val intent = Intent(this, FriendsListActivity::class.java)
             startActivity(intent)
@@ -104,7 +102,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         communityButton.setOnClickListener {
-            println("In MainActivity: communityButton onclick listener")
             val intent = Intent(this, CommunityBoardActivity::class.java)
             startActivity(intent)
         }

@@ -35,10 +35,9 @@ class MotivationActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         // button event listeners
-//        eventsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
+        eventsButton.setOnClickListener {
+            startActivity(Intent(this, EventsActivity::class.java))
+        }
 //
 //        motivationButton.setOnClickListener {
 //            val intent = Intent(this, MotivationActivity::class.java)

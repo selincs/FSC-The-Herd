@@ -62,21 +62,17 @@ class CreateGuideActivity : AppCompatActivity() {
         categories.adapter = adapter
 
         // button event listeners
-//        eventsButton.setOnClickListener {
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
+        eventsButton.setOnClickListener {
+            startActivity(Intent(this, EventsActivity::class.java))
+        }
         motivationButton.setOnClickListener {
             val intent = Intent(this, MotivationActivity::class.java)
             startActivity(intent)
         }
-//
         friendsButton.setOnClickListener {
             val intent = Intent(this, FriendsListActivity::class.java)
             startActivity(intent)
         }
-//
         interestsButton.setOnClickListener {
             val intent = Intent(this, TopicsActivity::class.java)
             startActivity(intent)
