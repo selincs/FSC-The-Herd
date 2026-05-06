@@ -125,6 +125,7 @@ class FriendsListActivity : BaseActivity() {
         val btnSend = view.findViewById<MaterialButton>(R.id.btnSendRequest)
         val etInput = view.findViewById<TextInputEditText>(R.id.etAddFriendInput)
         val inputLayout = view.findViewById<TextInputLayout>(R.id.addFriendInputLayout)
+        val btnCancel = view.findViewById<MaterialButton>(R.id.btnCancelAddFriend)
 
         btnSend.setOnClickListener {
             val input = etInput.text.toString().trim()
@@ -140,6 +141,12 @@ class FriendsListActivity : BaseActivity() {
             } else {
                 inputLayout.error = "Input required"
             }
+        }
+
+        btnCancel.setOnClickListener {
+//            inputLayout.error = null
+//            etInput.text?.clear()
+            dialog.dismiss()
         }
         dialog.setContentView(view)
         dialog.show()

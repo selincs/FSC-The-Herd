@@ -31,6 +31,7 @@ class FriendProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_friend_profile)
 
+        val friendName = intent.getStringExtra("FRIEND_NAME") ?: "Ram User"
         val friendId = intent.getStringExtra("FRIEND_ID") ?: return
         val isFriend = intent.getBooleanExtra("IS_FRIEND", false)
         val isIncoming = intent.getBooleanExtra("IS_INCOMING", false)
