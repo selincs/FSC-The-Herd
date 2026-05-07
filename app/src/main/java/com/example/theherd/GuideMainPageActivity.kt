@@ -1,7 +1,7 @@
 package com.example.theherd
 
 import Model.Guide
-import Model.GuideRepository
+import com.example.theherd.GuideRepository
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -83,7 +83,7 @@ class GuideMainPageActivity : AppCompatActivity() {
 
 
 private fun setupRecyclerView() {
-    val allGuides = Model.GuideRepository.getAllGuides()
+    val allGuides = GuideRepository.getAllGuides()
     val incomingCategory = intent.getStringExtra("CATEGORY_NAME")
 
     val displayedGuides = if (incomingCategory != null) {

@@ -1,16 +1,16 @@
 package com.example.theherd
 
+import Model.Guide
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import Model.Guide
-import Model.GuideRepository
-import android.content.Intent
-import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,8 +21,6 @@ class GuideTemplateActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guide_template)
 
-
-        // toolbar buttons
         val eventsButton: Button = findViewById(R.id.events_button)
         val motivationButton: Button = findViewById(R.id.motivation_button)
         val friendsButton: Button = findViewById(R.id.friends_button)
@@ -32,36 +30,29 @@ class GuideTemplateActivity : AppCompatActivity() {
         val guideButton: Button = findViewById(R.id.guide_button)
 
         interestsButton.setOnClickListener {
-            val intent = Intent(this, TopicsActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, TopicsActivity::class.java))
         }
 
         communityButton.setOnClickListener {
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, CommunityBoardActivity::class.java))
         }
 
         profileButton.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
 
         guideButton.setOnClickListener {
-            val intent = Intent(this, GuidesActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, GuidesActivity::class.java))
         }
+
         friendsButton.setOnClickListener {
-            val intent = Intent(this, FriendsListActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, FriendsListActivity::class.java))
         }
+
         motivationButton.setOnClickListener {
-            val intent = Intent(this, MotivationActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, MotivationActivity::class.java))
         }
 
-
-
-        // toolbar
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         setSupportActionBar(toolbar)
 
@@ -72,9 +63,9 @@ class GuideTemplateActivity : AppCompatActivity() {
         homeButton.setOnClickListener { finish() }
 
         val incomingGuideId = intent.getStringExtra("GUIDE_ID")
+        val guideId = incomingGuideId ?: ""
 
         val selectedGuide = GuideRepository.getGuideById(incomingGuideId)
-
 
         if (selectedGuide != null) {
             titleText.text = selectedGuide.title
@@ -82,11 +73,12 @@ class GuideTemplateActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Error: Guide not found", Toast.LENGTH_SHORT).show()
             finish()
+            return
         }
 
         val thumbsUpButton: ImageButton = findViewById(R.id.thumbsUpButton)
         val thumbsDownButton: ImageButton = findViewById(R.id.thumbsDownButton)
-        val feedbackEditText: TextView = findViewById(R.id.feedbackEditText)
+        val feedbackEditText: EditText = findViewById(R.id.feedbackEditText)
         val layoutFeedback: LinearLayout = findViewById(R.id.layoutFeedback)
         val submitFeedbackButton: Button = findViewById(R.id.submitFeedbackButton)
 
@@ -100,52 +92,66 @@ class GuideTemplateActivity : AppCompatActivity() {
         }
 
         submitFeedbackButton.setOnClickListener {
-            val feedback = feedbackEditText.text.toString()
+            val feedback = feedbackEditText.text.toString().trim()
+
             if (feedback.isNotBlank()) {
                 Toast.makeText(this, "Thank you for your feedback!", Toast.LENGTH_SHORT).show()
                 layoutFeedback.visibility = View.GONE
-                feedbackEditText.setText("")
+                feedbackEditText.text.clear()
             } else {
                 Toast.makeText(this, "Please tell us how to improve!", Toast.LENGTH_SHORT).show()
             }
         }
 
         val rvQuestions: RecyclerView = findViewById(R.id.rvQuestions)
+        val etQuestionInput: EditText = findViewById(R.id.etQuestionInput)
+        val askQuestionButton: Button = findViewById(R.id.askQuestionButton)
+
         rvQuestions.layoutManager = LinearLayoutManager(this)
 
-        val dummyQuestions = listOf(
-            mapOf(
-                "username" to "John Doe",
-                "questionText" to "Does the shuttle run every 15 minutes?",
-                "timestamp" to System.currentTimeMillis() - 3600000
-            ),
-            mapOf(
-                "username" to "Jane Smith",
-                "questionText" to "Where is the science building?",
-                "timestamp" to System.currentTimeMillis() - 7200000
-            ),
-        )
-
-        val adapter = QuestionsAdapter(dummyQuestions) { question ->
-
+        val adapter = QuestionsAdapter(emptyList()) { question ->
             val intent = Intent(this, AnswerActivity::class.java)
 
-            intent.putExtra("questionText", question["questionText"].toString())
-            intent.putExtra("username", question["username"].toString())
-            intent.putExtra("timestamp", question["timestamp"] as Long)
+            intent.putExtra("guideId", guideId)
+            intent.putExtra("questionId", question.questionId)
+            intent.putExtra("questionText", question.questionText)
+            intent.putExtra("username", question.username)
+            intent.putExtra("timestamp", question.timestamp ?: System.currentTimeMillis())
 
             startActivity(intent)
         }
 
         rvQuestions.adapter = adapter
 
-    }
+        fun refreshQuestions() {
+            GuideRepository.getQuestions(guideId) { questions ->
+                adapter.updateData(questions)
+            }
+        }
 
-    private fun getDatabaseGuides(): List<Guide> {
-        return listOf(
-            Guide("101", "Finding the Hidden Science Lab Classrooms", "This is the full text of the article! To find the hidden labs, you need to go past the main quad, enter the science building through the side door near the greenhouse, and take the service elevator to the basement.", true, false, "Navigation"),
-            Guide("102", "FSC Shuttle Bus Schedule", "The shuttle runs every 15 minutes. It stops at the Student Center, the main parking lot, and the dorms. Don't forget your student ID!", false, true, "Travel"),
-            Guide("201", "How to Register for OPSTEP Classes", "Log into the portal, click on Academics, and select the OPSTEP registration tool. Make sure you meet with your advisor first to get your registration pin.", true, false, "Academic")
-        )
+        refreshQuestions()
+
+        askQuestionButton.setOnClickListener {
+            val questionText = etQuestionInput.text.toString().trim()
+
+            if (questionText.isBlank()) {
+                Toast.makeText(this, "Please type a question", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            GuideRepository.addQuestion(
+                guideId = guideId,
+                questionText = questionText,
+                username = "Student"
+            ) { success ->
+                if (success) {
+                    etQuestionInput.text.clear()
+                    refreshQuestions()
+                    Toast.makeText(this, "Question posted", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Failed to post question", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }
