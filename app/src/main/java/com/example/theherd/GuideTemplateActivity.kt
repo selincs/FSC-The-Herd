@@ -1,6 +1,5 @@
 package com.example.theherd
 
-import Model.Guide
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -56,24 +55,28 @@ class GuideTemplateActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.topToolbar)
         setSupportActionBar(toolbar)
 
-        val titleText: TextView = findViewById(R.id.dynamic_guide_title)
-        val descText: TextView = findViewById(R.id.dynamic_guide_desc)
-
         val homeButton: ImageButton = findViewById(R.id.homeButton)
         homeButton.setOnClickListener { finish() }
 
-        val incomingGuideId = intent.getStringExtra("GUIDE_ID")
-        val guideId = incomingGuideId ?: ""
+        val titleText: TextView = findViewById(R.id.dynamic_guide_title)
+        val descText: TextView = findViewById(R.id.dynamic_guide_desc)
 
-        val selectedGuide = GuideRepository.getGuideById(incomingGuideId)
+        val guideId = intent.getStringExtra("GUIDE_ID") ?: ""
 
-        if (selectedGuide != null) {
-            titleText.text = selectedGuide.title
-            descText.text = selectedGuide.description
-        } else {
-            Toast.makeText(this, "Error: Guide not found", Toast.LENGTH_SHORT).show()
+        if (guideId.isBlank()) {
+            Toast.makeText(this, "Error: Missing guide ID", Toast.LENGTH_SHORT).show()
             finish()
             return
+        }
+
+        GuideRepository.getGuideFromFirestoreById(guideId) { selectedGuide ->
+            if (selectedGuide != null) {
+                titleText.text = selectedGuide.title
+                descText.text = selectedGuide.description
+            } else {
+                Toast.makeText(this, "Error: Guide not found", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
 
         val thumbsUpButton: ImageButton = findViewById(R.id.thumbsUpButton)
@@ -83,12 +86,24 @@ class GuideTemplateActivity : AppCompatActivity() {
         val submitFeedbackButton: Button = findViewById(R.id.submitFeedbackButton)
 
         thumbsUpButton.setOnClickListener {
-            Toast.makeText(this, "Glad it helped", Toast.LENGTH_SHORT).show()
-            layoutFeedback.visibility = View.GONE
+            GuideRepository.voteGuide(guideId, "up") { success ->
+                if (success) {
+                    Toast.makeText(this, "Glad it helped", Toast.LENGTH_SHORT).show()
+                    layoutFeedback.visibility = View.GONE
+                } else {
+                    Toast.makeText(this, "Vote failed", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         thumbsDownButton.setOnClickListener {
-            layoutFeedback.visibility = View.VISIBLE
+            GuideRepository.voteGuide(guideId, "down") { success ->
+                if (success) {
+                    layoutFeedback.visibility = View.VISIBLE
+                } else {
+                    Toast.makeText(this, "Vote failed", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         submitFeedbackButton.setOnClickListener {

@@ -76,6 +76,123 @@ object GuideRepository {
             .addOnSuccessListener { onDone(true) }
             .addOnFailureListener { onDone(false) }
     }
+    fun getGuidesFromFirestore(
+        onDone: (List<Guide>) -> Unit
+    ) {
+        FirestoreDatabase.guides
+            .get()
+            .addOnSuccessListener { result ->
+                val guides = result.documents.mapNotNull { doc ->
+                    doc.toObject(Guide::class.java)
+                }
+
+                onDone(guides)
+            }
+            .addOnFailureListener {
+                onDone(emptyList())
+            }
+    }
+    fun voteGuide(
+        guideId: String,
+        newVote: String,
+        onDone: (Boolean) -> Unit
+    ) {
+
+        val userId = FirestoreAuthManager.currentUserId ?: run {
+            onDone(false)
+            return
+        }
+
+        val voteRef = FirestoreDatabase.guides
+            .document(guideId)
+            .collection("votes")
+            .document(userId)
+
+        val guideRef = FirestoreDatabase.guides
+            .document(guideId)
+
+        voteRef.get()
+            .addOnSuccessListener { doc ->
+
+                val oldVote = doc.getString("vote")
+
+                var helpfulChange = 0
+                var notHelpfulChange = 0
+                var finalVote = newVote
+
+                if (oldVote == newVote) {
+
+                    finalVote = ""
+
+                    if (newVote == "up") {
+                        helpfulChange = -1
+                    } else {
+                        notHelpfulChange = -1
+                    }
+
+                } else {
+
+                    if (oldVote == "up") {
+                        helpfulChange -= 1
+                    }
+
+                    if (oldVote == "down") {
+                        notHelpfulChange -= 1
+                    }
+
+                    if (newVote == "up") {
+                        helpfulChange += 1
+                    }
+
+                    if (newVote == "down") {
+                        notHelpfulChange += 1
+                    }
+                }
+
+                val batch = FirestoreDatabase.db.batch()
+
+                batch.update(
+                    guideRef,
+                    mapOf(
+                        "helpfulCount" to FieldValue.increment(helpfulChange.toLong()),
+                        "notHelpfulCount" to FieldValue.increment(notHelpfulChange.toLong())
+                    )
+                )
+
+                if (finalVote.isBlank()) {
+                    batch.delete(voteRef)
+                } else {
+                    batch.set(voteRef, mapOf("vote" to finalVote))
+                }
+
+                batch.commit()
+                    .addOnSuccessListener {
+                        onDone(true)
+                    }
+                    .addOnFailureListener {
+                        onDone(false)
+                    }
+            }
+            .addOnFailureListener {
+                onDone(false)
+            }
+    }
+
+    fun getGuideFromFirestoreById(
+        guideId: String,
+        onDone: (Guide?) -> Unit
+    ) {
+        FirestoreDatabase.guides
+            .document(guideId)
+            .get()
+            .addOnSuccessListener { doc ->
+                val guide = doc.toObject(Guide::class.java)
+                onDone(guide)
+            }
+            .addOnFailureListener {
+                onDone(null)
+            }
+    }
 
     fun getQuestions(
         guideId: String,
