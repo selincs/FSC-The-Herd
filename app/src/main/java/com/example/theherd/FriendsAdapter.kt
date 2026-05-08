@@ -161,6 +161,7 @@ class FriendsAdapter(
                         Toast.makeText(context, "Friend added!", Toast.LENGTH_SHORT).show()
                         friendsList.removeAt(pos)
                         notifyItemRemoved(pos)
+                        onRemoveClick(friend)
                     } else {
                         Toast.makeText(context, "Failed to accept request", Toast.LENGTH_SHORT).show()
                     }

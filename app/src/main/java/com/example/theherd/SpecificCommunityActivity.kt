@@ -31,11 +31,6 @@ class SpecificCommunityActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_specific_community)
         setupNavigation() // sets up all buttons in the tool/nav bar
-        
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-
 
         communityName = intent.getStringExtra("COMMUNITY_NAME") ?: "General"
         //firestore path

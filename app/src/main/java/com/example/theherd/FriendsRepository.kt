@@ -513,7 +513,11 @@ object FriendsRepository {
             .collection("friendRequests")
             .document(currentUserID)
 
-        batch.delete(reverseRequestRef)
+        val incomingRequest = currentUserRef.collection("friendRequests").document(fromUserID)
+        batch.delete(incomingRequest)
+
+        val outgoingRequest = otherUserRef.collection("friendRequests").document(currentUserID)
+        batch.delete(outgoingRequest)
 
         batch.commit()
             .addOnSuccessListener { onComplete(true) }
