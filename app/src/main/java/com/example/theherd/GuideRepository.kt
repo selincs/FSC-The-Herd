@@ -6,9 +6,11 @@ import Model.GuideQuestion
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
+
 object GuideRepository {
 
     private val db = FirebaseFirestore.getInstance()
+
 
     private val allGuides = listOf(
         Guide("101", "Finding the Hidden Science Lab Classrooms", "A quick walkthrough from the main quad.", true, false, "Navigation"),
@@ -25,6 +27,30 @@ object GuideRepository {
 
     fun getGuideById(id: String?): Guide? {
         return allGuides.find { it.id == id }
+    }
+    fun createGuide(
+        title: String,
+        category: String,
+        description: String,
+        onDone: (Boolean) -> Unit
+    ) {
+        val guideRef = FirestoreDatabase.guides.document()
+
+        val guideData = hashMapOf(
+            "id" to guideRef.id,
+            "title" to title,
+            "description" to description,
+            "category" to category,
+            "verified" to false,
+            "userSuggested" to true,
+            "helpfulCount" to 0,
+            "notHelpfulCount" to 0,
+            "createdAt" to FieldValue.serverTimestamp()
+        )
+
+        guideRef.set(guideData)
+            .addOnSuccessListener { onDone(true) }
+            .addOnFailureListener { onDone(false) }
     }
 
     fun addQuestion(
