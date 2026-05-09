@@ -257,7 +257,7 @@ class EventsActivity : BaseActivity() {
         FriendsRepository.loadFriends(
 
             onSuccess = { friendsList ->
-                println("Success in loading friends")
+                println("Success in loading friends->eventsAct")
 
                 recyclerView.adapter =
                     FriendSelectAdapter(friendsList) { selectedFriend ->
@@ -300,7 +300,7 @@ class EventsActivity : BaseActivity() {
             },
 
             onFailure = {
-                println("Friend event list failure for sending events")
+                println("Friend event list failure for sending events->EventsAct")
 
                 Toast.makeText(
                     this,
