@@ -62,19 +62,62 @@ class CreateGuideActivity : BaseActivity() {
         categories.adapter = adapter
 
         submitButton.setOnClickListener {
-            val title = guideTitle.text.toString()
-            val content = guideContent.text.toString()
-            when {
-                (title.isEmpty() || content.isEmpty()) -> {
-                    Toast.makeText(this, "Error: Please fill out all fields", Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    Toast.makeText(this, "Guide request submitted!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java)
+
+            val title = guideTitle.text.toString().trim()
+
+            val category = categories.selectedItem.toString()
+
+            val content = guideContent.text.toString().trim()
+
+            if (title.isEmpty() || content.isEmpty()) {
+
+                Toast.makeText(
+                    this,
+                    "Error: Please fill out all fields",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                return@setOnClickListener
+            }
+
+            GuideRepository.createGuide(
+                title,
+                category,
+                content
+            ) { success ->
+
+                if (success) {
+
+                    Toast.makeText(
+                        this,
+                        "Guide request submitted!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    val intent = Intent(this, GuidesActivity::class.java)
                     startActivity(intent)
+
+                    finish()
+
+                } else {
+
+                    Toast.makeText(
+                        this,
+                        "Failed to create guide",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
 
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
+
+        homeButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+        }
     }
 }

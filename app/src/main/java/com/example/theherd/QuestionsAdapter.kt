@@ -1,16 +1,17 @@
 package com.example.theherd
 
+import Model.GuideQuestion
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.theherd.R
-import android.text.format.DateUtils
 
-class QuestionsAdapter(private var questionsList: List<Map<String, Any>>) :
-    RecyclerView.Adapter<QuestionsAdapter.QuestionViewHolder>() {
-
+class QuestionsAdapter(
+    private var questionsList: List<GuideQuestion>,
+    private val onQuestionClick: (GuideQuestion) -> Unit
+) : RecyclerView.Adapter<QuestionsAdapter.QuestionViewHolder>() {
 
     class QuestionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvUser: TextView = itemView.findViewById(R.id.tvQuestionUser)
@@ -24,29 +25,29 @@ class QuestionsAdapter(private var questionsList: List<Map<String, Any>>) :
         return QuestionViewHolder(view)
     }
 
-
     override fun onBindViewHolder(holder: QuestionViewHolder, position: Int) {
-        val data = questionsList[position]
+        val question = questionsList[position]
 
-        holder.tvUser.text = data["username"]?.toString() ?: "Anonymous"
-        holder.tvText.text = data["questionText"]?.toString() ?: ""
+        holder.tvUser.text = question.username
+        holder.tvText.text = question.questionText
 
-
-        val ts = data["timestamp"] as? Long ?: System.currentTimeMillis()
         val relativeTime = DateUtils.getRelativeTimeSpanString(
-            ts,
+            question.timestamp ?: System.currentTimeMillis(),
             System.currentTimeMillis(),
             DateUtils.MINUTE_IN_MILLIS
         )
+
         holder.tvTime.text = relativeTime
+
+        holder.itemView.setOnClickListener {
+            onQuestionClick(question)
+        }
     }
 
     override fun getItemCount(): Int = questionsList.size
 
-    fun updateData(newList: List<Map<String, Any>>) {
-        val oldSize = questionsList.size
+    fun updateData(newList: List<GuideQuestion>) {
         questionsList = newList
-        notifyItemRangeInserted(oldSize, newList.size)
-
+        notifyDataSetChanged()
     }
 }

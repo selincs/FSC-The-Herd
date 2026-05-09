@@ -263,6 +263,17 @@
                 android:nestedScrollingEnabled="false"
                 android:paddingHorizontal="16dp"
                 tools:listitem="@layout/item_question"/>
+            <EditText
+                android:id="@+id/etQuestionInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ask a question..."
+                android:padding="12dp"
+                android:background="@drawable/bg_edit_text_subtle"
+                android:inputType="textMultiLine|textCapSentences"
+                android:minLines="2"
+                android:gravity="top"
+                android:layout_marginTop="8dp" />
 
             <Button
                 android:id="@+id/askQuestionButton"

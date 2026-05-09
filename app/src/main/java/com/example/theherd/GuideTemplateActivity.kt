@@ -1,16 +1,15 @@
 package com.example.theherd
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import Model.Guide
-import Model.GuideRepository
-import android.content.Intent
-import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,77 +21,118 @@ class GuideTemplateActivity : BaseActivity() {
         setContentView(R.layout.activity_guide_template)
         setupNavigation() // sets up all buttons in the tool/nav bar
 
-        val titleText: TextView = findViewById(R.id.dynamic_guide_title)
-        val descText: TextView = findViewById(R.id.dynamic_guide_desc)
-
         val homeButton: ImageButton = findViewById(R.id.homeButton)
         homeButton.setOnClickListener { finish() }
 
-        val incomingGuideId = intent.getStringExtra("GUIDE_ID")
+        val titleText: TextView = findViewById(R.id.dynamic_guide_title)
+        val descText: TextView = findViewById(R.id.dynamic_guide_desc)
 
-        val selectedGuide = GuideRepository.getGuideById(incomingGuideId)
+        val guideId = intent.getStringExtra("GUIDE_ID") ?: ""
 
-
-        if (selectedGuide != null) {
-            titleText.text = selectedGuide.title
-            descText.text = selectedGuide.description
-        } else {
-            Toast.makeText(this, "Error: Guide not found", Toast.LENGTH_SHORT).show()
+        if (guideId.isBlank()) {
+            Toast.makeText(this, "Error: Missing guide ID", Toast.LENGTH_SHORT).show()
             finish()
+            return
+        }
+
+        GuideRepository.getGuideFromFirestoreById(guideId) { selectedGuide ->
+            if (selectedGuide != null) {
+                titleText.text = selectedGuide.title
+                descText.text = selectedGuide.description
+            } else {
+                Toast.makeText(this, "Error: Guide not found", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
 
         val thumbsUpButton: ImageButton = findViewById(R.id.thumbsUpButton)
         val thumbsDownButton: ImageButton = findViewById(R.id.thumbsDownButton)
-        val feedbackEditText: TextView = findViewById(R.id.feedbackEditText)
+        val feedbackEditText: EditText = findViewById(R.id.feedbackEditText)
         val layoutFeedback: LinearLayout = findViewById(R.id.layoutFeedback)
         val submitFeedbackButton: Button = findViewById(R.id.submitFeedbackButton)
 
         thumbsUpButton.setOnClickListener {
-            Toast.makeText(this, "Glad it helped", Toast.LENGTH_SHORT).show()
-            layoutFeedback.visibility = View.GONE
+            GuideRepository.voteGuide(guideId, "up") { success ->
+                if (success) {
+                    Toast.makeText(this, "Glad it helped", Toast.LENGTH_SHORT).show()
+                    layoutFeedback.visibility = View.GONE
+                } else {
+                    Toast.makeText(this, "Vote failed", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         thumbsDownButton.setOnClickListener {
-            layoutFeedback.visibility = View.VISIBLE
+            GuideRepository.voteGuide(guideId, "down") { success ->
+                if (success) {
+                    layoutFeedback.visibility = View.VISIBLE
+                } else {
+                    Toast.makeText(this, "Vote failed", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         submitFeedbackButton.setOnClickListener {
-            val feedback = feedbackEditText.text.toString()
+            val feedback = feedbackEditText.text.toString().trim()
+
             if (feedback.isNotBlank()) {
                 Toast.makeText(this, "Thank you for your feedback!", Toast.LENGTH_SHORT).show()
                 layoutFeedback.visibility = View.GONE
-                feedbackEditText.setText("")
+                feedbackEditText.text.clear()
             } else {
                 Toast.makeText(this, "Please tell us how to improve!", Toast.LENGTH_SHORT).show()
             }
         }
 
         val rvQuestions: RecyclerView = findViewById(R.id.rvQuestions)
+        val etQuestionInput: EditText = findViewById(R.id.etQuestionInput)
+        val askQuestionButton: Button = findViewById(R.id.askQuestionButton)
+
         rvQuestions.layoutManager = LinearLayoutManager(this)
 
-        val dummyQuestions = listOf(
-            mapOf(
-                "username" to "John Doe",
-                "questionText" to "Does the shuttle run every 15 minutes?",
-                "timestamp" to System.currentTimeMillis() - 3600000
-            ),
-            mapOf(
-                "username" to "Jane Smith",
-                "questionText" to "Where is the science building?",
-                "timestamp" to System.currentTimeMillis() - 7200000
-            ),
-        )
+        val adapter = QuestionsAdapter(emptyList()) { question ->
+            val intent = Intent(this, AnswerActivity::class.java)
 
-        val adapter = QuestionsAdapter(dummyQuestions)
+            intent.putExtra("guideId", guideId)
+            intent.putExtra("questionId", question.questionId)
+            intent.putExtra("questionText", question.questionText)
+            intent.putExtra("username", question.username)
+            intent.putExtra("timestamp", question.timestamp ?: System.currentTimeMillis())
+
+            startActivity(intent)
+        }
+
         rvQuestions.adapter = adapter
 
-    }
+        fun refreshQuestions() {
+            GuideRepository.getQuestions(guideId) { questions ->
+                adapter.updateData(questions)
+            }
+        }
 
-    private fun getDatabaseGuides(): List<Guide> {
-        return listOf(
-            Guide("101", "Finding the Hidden Science Lab Classrooms", "This is the full text of the article! To find the hidden labs, you need to go past the main quad, enter the science building through the side door near the greenhouse, and take the service elevator to the basement.", true, false, "Navigation"),
-            Guide("102", "FSC Shuttle Bus Schedule", "The shuttle runs every 15 minutes. It stops at the Student Center, the main parking lot, and the dorms. Don't forget your student ID!", false, true, "Travel"),
-            Guide("201", "How to Register for OPSTEP Classes", "Log into the portal, click on Academics, and select the OPSTEP registration tool. Make sure you meet with your advisor first to get your registration pin.", true, false, "Academic")
-        )
+        refreshQuestions()
+
+        askQuestionButton.setOnClickListener {
+            val questionText = etQuestionInput.text.toString().trim()
+
+            if (questionText.isBlank()) {
+                Toast.makeText(this, "Please type a question", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            GuideRepository.addQuestion(
+                guideId = guideId,
+                questionText = questionText,
+                username = "Student"
+            ) { success ->
+                if (success) {
+                    etQuestionInput.text.clear()
+                    refreshQuestions()
+                    Toast.makeText(this, "Question posted", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Failed to post question", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }
