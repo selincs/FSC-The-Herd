@@ -45,7 +45,7 @@ class FriendsListActivity : BaseActivity() {
         }
 
         //filterFriends("") -> MERGING COMMENT OUT
-      recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         loadTabData("")
 

@@ -16,6 +16,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import android.app.AlertDialog
+import android.view.LayoutInflater
 
 class TopicDetailActivity : BaseActivity() {
     private lateinit var eventsRecycler: RecyclerView
@@ -109,7 +111,7 @@ class TopicDetailActivity : BaseActivity() {
             },
 
             onSend = { event ->
-                Toast.makeText(this, "Sent: ${event.name}", Toast.LENGTH_SHORT).show()
+                showInviteDialog(event)
             }
         )
 
@@ -483,5 +485,82 @@ class TopicDetailActivity : BaseActivity() {
 
             UserRepository.addUserEvent(userId, event)
         }
+    }
+
+    private fun showInviteDialog(event: Event) {
+        println("Showing Invite Dialog...")
+        val dialogView = LayoutInflater.from(this)
+            .inflate(R.layout.dialog_select_friend, null)
+
+        val recyclerView =
+            dialogView.findViewById<RecyclerView>(R.id.friendsRecyclerView)
+
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        // ----------------------------
+        // LOAD FRIENDS
+        // ----------------------------
+        FriendsRepository.loadFriends(
+
+            onSuccess = { friendsList ->
+                println("Success in loading friends")
+
+                recyclerView.adapter =
+                    FriendSelectAdapter(friendsList) { selectedFriend ->
+
+                        val myId = SessionManager.requireUserId()
+
+                        val convoId = MessageRepository.getConversationId(
+                            myId,
+                            selectedFriend.id
+                        )
+
+                        val inviteMessage = Message(
+                            senderId = myId,
+                            receiverId = selectedFriend.id,
+
+                            text = "You're invited to ${event.name}",
+
+                            type = "event_invite",
+
+                            eventId = event.id,
+                            eventName = event.name,
+                            eventTime = event.time,
+                            eventLocation = event.location,
+                            topicId = event.topicId
+                        )
+
+                        MessageRepository.sendMessage(
+                            convoId,
+                            inviteMessage
+                        )
+
+                        Toast.makeText(
+                            this,
+                            "Invite sent to ${selectedFriend.name}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        dialog.dismiss()
+                    }
+            },
+
+            onFailure = {
+                println("Friend event list failure for sending events")
+
+                Toast.makeText(
+                    this,
+                    "Failed to load friends",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        )
+
+        dialog.show()
     }
 }
