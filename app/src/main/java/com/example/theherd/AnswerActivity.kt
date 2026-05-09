@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class AnswerActivity : AppCompatActivity() {
+class AnswerActivity : BaseActivity() {
 
     private lateinit var adapter: AnswerAdapter
 
