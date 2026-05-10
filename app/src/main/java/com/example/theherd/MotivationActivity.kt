@@ -134,9 +134,6 @@ class MotivationActivity : BaseActivity() {
 
             newGoalSheet.show()
         }
-
-
-
     }
 
     private fun showMentorshipSignupDialog(role: String) {

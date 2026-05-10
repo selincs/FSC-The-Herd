@@ -127,6 +127,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Submit"
+            android:backgroundTint="#ACD1AF"
             android:layout_marginTop="24dp"/>
 
         <!-- Cancel Enrollment -->
@@ -136,6 +137,7 @@
             android:layout_height="wrap_content"
             android:text="Cancel Mentorship Enrollment"
             android:textColor="#B00020"
+            android:backgroundTint="#9E9E9E"
             android:layout_marginTop="12dp"/>
 
     </LinearLayout>
