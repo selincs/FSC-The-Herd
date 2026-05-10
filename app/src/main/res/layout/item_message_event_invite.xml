@@ -15,12 +15,9 @@
         android:id="@+id/tvInviteHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:text="🎉 Event Invite"
-
         android:textStyle="bold"
         android:textSize="16sp"
-
         android:paddingBottom="8dp"/>
 
     <!-- Event Name -->
@@ -28,22 +25,25 @@
         android:id="@+id/tvInviteEventName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:text="Event Name"
-
         android:textStyle="bold"
         android:textSize="18sp"
-
         android:paddingBottom="4dp"/>
+
+    <!-- Event Date -->
+    <TextView
+        android:id="@+id/tvInviteEventDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="May 22, 2026"
+        android:paddingBottom="2dp"/>
 
     <!-- Event Time -->
     <TextView
         android:id="@+id/tvInviteEventTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:text="8:00 PM"
-
         android:paddingBottom="2dp"/>
 
     <!-- Event Location -->
@@ -51,32 +51,20 @@
         android:id="@+id/tvInviteEventLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:text="Selin's House"
-
         android:paddingBottom="10dp"/>
 
     <!-- Buttons -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnViewEvent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:text="View Event"/>
 
         <Button
             android:id="@+id/btnRsvpInvite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_marginStart="8dp"
-
             android:text="RSVP"/>
     </LinearLayout>
 

@@ -135,61 +135,34 @@ class MessageAdapter(
     class EventInviteViewHolder(view: View) :
         RecyclerView.ViewHolder(view) {
 
-        private val tvEventName: TextView =
-            view.findViewById(R.id.tvInviteEventName)
-
-        private val tvEventTime: TextView =
-            view.findViewById(R.id.tvInviteEventTime)
-
-        private val tvEventLocation: TextView =
-            view.findViewById(R.id.tvInviteEventLocation)
-
-        private val btnViewEvent: Button =
-            view.findViewById(R.id.btnViewEvent)
-
-        private val btnRsvp: Button =
-            view.findViewById(R.id.btnRsvpInvite)
+        private val tvEventName: TextView = view.findViewById(R.id.tvInviteEventName)
+        private val tvEventDate: TextView = view.findViewById(R.id.tvInviteEventDate)
+        private val tvEventTime: TextView = view.findViewById(R.id.tvInviteEventTime)
+        private val tvEventLocation: TextView = view.findViewById(R.id.tvInviteEventLocation)
+        private val btnRsvp: Button = view.findViewById(R.id.btnRsvpInvite)
 
         fun bind(msg: Message) {
-
             // ----------------------------------------
             // Populate event info
             // ----------------------------------------
             tvEventName.text = msg.eventName ?: "Unknown Event"
 
-            tvEventTime.text =
-                "🕒 ${msg.eventTime ?: "Unknown Time"}"
-
-            tvEventLocation.text =
-                "📍 ${msg.eventLocation ?: "Unknown Location"}"
-
-            // ----------------------------------------
-            // VIEW EVENT BUTTON
-            // ----------------------------------------
-            btnViewEvent.setOnClickListener {
-
-                Toast.makeText(
-                    itemView.context,
-                    "Opening Event...",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                /*
-                FUTURE:
-                Open TopicDetailActivity
-
-                Example:
-                val intent = Intent(
-                    itemView.context,
-                    TopicDetailActivity::class.java
-                )
-
-                intent.putExtra("EVENT_ID", msg.eventId)
-                intent.putExtra("TOPIC_ID", msg.topicId)
-
-                itemView.context.startActivity(intent)
-                 */
+            val formattedDate = try {
+                val parts = msg.eventDate?.split("-")
+                if (parts != null && parts.size == 3) {
+                    val year = parts[0]
+                    val month = parts[1].padStart(2, '0')
+                    val day = parts[2].padStart(2, '0')
+                    "$month-$day-$year"
+                } else {
+                    msg.eventDate ?: "Unknown Date"
+                }
+            } catch (e: Exception) {
+                msg.eventDate ?: "Unknown Date"
             }
+            tvEventDate.text = "📅 $formattedDate"
+            tvEventTime.text = "🕒 ${msg.eventTime ?: "Unknown Time"}"
+            tvEventLocation.text = "📍 ${msg.eventLocation ?: "Unknown Location"}"
 
             // ----------------------------------------
             // INITIAL RSVP BUTTON STATE
