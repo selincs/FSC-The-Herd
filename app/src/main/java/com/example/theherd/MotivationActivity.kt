@@ -278,12 +278,7 @@ class MotivationActivity : BaseActivity() {
             "Senior"
         )
 
-        val spinnerAdapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            years
-        )
-
+        val spinnerAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,years)
         yearSpinner?.adapter = spinnerAdapter
 
         // Load existing profile data into UI
@@ -340,21 +335,16 @@ class MotivationActivity : BaseActivity() {
             },
 
             onFailure = {
-                println("Failure in loading, user may not have profile yet.")
+                println("Failure in loading, user may not have profile yet. Verify showMentorshipSignupDialog")
                 // Silent fail is okay here
                 // User may simply not have a profile yet
             }
         )
 
         signupButton?.setOnClickListener {
-
             val selectedTopics = mutableListOf<String>()
-
             chipGroup?.checkedChipIds?.forEach { chipId ->
-
-                val chip =
-                    chipGroup.findViewById<Chip>(chipId)
-
+                val chip = chipGroup.findViewById<Chip>(chipId)
                 selectedTopics.add(chip.text.toString())
             }
 
@@ -365,9 +355,7 @@ class MotivationActivity : BaseActivity() {
 
             // FIRST load existing profile
             MotivationRepository.getMentorshipProfile(
-
                 onSuccess = { existingProfile ->
-
                     // Preserve old roles
                     val updatedRoles =(existingProfile?.roles ?: emptyList()).toMutableSet()
 
@@ -476,7 +464,6 @@ class MotivationActivity : BaseActivity() {
                     )
 
                     MotivationRepository.createOrUpdateMentorshipProfile(
-
                         updatedProfile,
                         onSuccess = {
                             Toast.makeText( this, "Sign-up cancelled", Toast.LENGTH_SHORT).show()
@@ -498,4 +485,4 @@ class MotivationActivity : BaseActivity() {
         bottomSheet.show()
     }
 }
-// data class Mentor(val name: String, val role: String)
+// data class Mentor(val name: String, val role: String) -> Only used for fake mentor displays currently
