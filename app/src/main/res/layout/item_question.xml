@@ -34,6 +34,18 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/tvAnswerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="#E8F5E9"
+            android:padding="10dp"
+            android:textColor="#1B5E20"
+            android:textSize="14sp"
+            android:textStyle="italic"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/tvQuestionTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

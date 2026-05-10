@@ -209,7 +209,8 @@ object GuideRepository {
                         doc.getString("questionId") ?: doc.id,
                         doc.getString("questionText") ?: "",
                         doc.getString("username") ?: "Anonymous",
-                        doc.getLong("timestamp") ?: System.currentTimeMillis()
+                        doc.getLong("timestamp") ?: System.currentTimeMillis(),
+                        doc.getString("topAnswer")
                     )
                 }
 
@@ -246,8 +247,22 @@ object GuideRepository {
         )
 
         answerRef.set(answerData)
-            .addOnSuccessListener { onDone(true) }
+//            .addOnSuccessListener { onDone(true) }
+//            .addOnFailureListener { onDone(false) }
+            .addOnSuccessListener {
+                val questionRef = db.collection("guides")
+                    .document(guideId)
+                    .collection("questions")
+                    .document(questionId)
+
+                questionRef.update("topAnswer", answerText)
+                    .addOnSuccessListener { onDone(true) }
+                    .addOnFailureListener { onDone(false) }
+            }
             .addOnFailureListener { onDone(false) }
+
+
+
     }
 
     fun getAnswers(

@@ -17,6 +17,8 @@ class QuestionsAdapter(
         val tvUser: TextView = itemView.findViewById(R.id.tvQuestionUser)
         val tvText: TextView = itemView.findViewById(R.id.tvQuestionText)
         val tvTime: TextView = itemView.findViewById(R.id.tvQuestionTime)
+
+        val tvAnswer: TextView = itemView.findViewById(R.id.tvAnswerText)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionViewHolder {
@@ -38,6 +40,17 @@ class QuestionsAdapter(
         )
 
         holder.tvTime.text = relativeTime
+
+        val reply = question.topAnswer
+
+        if (!reply.isNullOrEmpty()) {
+            holder.tvAnswer.text = "Top Answer: $reply"
+            holder.tvAnswer.visibility = View.VISIBLE
+        } else {
+            holder.tvAnswer.visibility = View.GONE
+        }
+
+
 
         holder.itemView.setOnClickListener {
             onQuestionClick(question)

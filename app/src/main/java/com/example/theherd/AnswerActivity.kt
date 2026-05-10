@@ -16,6 +16,7 @@ class AnswerActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_answer)
+        setupNavigation()
 
         val guideId = intent.getStringExtra("guideId") ?: ""
         val questionId = intent.getStringExtra("questionId") ?: ""
