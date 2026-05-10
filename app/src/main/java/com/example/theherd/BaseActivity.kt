@@ -36,8 +36,12 @@ abstract class BaseActivity : AppCompatActivity() {
         }
 
         findViewById<ImageButton>(R.id.btnBack)?.apply {
-            visibility = View.VISIBLE
-            setOnClickListener { finish() }
+            if (this@BaseActivity is MainActivity) {
+                visibility = View.GONE
+            } else {
+                visibility = View.VISIBLE
+                setOnClickListener { finish() }
+            }
         }
 
         setupNavButton(R.id.friends_button, FriendsListActivity::class.java)

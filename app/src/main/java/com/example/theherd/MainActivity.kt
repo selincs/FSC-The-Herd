@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private var keepSplash = true
 
@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        setupNavigation()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
 //            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 //            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -70,49 +71,6 @@ class MainActivity : AppCompatActivity() {
 
         createPostButton.setOnClickListener {
             val intent = Intent(this, CreateStatusActivity::class.java)
-            startActivity(intent)
-        }
-
-        // buttons
-        val eventsButton: Button = findViewById(R.id.events_button)
-        val motivationButton: Button = findViewById(R.id.motivation_button)
-        val friendsButton: Button = findViewById(R.id.friends_button)
-        val interestsButton: Button = findViewById(R.id.interests_button)
-        val communityButton: Button = findViewById(R.id.community_button)
-        val profileButton: Button = findViewById(R.id.profile_button)
-        val guideButton: Button = findViewById(R.id.guide_button)
-
-        // event listeners
-        eventsButton.setOnClickListener {
-            val intent = Intent(this, EventsActivity::class.java)
-            startActivity(intent)
-        }
-        motivationButton.setOnClickListener {
-            val intent = Intent(this, MotivationActivity::class.java)
-            startActivity(intent)
-        }
-        friendsButton.setOnClickListener {
-            val intent = Intent(this, FriendsListActivity::class.java)
-            startActivity(intent)
-        }
-
-        interestsButton.setOnClickListener {
-            val intent = Intent(this, TopicsActivity::class.java)
-           startActivity(intent)
-        }
-
-        communityButton.setOnClickListener {
-            val intent = Intent(this, CommunityBoardActivity::class.java)
-            startActivity(intent)
-        }
-
-        profileButton.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        }
-
-        guideButton.setOnClickListener {
-            val intent = Intent(this, GuidesActivity::class.java)
             startActivity(intent)
         }
     }

@@ -89,6 +89,7 @@ class ProfileActivity : BaseActivity() {
         val graduationDateInput = findViewById<EditText>(R.id.graduationDateInput)
         val bioInput = findViewById<EditText>(R.id.bioInput)
 
+
         //Disable the Profile fields a User cannot directly change
         lastNameInput.isFocusable = false //Last name probably cant change without some verification
         lastNameInput.isClickable = false
@@ -259,7 +260,7 @@ class ProfileActivity : BaseActivity() {
     }
 
     private fun setEditMode(isEditing: Boolean) {
-
+        val profileImage = findViewById<ImageView>(R.id.profileImage)
         val inputs = listOf(
             R.id.firstNameInput,
             R.id.majorInput,
@@ -276,10 +277,19 @@ class ProfileActivity : BaseActivity() {
             et.isCursorVisible = isEditing
             //Set editable fields to highlight color
             if (isEditing) {
+                // profileImage.set
                 et.setBackgroundResource(R.drawable.edit_field_background)
             } else {
                 et.background = defaultFieldBackground
             }
+        }
+
+        if (isEditing) {
+            profileImage.setBackgroundResource(R.drawable.edit_field_background)
+            profileImage.setPadding(8, 8, 8, 8)
+        } else {
+            profileImage.background = null
+            profileImage.setPadding(0, 0, 0, 0)
         }
 
         findViewById<Button>(R.id.addTopicButton).visibility =
