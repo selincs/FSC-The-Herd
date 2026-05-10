@@ -17,6 +17,8 @@ class CommitmentAdapter(
         val partnerName: TextView = itemView.findViewById(R.id.partnerNameText)
         val streakText: TextView = itemView.findViewById(R.id.streakText)
         val streakRing: CircularProgressIndicator = itemView.findViewById(R.id.streakRing)
+
+        val cardLevel: TextView = itemView.findViewById(R.id.cardlevelText)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommitmentViewHolder {
@@ -28,9 +30,17 @@ class CommitmentAdapter(
         val currentItem = commitmentList[position]
 
         holder.activityTitle.text = currentItem.activityName
-        holder.partnerName.text = "w/ ${currentItem.partnerName}"
+
+        if (currentItem.partnerName.isEmpty()) {
+            holder.partnerName.text = "Going solo"
+        } else {
+            holder.partnerName.text = "w/ ${currentItem.partnerName}"
+        }
+
+
         holder.streakText.text = "🔥 ${currentItem.streak}"
         holder.streakRing.progress = currentItem.streak
+        holder.cardLevel.text = "Level ${currentItem.level}"
 
         holder.itemView.setOnClickListener {
             onCardClick(currentItem)
@@ -41,4 +51,4 @@ class CommitmentAdapter(
 
 }
 
-data class Commitment(val activityName: String, val partnerName: String, val streak: Int)
+data class Commitment(val activityName: String, val partnerName: String, var streak: Int, var level: Int = 1)

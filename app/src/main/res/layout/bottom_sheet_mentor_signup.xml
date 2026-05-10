@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FFFFFF"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="24dp"
+        android:background="#CCCCCC" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Become a Mentor"
+        android:textColor="#2F442F"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Help guide others by sharing what you know."
+        android:textColor="#666666"
+        android:textSize="14sp"
+        android:layout_marginBottom="20dp"/>
+
+    <EditText
+        android:id="@+id/inputMentorName"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:hint="Your Name"
+        android:background="#F8F9FA"
+        android:paddingHorizontal="16dp"
+        android:layout_marginBottom="12dp"
+        android:inputType="textPersonName"/>
+
+    <EditText
+        android:id="@+id/inputMentorRole"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:hint="Area of Expertise (e.g. CS Tutor, Gym Buddy)"
+        android:background="#F8F9FA"
+        android:paddingHorizontal="16dp"
+        android:layout_marginBottom="32dp"
+        android:inputType="textCapWords"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSubmitMentor"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Join the Mentors"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:backgroundTint="#779A77"
+        app:cornerRadius="12dp" />
+
+</LinearLayout>
