@@ -1,27 +1,22 @@
 package com.example.theherd
 
 import Model.MentorshipRoles
-import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
-import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
-import androidx.appcompat.widget.Toolbar
-import androidx.appcompat.app.AppCompatActivity
-import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.Toast
-import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import Model.Commitment
+import com.google.android.material.button.MaterialButton
 
 class MotivationActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,12 +42,16 @@ class MotivationActivity : BaseActivity() {
             Mentor("Phoebe Buffay", "Mentor")
         )
 
-        val fakeCommitments = mutableListOf(
-            Commitment("Go to Gym", "Chandler", 3, 1),
-            Commitment("Study", "Monica", 5, 1),
-            Commitment("Go for a hike", "Joey", 9, 1),
-            Commitment("Self Defense", "Rachel", 8, 1)
-        )
+//        val fakeCommitments = mutableListOf(
+//            Commitment("Go to Gym", "Chandler", 3, 1),
+//            Commitment("Study", "Monica", 5, 1),
+//            Commitment("Go for a hike", "Joey", 9, 1),
+//            Commitment("Self Defense", "Rachel", 8, 1)
+//        )
+
+        val commitments = mutableListOf<Commitment>()
+
+
 
         findMentorCard.setOnClickListener {
             showMentorshipSignupDialog(MentorshipRoles.MENTEE)
@@ -64,49 +63,130 @@ class MotivationActivity : BaseActivity() {
 
         mentorsRecyclerView.adapter = MentorAdapter(fakeMentors)
 
-        commitmentsRecyclerView.adapter = CommitmentAdapter(fakeCommitments) { clickedCommitment ->
-            val bottomSheet = BottomSheetDialog(this)
-            bottomSheet.setContentView(R.layout.bottom_sheet_commitment)
+        lateinit var commitmentAdapter: CommitmentAdapter
 
-            val titleText = bottomSheet.findViewById<TextView>(R.id.detailActivityName)
-            val partnerText = bottomSheet.findViewById<TextView>(R.id.detailPartnerName)
-            val streakNum = bottomSheet.findViewById<TextView>(R.id.detailStreakNumber)
-            val levelText = bottomSheet.findViewById<TextView>(R.id.detailLevelText)
-            val completeBtn = bottomSheet.findViewById<Button>(R.id.btnMarkComplete)
+        commitmentAdapter =
+            CommitmentAdapter(commitments) { clickedCommitment ->
 
-            titleText?.text = clickedCommitment.activityName
-            if (clickedCommitment.partnerName.isEmpty()) {
-                partnerText?.text = "Going solo"
-            } else {
-                partnerText?.text = "Shared commitment with ${clickedCommitment.partnerName}"
-            }
-            streakNum?.text = "🔥 ${clickedCommitment.streak} Days"
-            levelText?.text = "Level ${clickedCommitment.level}"
+                val bottomSheet = BottomSheetDialog(this)
 
-            completeBtn?.setOnClickListener {
+                bottomSheet.setContentView(
+                    R.layout.bottom_sheet_commitment
+                )
 
-                clickedCommitment.streak += 1
+                val titleText =
+                    bottomSheet.findViewById<TextView>(
+                        R.id.detailActivityName
+                    )
 
-                if (clickedCommitment.streak >= 10) {
-                    clickedCommitment.streak = 0
-                    clickedCommitment.level += 1
+                val partnerText =
+                    bottomSheet.findViewById<TextView>(
+                        R.id.detailPartnerName
+                    )
+
+                val streakNum =
+                    bottomSheet.findViewById<TextView>(
+                        R.id.detailStreakNumber
+                    )
+
+                val levelText =
+                    bottomSheet.findViewById<TextView>(
+                        R.id.detailLevelText
+                    )
+
+                val completeBtn =
+                    bottomSheet.findViewById<Button>(
+                        R.id.btnMarkComplete
+                    )
+
+                titleText?.text =
+                    clickedCommitment.activityName
+
+                if (clickedCommitment.partnerName.isEmpty()) {
+
+                    partnerText?.text = "Going solo"
+
+                } else {
+
+                    partnerText?.text =
+                        "Shared commitment with ${clickedCommitment.partnerName}"
                 }
 
-                streakNum?.text = "🔥 ${clickedCommitment.streak} Days"
-                levelText?.text = "Level ${clickedCommitment.level}"
+                streakNum?.text =
+                    "🔥 ${clickedCommitment.streak} Days"
 
-                commitmentsRecyclerView.adapter?.notifyDataSetChanged()
-                bottomSheet.dismiss() // Should clicking the complete button dismiss the bottom sheet?
+                levelText?.text =
+                    "Level ${clickedCommitment.level}"
+
+                completeBtn?.setOnClickListener {
+
+                    clickedCommitment.streak += 1
+
+                    if (clickedCommitment.streak >= 10) {
+
+                        clickedCommitment.streak = 0
+
+                        clickedCommitment.level += 1
+                    }
+
+                    MotivationRepository.updateCommitment(
+
+                        clickedCommitment,
+
+                        onSuccess = {
+
+                            streakNum?.text =
+                                "🔥 ${clickedCommitment.streak} Days"
+
+                            levelText?.text =
+                                "Level ${clickedCommitment.level}"
+
+                            commitmentAdapter.notifyDataSetChanged()
+
+                            bottomSheet.dismiss()
+                        },
+
+                        onFailure = {
+
+                            Toast.makeText(
+                                this,
+                                "Failed to update streak",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+                }
+
+                bottomSheet.show()
             }
 
+        commitmentsRecyclerView.adapter = commitmentAdapter
+
+        MotivationRepository.getUserCommitments(
+
+            onSuccess = { loadedCommitments ->
+
+                commitments.clear()
+
+                commitments.addAll(loadedCommitments)
+
+                commitmentAdapter.notifyDataSetChanged()
+            },
+
+            onFailure = {
+
+                Toast.makeText(
+                    this,
+                    "Failed to load commitments",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        )
 
 
-            bottomSheet.show()
-        }
+        val addCommitmentBtn = findViewById<MaterialButton>(R.id.fabAddCommitment)
 
-        val fabAddCommitment = findViewById<FloatingActionButton>(R.id.fabAddCommitment)
-
-        fabAddCommitment.setOnClickListener {
+        addCommitmentBtn.setOnClickListener {
             val newGoalSheet = BottomSheetDialog(this)
             newGoalSheet.setContentView(R.layout.bottom_sheet_new_commitment)
 
@@ -119,15 +199,47 @@ class MotivationActivity : BaseActivity() {
                 val activityText = inputActivity?.text.toString()
                 val partnerText = inputPartner?.text.toString().trim()
 
-
                 if (activityText.isNotEmpty()) {
-                    val newGoal = Commitment(activityText, partnerText, 0, 1)
-                    fakeCommitments.add(newGoal)
 
-                    commitmentsRecyclerView.adapter?.notifyDataSetChanged()
-                    commitmentsRecyclerView.scrollToPosition(fakeCommitments.size - 1)
-                    newGoalSheet.dismiss()
-                }else {
+                    val newGoal = Commitment(
+
+                        activityName = activityText,
+
+                        partnerName = partnerText,
+
+                        streak = 0,
+
+                        level = 1
+                    )
+
+                    MotivationRepository.createCommitment(
+
+                        newGoal,
+
+                        onSuccess = { savedCommitment ->
+
+                            commitments.add(savedCommitment)
+
+                            commitmentAdapter.notifyDataSetChanged()
+
+                            commitmentsRecyclerView.scrollToPosition(
+                                commitments.size - 1
+                            )
+
+                            newGoalSheet.dismiss()
+                        },
+
+                        onFailure = {
+
+                            Toast.makeText(
+                                this,
+                                "Failed to save commitment",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+
+                } else {
                     Toast.makeText(this, "Please name your new goal!", Toast.LENGTH_SHORT).show()
                 }
             }

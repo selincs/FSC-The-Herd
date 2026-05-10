@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import Model.Commitment
 
 class CommitmentAdapter(
     private val commitmentList: List<Commitment>,
@@ -51,4 +52,4 @@ class CommitmentAdapter(
 
 }
 
-data class Commitment(val activityName: String, val partnerName: String, var streak: Int, var level: Int = 1)
+//data class Commitment(val activityName: String, val partnerName: String, var streak: Int, var level: Int = 1)
