@@ -129,6 +129,15 @@
             android:text="Submit"
             android:layout_marginTop="24dp"/>
 
+        <!-- Cancel Enrollment -->
+        <Button
+            android:id="@+id/cancelSignupButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancel Mentorship Enrollment"
+            android:textColor="#B00020"
+            android:layout_marginTop="12dp"/>
+
     </LinearLayout>
 
 </ScrollView>

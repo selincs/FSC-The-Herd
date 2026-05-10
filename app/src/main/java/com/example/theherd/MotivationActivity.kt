@@ -104,40 +104,6 @@ class MotivationActivity : BaseActivity() {
             bottomSheet.show()
         }
 
-//        val becomeMentorCard = findViewById<MaterialCardView>(R.id.cardBecomeMentor)
-//
-//        becomeMentorCard.setOnClickListener {
-//            val mentorSignupSheet = BottomSheetDialog(this)
-//            mentorSignupSheet.setContentView(R.layout.bottom_sheet_mentor_signup)
-//
-//            val inputName = mentorSignupSheet.findViewById<EditText>(R.id.inputMentorName)
-//            val inputRole = mentorSignupSheet.findViewById<EditText>(R.id.inputMentorRole)
-//            val btnSubmit = mentorSignupSheet.findViewById<Button>(R.id.btnSubmitMentor)
-//
-//            btnSubmit?.setOnClickListener {
-//                val nameText = inputName?.text.toString()
-//                val roleText = inputRole?.text.toString()
-//
-//                if (nameText.isNotEmpty() && roleText.isNotEmpty()) {
-//
-//                    val newMentor = Mentor(nameText, roleText)
-//
-//                    fakeMentors.add(0, newMentor)
-//
-//                    mentorsRecyclerView.adapter?.notifyItemInserted(0)
-//                    mentorsRecyclerView.scrollToPosition(0)
-//
-//                    Toast.makeText(this, "Thank you for becoming a mentor!", Toast.LENGTH_SHORT).show()
-//                    mentorSignupSheet.dismiss()
-//                } else {
-//                    Toast.makeText(this, "Please fill out both fields!", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//
-//            mentorSignupSheet.show()
-//
-//        }
-
         val fabAddCommitment = findViewById<FloatingActionButton>(R.id.fabAddCommitment)
 
         fabAddCommitment.setOnClickListener {
@@ -162,7 +128,7 @@ class MotivationActivity : BaseActivity() {
                     commitmentsRecyclerView.scrollToPosition(fakeCommitments.size - 1)
                     newGoalSheet.dismiss()
                 }else {
-                    Toast.makeText(this, "Please fill out both fields!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Please name your new goal!", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -175,32 +141,18 @@ class MotivationActivity : BaseActivity() {
 
     private fun showMentorshipSignupDialog(role: String) {
         val bottomSheet = BottomSheetDialog(this)
-
         bottomSheet.setContentView(R.layout.bottom_sheet_mentorship_signup)
 
-        val titleText =
-            bottomSheet.findViewById<TextView>(R.id.signupTitle)
-
-        val bioEditText =
-            bottomSheet.findViewById<EditText>(R.id.bioEditText)
-
-        val majorEditText =
-            bottomSheet.findViewById<EditText>(R.id.majorEditText)
-
-        val yearSpinner =
-            bottomSheet.findViewById<Spinner>(R.id.yearSpinner)
-
-        val chipGroup =
-            bottomSheet.findViewById<ChipGroup>(R.id.topicChipGroup)
-
-        val commuterCheckbox =
-            bottomSheet.findViewById<CheckBox>(R.id.commuterCheckbox)
-
-        val transferCheckbox =
-            bottomSheet.findViewById<CheckBox>(R.id.transferCheckbox)
-
-        val signupButton =
-            bottomSheet.findViewById<Button>(R.id.signupButton)
+        //Set up Mentorship GUI fields
+        val titleText = bottomSheet.findViewById<TextView>(R.id.signupTitle)
+        val bioEditText = bottomSheet.findViewById<EditText>(R.id.bioEditText)
+        val majorEditText = bottomSheet.findViewById<EditText>(R.id.majorEditText)
+        val yearSpinner = bottomSheet.findViewById<Spinner>(R.id.yearSpinner)
+        val chipGroup = bottomSheet.findViewById<ChipGroup>(R.id.topicChipGroup)
+        val commuterCheckbox = bottomSheet.findViewById<CheckBox>(R.id.commuterCheckbox)
+        val transferCheckbox = bottomSheet.findViewById<CheckBox>(R.id.transferCheckbox)
+        val signupButton = bottomSheet.findViewById<Button>(R.id.signupButton)
+        val cancelSignupButton = bottomSheet.findViewById<Button>(R.id.cancelSignupButton)
 
         // Dynamic title
         titleText?.text =
@@ -225,6 +177,66 @@ class MotivationActivity : BaseActivity() {
 
         yearSpinner?.adapter = spinnerAdapter
 
+        // Load existing profile data into UI
+        MotivationRepository.getMentorshipProfile(
+
+            onSuccess = { existingProfile ->
+
+                existingProfile?.let { profile ->
+
+                    // Shared fields
+                    majorEditText?.setText(profile.major)
+
+                    commuterCheckbox?.isChecked =
+                        profile.commuter
+
+                    transferCheckbox?.isChecked =
+                        profile.transferStudent
+
+                    // Restore spinner selection
+                    val yearPosition =
+                        years.indexOf(profile.year)
+
+                    if (yearPosition >= 0) {
+                        yearSpinner?.setSelection(yearPosition)
+                    }
+
+                    // Role-specific bio/topics
+                    val existingBio =
+                        if (role == MentorshipRoles.MENTOR)
+                            profile.mentorBio
+                        else
+                            profile.menteeBio
+
+                    val existingTopics =
+                        if (role == MentorshipRoles.MENTOR)
+                            profile.mentorTopics
+                        else
+                            profile.menteeTopics
+
+                    bioEditText?.setText(existingBio)
+
+                    // Restore selected chips
+                    for (i in 0 until chipGroup!!.childCount) {
+
+                        val chip =
+                            chipGroup.getChildAt(i) as? Chip
+
+                        chip?.isChecked =
+                            existingTopics.contains(
+                                chip.text.toString()
+                            )
+                    }
+                }
+            },
+
+            onFailure = {
+                println("Failure in loading, user may not have profile yet.")
+                // Silent fail is okay here
+                // User may simply not have a profile yet
+            }
+        )
+
         signupButton?.setOnClickListener {
 
             val selectedTopics = mutableListOf<String>()
@@ -248,33 +260,44 @@ class MotivationActivity : BaseActivity() {
                 onSuccess = { existingProfile ->
 
                     // Preserve old roles
-                    val updatedRoles =
-                        (existingProfile?.roles ?: emptyList())
-                            .toMutableSet()
+                    val updatedRoles =(existingProfile?.roles ?: emptyList()).toMutableSet()
 
                     // Add new role if not already present
                     updatedRoles.add(role)
 
                     // Create updated profile
                     val profile = MentorshipProfile(
-
                         username = username,
-
                         roles = updatedRoles.toList(),
 
-                        mentorshipTopics = selectedTopics,
+                        mentorTopics =
+                            if (role == MentorshipRoles.MENTOR)
+                                selectedTopics
+                            else
+                                existingProfile?.mentorTopics ?: emptyList(),
 
-                        bio = bioEditText?.text.toString()?.trim() ?: "",
+                        menteeTopics =
+                            if (role == MentorshipRoles.MENTEE)
+                                selectedTopics
+                            else
+                                existingProfile?.menteeTopics ?: emptyList(),
+
+                        mentorBio =
+                            if (role == MentorshipRoles.MENTOR)
+                                bioEditText?.text.toString()?.trim() ?: ""
+                            else
+                                existingProfile?.mentorBio ?: "",
+
+                        menteeBio =
+                            if (role == MentorshipRoles.MENTEE)
+                                bioEditText?.text.toString()?.trim() ?: ""
+                            else
+                                existingProfile?.menteeBio ?: "",
 
                         major = majorEditText?.text.toString()?.trim() ?: "",
-
                         year = yearSpinner?.selectedItem.toString(),
-
                         commuter = commuterCheckbox?.isChecked ?: false,
-
-                        transferStudent =
-                            transferCheckbox?.isChecked ?: false,
-
+                        transferStudent =transferCheckbox?.isChecked ?: false,
                         active = true
                     )
 
@@ -283,38 +306,86 @@ class MotivationActivity : BaseActivity() {
                         profile,
 
                         onSuccess = {
-
-                            Toast.makeText(
-                                this,
-                                "Mentorship profile created!",
-                                Toast.LENGTH_SHORT
+                            Toast.makeText(this,"Mentorship profile created!",Toast.LENGTH_SHORT
                             ).show()
-
                             bottomSheet.dismiss()
                         },
 
                         onFailure = {
-
-                            Toast.makeText(
-                                this,
-                                "Failed to create profile",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(this,"Failed to create profile",Toast.LENGTH_SHORT).show()
                         }
                     )
                 },
 
                 onFailure = {
-
-                    Toast.makeText(
-                        this,
-                        "Failed to load existing profile",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this,"Failed to load existing profile",Toast.LENGTH_SHORT).show()
                 }
             )
         }
 
+        //Clear out Mentorship Enrollment by Role
+        cancelSignupButton?.setOnClickListener {
+            MotivationRepository.getMentorshipProfile(
+
+                onSuccess = { existingProfile ->
+                    if (existingProfile == null) {
+                        Toast.makeText(this,"No mentorship profile found",Toast.LENGTH_SHORT).show()
+                        return@getMentorshipProfile
+                    }
+
+                    // Remove current role
+                    val updatedRoles =existingProfile.roles.toMutableList()
+                    updatedRoles.remove(role)
+
+                    // Clear ONLY fields related to this role
+                    val updatedProfile = existingProfile.copy(
+                        roles = updatedRoles,
+
+                        mentorTopics =
+                            if (role == MentorshipRoles.MENTOR)
+                                emptyList()
+                            else
+                                existingProfile.mentorTopics,
+
+                        menteeTopics =
+                            if (role == MentorshipRoles.MENTEE)
+                                emptyList()
+                            else
+                                existingProfile.menteeTopics,
+
+                        mentorBio =
+                            if (role == MentorshipRoles.MENTOR)
+                                ""
+                            else
+                                existingProfile.mentorBio,
+
+                        menteeBio =
+                            if (role == MentorshipRoles.MENTEE)
+                                ""
+                            else
+                                existingProfile.menteeBio
+                    )
+
+                    MotivationRepository.createOrUpdateMentorshipProfile(
+
+                        updatedProfile,
+                        onSuccess = {
+                            Toast.makeText( this, "Sign-up cancelled", Toast.LENGTH_SHORT).show()
+                            bottomSheet.dismiss()
+                        },
+
+                        onFailure = {
+                            Toast.makeText(this,"Failed to cancel sign-up",Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                },
+
+                onFailure = {
+                    Toast.makeText(this,"Failed to load profile",Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+        //Show mentorship bottom sheet
         bottomSheet.show()
     }
 }

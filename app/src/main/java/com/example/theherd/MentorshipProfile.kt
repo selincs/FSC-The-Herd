@@ -4,20 +4,23 @@ data class MentorshipProfile(
 
     val userId: String = "",
     val username: String = "",
-// user can be both mentor and mentee
+
+    //Roles : Mentor or Mentee, a user can be each.
     val roles: List<String> = emptyList(),
 
-    val mentorshipTopics: List<String> = emptyList(),
+    // Mentor-specific
+    val mentorTopics: List<String> = emptyList(),
+    val mentorBio: String = "",
 
-    val bio: String = "",
+    // Mentee-specific
+    val menteeTopics: List<String> = emptyList(),
+    val menteeBio: String = "",
 
+    // Shared profile info, not varied by mentorship role
     val major: String = "",
     val year: String = "",
-
     val commuter: Boolean = false,
     val transferStudent: Boolean = false,
-
-    val timestamp: Long = System.currentTimeMillis(),
-
-    val active: Boolean = true
+    val active: Boolean = true,
+    val timestamp: Long = System.currentTimeMillis()
 )
