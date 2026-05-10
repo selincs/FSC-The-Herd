@@ -107,7 +107,7 @@ class TopicDetailActivity : BaseActivity() {
 
             onRsvp = { event ->
                 handleRsvp(topicID, event)
-                Toast.makeText(this, "RSVP'd to: ${event.name}", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "RSVP'd to: ${event.name}", Toast.LENGTH_SHORT).show()
             },
 
             onSend = { event ->
@@ -457,7 +457,7 @@ class TopicDetailActivity : BaseActivity() {
                     Toast.makeText(this, "Failed to un-RSVP", Toast.LENGTH_SHORT).show()
                 }
             }
-
+            Toast.makeText(this, "UNRSVP'd from: ${event.name}", Toast.LENGTH_SHORT).show()
             UserRepository.removeUserEvent(userId, event.id)
 
         } else {
@@ -483,6 +483,7 @@ class TopicDetailActivity : BaseActivity() {
                 }
             }
 
+            Toast.makeText(this, "RSVP'd to: ${event.name}", Toast.LENGTH_SHORT).show()
             UserRepository.addUserEvent(userId, event)
         }
     }
@@ -532,6 +533,7 @@ class TopicDetailActivity : BaseActivity() {
                             eventName = event.name,
                             eventTime = event.time,
                             eventLocation = event.location,
+                            eventDate = event.date,
                             topicId = event.topicId
                         )
 

@@ -8,61 +8,169 @@ object MessageRepository {
         return listOf(user1, user2).sorted().joinToString("_")
     }
 
-    fun sendMessage(convoId: String, message: Message) {
-        println("Sending message in repo sendmsg()")
-        val db = FirebaseFirestore.getInstance()
+//    fun sendMessage(convoId: String, message: Message) {
+//        println("Sending message in repo sendmsg()")
+//        val db = FirebaseFirestore.getInstance()
+//
+//        val convoRef = db.collection("conversations").document(convoId)
+//
+//        val messageData = hashMapOf(
+//            "senderId" to message.senderId,
+//            "receiverId" to message.receiverId,
+//            "text" to message.text,
+//            "timestamp" to FieldValue.serverTimestamp() // 🔥 FIX
+//        )
+//        // 1. Write message
+//        convoRef.collection("messages")
+//            .add(messageData)
+//            .addOnSuccessListener {
+//                println("Message sent successfully")
+//                // 2. Update shared conversation metadata
+//                val convoMeta = mapOf(
+//                    "lastMessage" to message.text,
+//                    "lastTimestamp" to FieldValue.serverTimestamp(),
+//                    "participants" to listOf(message.senderId, message.receiverId)
+//                )
+//
+//                convoRef.set(convoMeta, com.google.firebase.firestore.SetOptions.merge())
+//                // 3. Update BOTH users' conversation lists
+//                val senderMeta = mapOf(
+//                    "lastMessage" to message.text,
+//                    "lastTimestamp" to FieldValue.serverTimestamp(),
+//                    "otherUserId" to message.receiverId
+//                )
+//
+//                val receiverMeta = mapOf(
+//                    "lastMessage" to message.text,
+//                    "lastTimestamp" to FieldValue.serverTimestamp(),
+//                    "otherUserId" to message.senderId
+//                )
+//
+//                db.collection("users")
+//                    .document(message.senderId)
+//                    .collection("conversations")
+//                    .document(convoId)
+//                    .set(senderMeta)
+//
+//                db.collection("users")
+//                    .document(message.receiverId)
+//                    .collection("conversations")
+//                    .document(convoId)
+//                    .set(receiverMeta)
+//            }
+//            .addOnFailureListener {
+//                println("FAILED to send message: ${it.message}")
+//            }
+//        println("msg sent")
+//    }
+fun sendMessage(convoId: String, message: Message) {
 
-        val convoRef = db.collection("conversations").document(convoId)
+    println("Sending message in repo sendmsg()")
 
-        val messageData = hashMapOf(
-            "senderId" to message.senderId,
-            "receiverId" to message.receiverId,
-            "text" to message.text,
-            "timestamp" to FieldValue.serverTimestamp() // 🔥 FIX
-        )
-        // 1. Write message
-        convoRef.collection("messages")
-            .add(messageData)
-            .addOnSuccessListener {
-                println("Message sent successfully")
-                // 2. Update shared conversation metadata
-                val convoMeta = mapOf(
-                    "lastMessage" to message.text,
-                    "lastTimestamp" to FieldValue.serverTimestamp(),
-                    "participants" to listOf(message.senderId, message.receiverId)
+    val db = FirebaseFirestore.getInstance()
+
+    val convoRef = db.collection("conversations")
+        .document(convoId)
+
+    // ----------------------------------------
+    // FIRESTORE MESSAGE DATA
+    // ----------------------------------------
+    val messageData = hashMapOf(
+
+        // normal message fields
+        "senderId" to message.senderId,
+        "receiverId" to message.receiverId,
+        "text" to message.text,
+        "type" to message.type,
+
+        // server timestamp
+        "timestamp" to FieldValue.serverTimestamp(),
+
+        // optional event invite fields
+        "eventId" to message.eventId,
+        "eventName" to message.eventName,
+        "eventTime" to message.eventTime,
+        "eventLocation" to message.eventLocation,
+        "eventDate" to message.eventDate,
+        "topicId" to message.topicId
+    )
+
+    // ----------------------------------------
+    // WRITE MESSAGE
+    // ----------------------------------------
+    convoRef.collection("messages")
+        .add(messageData)
+
+        .addOnSuccessListener {
+
+            println("Message sent successfully")
+
+            // ----------------------------------------
+            // Conversation metadata
+            // ----------------------------------------
+            val convoMeta = mapOf(
+
+                "lastMessage" to message.text,
+
+                "lastTimestamp" to FieldValue.serverTimestamp(),
+
+                "participants" to listOf(
+                    message.senderId,
+                    message.receiverId
                 )
+            )
 
-                convoRef.set(convoMeta, com.google.firebase.firestore.SetOptions.merge())
-                // 3. Update BOTH users' conversation lists
-                val senderMeta = mapOf(
-                    "lastMessage" to message.text,
-                    "lastTimestamp" to FieldValue.serverTimestamp(),
-                    "otherUserId" to message.receiverId
-                )
+            convoRef.set(
+                convoMeta,
+                com.google.firebase.firestore.SetOptions.merge()
+            )
 
-                val receiverMeta = mapOf(
-                    "lastMessage" to message.text,
-                    "lastTimestamp" to FieldValue.serverTimestamp(),
-                    "otherUserId" to message.senderId
-                )
+            // ----------------------------------------
+            // Sender conversation metadata
+            // ----------------------------------------
+            val senderMeta = mapOf(
 
-                db.collection("users")
-                    .document(message.senderId)
-                    .collection("conversations")
-                    .document(convoId)
-                    .set(senderMeta)
+                "lastMessage" to message.text,
 
-                db.collection("users")
-                    .document(message.receiverId)
-                    .collection("conversations")
-                    .document(convoId)
-                    .set(receiverMeta)
-            }
-            .addOnFailureListener {
-                println("FAILED to send message: ${it.message}")
-            }
-        println("msg sent")
-    }
+                "lastTimestamp" to FieldValue.serverTimestamp(),
+
+                "otherUserId" to message.receiverId
+            )
+
+            // ----------------------------------------
+            // Receiver conversation metadata
+            // ----------------------------------------
+            val receiverMeta = mapOf(
+
+                "lastMessage" to message.text,
+
+                "lastTimestamp" to FieldValue.serverTimestamp(),
+
+                "otherUserId" to message.senderId
+            )
+
+            // sender conversation list
+            db.collection("users")
+                .document(message.senderId)
+                .collection("conversations")
+                .document(convoId)
+                .set(senderMeta)
+
+            // receiver conversation list
+            db.collection("users")
+                .document(message.receiverId)
+                .collection("conversations")
+                .document(convoId)
+                .set(receiverMeta)
+        }
+
+        .addOnFailureListener {
+
+            println("FAILED to send message: ${it.message}")
+        }
+
+    println("msg sent")
+}
 
     fun listenForMessages(
         convoId: String,

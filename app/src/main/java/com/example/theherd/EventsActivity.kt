@@ -281,6 +281,7 @@ class EventsActivity : BaseActivity() {
                             eventName = event.name,
                             eventTime = event.time,
                             eventLocation = event.location,
+                            eventDate = event.date,
                             topicId = event.topicId
                         )
 

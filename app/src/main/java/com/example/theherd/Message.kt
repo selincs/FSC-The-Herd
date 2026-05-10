@@ -17,6 +17,7 @@ data class Message(
     val eventName: String? = null,
     val eventTime: String? = null,
     val eventLocation: String? = null,
+    val eventDate: String? = null,
     val topicId: String? = null
 )
 
