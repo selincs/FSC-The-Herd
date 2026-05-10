@@ -187,7 +187,9 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="We could make a silly little RAM or shepherd pun here, but honestly…\n\nWe’re all people out here just trying our best. We hope you can find something or someone that helps you be your best too. If you’re feeling lost, here is where you can try one of many ways to reach out for help.
+                    android:text="We could make a silly little RAM or shepherd pun here, but honestly…\n\n
+
+We’re all people out here just trying our best. We hope you can find something or someone that helps you be your best too. If you’re feeling lost, here is where you can try one of many ways to reach out for help.
 "
                     android:textSize="16sp"
                     android:textColor="#2F442F"
@@ -206,6 +208,7 @@
 
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/findMentorCard"
                         android:layout_width="130dp"
                         android:layout_height="75dp"
                         android:layout_marginEnd="12dp"
@@ -244,7 +247,7 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardBecomeMentor"
+                        android:id="@+id/becomeMentorCard"
                         android:layout_width="130dp"
                         android:layout_height="75dp"
                         android:layout_gravity="center"

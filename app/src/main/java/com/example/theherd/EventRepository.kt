@@ -155,4 +155,134 @@ object EventRepository {
             }
             .addOnFailureListener { onFailure(it) }
     }
+
+    //Used only in message event invites, but could be refactored to handle TopicDetailActivity/EventActivity rsvp's as well
+    fun toggleRsvp(
+        event: Event,
+        onComplete: (Boolean, Boolean) -> Unit
+    ) {
+        println("toggleRSVP entered")
+        val db = FirebaseFirestore.getInstance()
+
+        val userId = SessionManager.requireUserId()
+
+        // ----------------------------------------
+        // FETCH REAL EVENT FROM FIRESTORE
+        // ----------------------------------------
+        db.collection("topics")
+            .document(event.topicId)
+            .collection("events")
+            .document(event.id)
+            .get()
+
+            .addOnSuccessListener { doc ->
+                println("Firestore doc exists = ${doc.exists()}")
+                println("Firestore raw data = ${doc.data}")
+
+                val firestoreEvent =doc.toObject(Event::class.java)
+                firestoreEvent?.id = doc.id //store the firestore event's document ID as well
+                //it is not automatically stored and this must be done
+                println("firestoreEvent = $firestoreEvent")
+
+                if (firestoreEvent == null) {
+
+                    onComplete(false, false)
+                    return@addOnSuccessListener
+                }
+
+                val alreadyRsvpd = firestoreEvent.rsvpUserIds.contains(userId)
+                // ----------------------------------------
+                // UN-RSVP
+                // ----------------------------------------
+                if (alreadyRsvpd) {
+
+                    firestoreEvent.rsvpUserIds.remove(userId)
+                    firestoreEvent.rsvpCount -= 1
+
+                } else {
+
+                    // ----------------------------------------
+                    // RSVP
+                    // ----------------------------------------
+                    firestoreEvent.rsvpUserIds.add(userId)
+                    firestoreEvent.rsvpCount += 1
+                }
+
+                // ----------------------------------------
+                // UPDATE FIRESTORE
+                // ----------------------------------------
+                updateRsvp(
+                    firestoreEvent.topicId,
+                    firestoreEvent.id,
+                    firestoreEvent.rsvpUserIds,
+                    firestoreEvent.rsvpCount
+                ) { success ->
+
+                    if (success) {
+
+                        // ----------------------------------------
+                        // USER SAVED EVENTS
+                        // ----------------------------------------
+                        if (alreadyRsvpd) {
+
+                            UserRepository.removeUserEvent(
+                                userId,
+                                firestoreEvent.id
+                            )
+
+                            println("Removing RSVP")
+
+                        } else {
+
+                            UserRepository.addUserEvent(
+                                userId,
+                                firestoreEvent
+                            )
+                            println("Adding RSVP")
+                        }
+
+                        onComplete(true, !alreadyRsvpd)
+
+                    } else {
+                        onComplete(false, alreadyRsvpd)
+                    }
+                }
+            }
+
+            .addOnFailureListener {
+                println("Failed to fetch event: ${it.message}")
+                onComplete(false, false)
+            }
+        println("toggleRSVP exit")
+    }
+
+    //gets user rsvp status for button state of event message invites
+    fun isUserRsvpd(
+        topicId: String,
+        eventId: String,
+        onResult: (Boolean) -> Unit
+    ) {
+
+        val userId = SessionManager.requireUserId()
+
+        FirebaseFirestore.getInstance()
+            .collection("topics")
+            .document(topicId)
+            .collection("events")
+            .document(eventId)
+            .get()
+
+            .addOnSuccessListener { doc ->
+
+                val rsvpList =
+                    doc.get("rsvpUserIds") as? List<String>
+                        ?: emptyList()
+
+                onResult(rsvpList.contains(userId))
+            }
+
+            .addOnFailureListener {
+                onResult(false)
+            }
+    }
 }
