@@ -289,7 +289,7 @@ class FriendProfileActivity : AppCompatActivity() {
                     "@$username".lowercase()
 
                 findViewById<TextView>(R.id.majorText).text = friendMajor
-                findViewById<TextView>(R.id.gradYearText).text = "Class of $gradYear"
+                findViewById<TextView>(R.id.gradYearText).text = "$gradYear"
                 findViewById<TextView>(R.id.bioText).text = friendBio
             }
     }

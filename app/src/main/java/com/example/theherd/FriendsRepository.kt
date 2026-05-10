@@ -481,43 +481,23 @@ object FriendsRepository {
 
         val batch = db.batch()
 
-        // Add friend to current user
-        val myFriendRef = currentUserRef
-            .collection("friends")
-            .document(fromUserID)
-
-        batch.set(myFriendRef, mapOf(
+        batch.set(currentUserRef.collection("friends").document(fromUserID), mapOf(
             "userID" to fromUserID,
             "addedAt" to FieldValue.serverTimestamp()
         ))
 
-        // Add current user to other user's friends
-        val theirFriendRef = otherUserRef
-            .collection("friends")
-            .document(currentUserID)
-
-        batch.set(theirFriendRef, mapOf(
+        batch.set(otherUserRef.collection("friends").document(currentUserID), mapOf(
             "userID" to currentUserID,
             "addedAt" to FieldValue.serverTimestamp()
         ))
 
-        //Case 1: Remove friend request (Normal case, user A sent request to user B with no pending requests)
-        val requestRef = currentUserRef
-            .collection("friendRequests")
-            .document(fromUserID)
+        // delete incoming requests
+        batch.delete(currentUserRef.collection("friendRequests").document(fromUserID))
+        batch.delete(otherUserRef.collection("friendRequests").document(currentUserID))
 
-        batch.delete(requestRef)
-
-        //Case 2: If both users friend requested each other, remove the request from both accounts
-        val reverseRequestRef = otherUserRef
-            .collection("friendRequests")
-            .document(currentUserID)
-
-        val incomingRequest = currentUserRef.collection("friendRequests").document(fromUserID)
-        batch.delete(incomingRequest)
-
-        val outgoingRequest = otherUserRef.collection("friendRequests").document(currentUserID)
-        batch.delete(outgoingRequest)
+        // delete outgoing requests
+        batch.delete(currentUserRef.collection("sentFriendRequests").document(fromUserID))
+        batch.delete(otherUserRef.collection("sentFriendRequests").document(currentUserID))
 
         batch.commit()
             .addOnSuccessListener { onComplete(true) }
