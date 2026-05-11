@@ -71,6 +71,28 @@ object GuideRepository {
     fun getGuideById(id: String?): Guide? {
         return allGuides.find { it.id == id }
     }
+    private fun getCurrentFirstName(): String {
+
+        val user = FirebaseAuth.getInstance().currentUser
+
+        val displayName = user?.displayName
+
+        if (!displayName.isNullOrBlank()) {
+            return displayName
+                .trim()
+                .split(" ")[0]
+        }
+
+        val email = user?.email
+
+        if (!email.isNullOrBlank()) {
+            return email
+                .substringBefore("@")
+                .replaceFirstChar { it.uppercase() }
+        }
+
+        return "Student"
+    }
 
     fun createGuide(
         title: String,
@@ -111,7 +133,7 @@ object GuideRepository {
         val questionData = hashMapOf(
             "questionId" to questionRef.id,
             "questionText" to questionText,
-            "username" to username,
+            "username" to getCurrentFirstName(),
             "timestamp" to System.currentTimeMillis(),
             "createdAt" to FieldValue.serverTimestamp()
         )
@@ -284,7 +306,7 @@ object GuideRepository {
         val answerData = hashMapOf(
             "answerId" to answerRef.id,
             "answerText" to answerText,
-            "username" to username,
+            "username" to getCurrentFirstName(),
             "timestamp" to System.currentTimeMillis(),
             "createdAt" to FieldValue.serverTimestamp(),
             "upvotes" to 0,
