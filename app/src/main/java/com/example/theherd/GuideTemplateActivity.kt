@@ -3,23 +3,19 @@ package com.example.theherd
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class GuideTemplateActivity : BaseActivity() {
 
+    private lateinit var questionsAdapter: QuestionsAdapter
+    private var guideId: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guide_template)
-        setupNavigation() // sets up all buttons in the tool/nav bar
+        setupNavigation()
 
         val homeButton: ImageButton = findViewById(R.id.homeButton)
         homeButton.setOnClickListener { finish() }
@@ -27,7 +23,7 @@ class GuideTemplateActivity : BaseActivity() {
         val titleText: TextView = findViewById(R.id.dynamic_guide_title)
         val descText: TextView = findViewById(R.id.dynamic_guide_desc)
 
-        val guideId = intent.getStringExtra("GUIDE_ID") ?: ""
+        guideId = intent.getStringExtra("GUIDE_ID") ?: ""
 
         if (guideId.isBlank()) {
             Toast.makeText(this, "Error: Missing guide ID", Toast.LENGTH_SHORT).show()
@@ -39,12 +35,69 @@ class GuideTemplateActivity : BaseActivity() {
             if (selectedGuide != null) {
                 titleText.text = selectedGuide.title
                 descText.text = selectedGuide.description
-            } else {
-                Toast.makeText(this, "Error: Guide not found", Toast.LENGTH_SHORT).show()
-                finish()
             }
         }
 
+        val rvQuestions: RecyclerView = findViewById(R.id.rvQuestions)
+        val etQuestionInput: EditText = findViewById(R.id.etQuestionInput)
+        val askQuestionButton: Button = findViewById(R.id.askQuestionButton)
+
+        rvQuestions.layoutManager = LinearLayoutManager(this)
+
+        questionsAdapter = QuestionsAdapter(emptyList()) { question ->
+            val intent = Intent(this, AnswerActivity::class.java)
+            intent.putExtra("guideId", guideId)
+            intent.putExtra("questionId", question.questionId)
+            intent.putExtra("questionText", question.questionText)
+            intent.putExtra("username", question.username)
+            intent.putExtra("timestamp", question.timestamp ?: System.currentTimeMillis())
+            startActivity(intent)
+        }
+
+        rvQuestions.adapter = questionsAdapter
+
+        askQuestionButton.setOnClickListener {
+            val questionText = etQuestionInput.text.toString().trim()
+
+            if (questionText.isBlank()) {
+                Toast.makeText(this, "Please type a question", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            GuideRepository.addQuestion(
+                guideId = guideId,
+                questionText = questionText,
+                username = "Student"
+            ) { success ->
+                if (success) {
+                    etQuestionInput.text.clear()
+                    refreshQuestions()
+                    Toast.makeText(this, "Question posted", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Failed to post question", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        refreshQuestions()
+        setupHelpfulButtons()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (::questionsAdapter.isInitialized && guideId.isNotBlank()) {
+            refreshQuestions()
+        }
+    }
+
+    private fun refreshQuestions() {
+        GuideRepository.getQuestions(guideId) { questions ->
+            questionsAdapter.updateData(questions)
+        }
+    }
+
+    private fun setupHelpfulButtons() {
         val thumbsUpButton: ImageButton = findViewById(R.id.thumbsUpButton)
         val thumbsDownButton: ImageButton = findViewById(R.id.thumbsDownButton)
         val feedbackEditText: EditText = findViewById(R.id.feedbackEditText)
@@ -81,57 +134,6 @@ class GuideTemplateActivity : BaseActivity() {
                 feedbackEditText.text.clear()
             } else {
                 Toast.makeText(this, "Please tell us how to improve!", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        val rvQuestions: RecyclerView = findViewById(R.id.rvQuestions)
-        val etQuestionInput: EditText = findViewById(R.id.etQuestionInput)
-        val askQuestionButton: Button = findViewById(R.id.askQuestionButton)
-
-        rvQuestions.layoutManager = LinearLayoutManager(this)
-
-        val adapter = QuestionsAdapter(emptyList()) { question ->
-            val intent = Intent(this, AnswerActivity::class.java)
-
-            intent.putExtra("guideId", guideId)
-            intent.putExtra("questionId", question.questionId)
-            intent.putExtra("questionText", question.questionText)
-            intent.putExtra("username", question.username)
-            intent.putExtra("timestamp", question.timestamp ?: System.currentTimeMillis())
-
-            startActivity(intent)
-        }
-
-        rvQuestions.adapter = adapter
-
-        fun refreshQuestions() {
-            GuideRepository.getQuestions(guideId) { questions ->
-                adapter.updateData(questions)
-            }
-        }
-
-        refreshQuestions()
-
-        askQuestionButton.setOnClickListener {
-            val questionText = etQuestionInput.text.toString().trim()
-
-            if (questionText.isBlank()) {
-                Toast.makeText(this, "Please type a question", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            GuideRepository.addQuestion(
-                guideId = guideId,
-                questionText = questionText,
-                username = "Student"
-            ) { success ->
-                if (success) {
-                    etQuestionInput.text.clear()
-                    refreshQuestions()
-                    Toast.makeText(this, "Question posted", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Failed to post question", Toast.LENGTH_SHORT).show()
-                }
             }
         }
     }

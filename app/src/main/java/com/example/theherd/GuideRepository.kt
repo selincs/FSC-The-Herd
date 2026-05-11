@@ -14,12 +14,54 @@ object GuideRepository {
 
 
     private val allGuides = listOf(
-        Guide("101", "Finding the Hidden Science Lab Classrooms", "A quick walkthrough from the main quad.", true, false, "Navigation"),
-        Guide("102", "FSC Shuttle Bus Schedule", "Times and stops for the campus loop.", false, true, "Travel"),
-        Guide("201", "How to Register for Classes", "Step-by-step for the new system.", true, false, "Academic"),
-        Guide("202", "FAFSA Deadline Guide", "Important dates for this semester.", true, false, "Financial Aid"),
-        Guide("301", "Dorm Room Essentials", "What you can and can't bring.", false, true, "Housing"),
-        Guide("302", "Joining 'The Herd' Club", "How to get involved on campus.", true, false, "Clubs")
+        Guide(
+            "101",
+            "Finding the Hidden Science Lab Classrooms",
+            "A quick walkthrough from the main quad.",
+            true,
+            false,
+            "Navigation"
+        ),
+        Guide(
+            "102",
+            "FSC Shuttle Bus Schedule",
+            "Times and stops for the campus loop.",
+            false,
+            true,
+            "Travel"
+        ),
+        Guide(
+            "201",
+            "How to Register for Classes",
+            "Step-by-step for the new system.",
+            true,
+            false,
+            "Academic"
+        ),
+        Guide(
+            "202",
+            "FAFSA Deadline Guide",
+            "Important dates for this semester.",
+            true,
+            false,
+            "Financial Aid"
+        ),
+        Guide(
+            "301",
+            "Dorm Room Essentials",
+            "What you can and can't bring.",
+            false,
+            true,
+            "Housing"
+        ),
+        Guide(
+            "302",
+            "Joining 'The Herd' Club",
+            "How to get involved on campus.",
+            true,
+            false,
+            "Clubs"
+        )
     )
 
     fun getAllGuides(): List<Guide> {
@@ -78,6 +120,7 @@ object GuideRepository {
             .addOnSuccessListener { onDone(true) }
             .addOnFailureListener { onDone(false) }
     }
+
     fun getGuidesFromFirestore(
         onDone: (List<Guide>) -> Unit
     ) {
@@ -94,6 +137,7 @@ object GuideRepository {
                 onDone(emptyList())
             }
     }
+
     fun voteGuide(
         guideId: String,
         newVote: String,
@@ -256,6 +300,7 @@ object GuideRepository {
                 onDone(false)
             }
     }
+
     fun getAnswers(
         guideId: String,
         questionId: String,
@@ -341,7 +386,47 @@ object GuideRepository {
                 "currentUserVote" to finalVote
             )
         )
-            .addOnSuccessListener { onDone(true) }
+            .addOnSuccessListener {
+                updateTopAnswer(guideId, questionId) {
+                    onDone(true)
+                }
+            }
             .addOnFailureListener { onDone(false) }
+    }
+    private fun updateTopAnswer(
+        guideId: String,
+        questionId: String,
+        onDone: () -> Unit
+    ) {
+        val questionRef = db.collection("guides")
+            .document(guideId)
+            .collection("questions")
+            .document(questionId)
+
+        questionRef.collection("answers")
+            .get()
+            .addOnSuccessListener { result ->
+
+                val topDoc = result.documents
+                    .filter { doc ->
+                        val upvotes = doc.getLong("upvotes") ?: 0
+                        upvotes > 0
+                    }
+                    .maxByOrNull { doc ->
+                        val upvotes = doc.getLong("upvotes") ?: 0
+                        val downvotes = doc.getLong("downvotes") ?: 0
+                        upvotes - downvotes
+                    }
+
+                val topAnswerText = topDoc?.getString("answerText") ?: ""
+
+                questionRef.update("topAnswer", topAnswerText)
+                    .addOnCompleteListener {
+                        onDone()
+                    }
+            }
+            .addOnFailureListener {
+                onDone()
+            }
     }
 }
