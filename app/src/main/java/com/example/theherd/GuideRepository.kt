@@ -5,6 +5,7 @@ import Model.GuideAnswer
 import Model.GuideQuestion
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuth
 
 
 object GuideRepository {
@@ -28,6 +29,7 @@ object GuideRepository {
     fun getGuideById(id: String?): Guide? {
         return allGuides.find { it.id == id }
     }
+
     fun createGuide(
         title: String,
         category: String,
@@ -247,24 +249,13 @@ object GuideRepository {
         )
 
         answerRef.set(answerData)
-//            .addOnSuccessListener { onDone(true) }
-//            .addOnFailureListener { onDone(false) }
             .addOnSuccessListener {
-                val questionRef = db.collection("guides")
-                    .document(guideId)
-                    .collection("questions")
-                    .document(questionId)
-
-                questionRef.update("topAnswer", answerText)
-                    .addOnSuccessListener { onDone(true) }
-                    .addOnFailureListener { onDone(false) }
+                onDone(true)
             }
-            .addOnFailureListener { onDone(false) }
-
-
-
+            .addOnFailureListener {
+                onDone(false)
+            }
     }
-
     fun getAnswers(
         guideId: String,
         questionId: String,

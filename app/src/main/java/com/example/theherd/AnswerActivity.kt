@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import android.view.View
 
 class AnswerActivity : BaseActivity() {
 
@@ -89,4 +90,5 @@ class AnswerActivity : BaseActivity() {
             adapter.updateData(answers)
         }
     }
+
 }
