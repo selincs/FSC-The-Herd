@@ -1,6 +1,7 @@
 package com.example.theherd
 
 import Model.GuideQuestion
+import android.graphics.Paint
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -16,9 +17,9 @@ class QuestionsAdapter(
     class QuestionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvUser: TextView = itemView.findViewById(R.id.tvQuestionUser)
         val tvText: TextView = itemView.findViewById(R.id.tvQuestionText)
-        val tvTime: TextView = itemView.findViewById(R.id.tvQuestionTime)
-
+        val tvVoteAnswer: TextView = itemView.findViewById(R.id.tvVoteAnswer)
         val tvAnswer: TextView = itemView.findViewById(R.id.tvAnswerText)
+        val tvTime: TextView = itemView.findViewById(R.id.tvQuestionTime)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionViewHolder {
@@ -32,6 +33,9 @@ class QuestionsAdapter(
 
         holder.tvUser.text = question.username
         holder.tvText.text = question.questionText
+
+        holder.tvVoteAnswer.paintFlags =
+            holder.tvVoteAnswer.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
         val relativeTime = DateUtils.getRelativeTimeSpanString(
             question.timestamp ?: System.currentTimeMillis(),
@@ -50,9 +54,11 @@ class QuestionsAdapter(
             holder.tvAnswer.visibility = View.GONE
         }
 
-
-
         holder.itemView.setOnClickListener {
+            onQuestionClick(question)
+        }
+
+        holder.tvVoteAnswer.setOnClickListener {
             onQuestionClick(question)
         }
     }

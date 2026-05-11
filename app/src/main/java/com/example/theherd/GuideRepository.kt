@@ -429,18 +429,29 @@ object GuideRepository {
             .get()
             .addOnSuccessListener { result ->
 
-                val topDoc = result.documents
-                    .filter { doc ->
-                        val upvotes = doc.getLong("upvotes") ?: 0
-                        upvotes > 0
-                    }
-                    .maxByOrNull { doc ->
-                        val upvotes = doc.getLong("upvotes") ?: 0
-                        val downvotes = doc.getLong("downvotes") ?: 0
-                        upvotes - downvotes
-                    }
+                if (result.isEmpty) {
+                    questionRef.update("topAnswer", "")
+                        .addOnCompleteListener { onDone() }
+                    return@addOnSuccessListener
+                }
 
-                val topAnswerText = topDoc?.getString("answerText") ?: ""
+                val topDoc = result.documents.maxByOrNull { doc ->
+                    val upvotes = doc.getLong("upvotes") ?: 0
+                    val downvotes = doc.getLong("downvotes") ?: 0
+                    upvotes - downvotes
+                }
+
+                val topScore = topDoc?.let { doc ->
+                    val upvotes = doc.getLong("upvotes") ?: 0
+                    val downvotes = doc.getLong("downvotes") ?: 0
+                    upvotes - downvotes
+                } ?: 0
+
+                val topAnswerText = if (topScore != 0L) {
+                    topDoc?.getString("answerText") ?: ""
+                } else {
+                    ""
+                }
 
                 questionRef.update("topAnswer", topAnswerText)
                     .addOnCompleteListener {
