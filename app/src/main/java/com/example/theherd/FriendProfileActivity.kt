@@ -247,17 +247,6 @@ class FriendProfileActivity : AppCompatActivity() {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
-
-        //TODO: Change status posts to load from Firestore once we have data in Firestore
-//        val statusPosts = listOf(
-//            StatusPost("Fountain Fest was 10/10 today! 🎡", "3 hours ago"),
-//            StatusPost("Looking for a study group for the CS Senior Project.", "Yesterday"),
-//            StatusPost("Java recursion is making my brain melt. 🫠", "2 days ago")
-//        )
-//
-//        val statusRecycler = findViewById<RecyclerView>(R.id.statusPostsRecycler)
-//        statusRecycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-//        statusRecycler.adapter = StatusAdapter(statusPosts)
     }
 
     //Should this be in FriendsRepo? It does do Firestore getting, but for now make it work.

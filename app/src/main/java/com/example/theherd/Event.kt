@@ -2,7 +2,7 @@ package com.example.theherd
 
 data class Event(
     var id: String = "",
-    var name: String,
+    var name: String = "",
     var location: String = "",
     var time: String = "",
     var hostId: String = "",

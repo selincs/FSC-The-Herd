@@ -36,6 +36,12 @@ object FriendsRepository {
                             val firstName = userDoc.getString("firstName") ?: ""
                             val lastName = userDoc.getString("lastName") ?: ""
                             val fullName = "$firstName $lastName".trim()
+                            val email = userDoc.getString("email") ?: ""
+                            val username = if (email.contains("@")) {
+                                email.substringBefore("@")
+                            } else {
+                                "Ram User"
+                            }
 
                             val isOnline = userDoc.getString("onlineStatus") == "online"
 
@@ -51,7 +57,8 @@ object FriendsRepository {
                                 name = fullName,
                                 statusText = latestStatusText,
                                 isOnline = isOnline,
-                                isFriend = true
+                                isFriend = true,
+                                username = username
                             )
 
                             friendsList.add(friend)
