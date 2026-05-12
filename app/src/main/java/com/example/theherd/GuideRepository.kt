@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 
 
+
 object GuideRepository {
 
     private val db = FirebaseFirestore.getInstance()
@@ -328,27 +329,81 @@ object GuideRepository {
         questionId: String,
         onDone: (List<GuideAnswer>) -> Unit
     ) {
-        db.collection("guides")
+        val userId = FirestoreAuthManager.currentUserId
+
+        val answersRef = db.collection("guides")
             .document(guideId)
             .collection("questions")
             .document(questionId)
             .collection("answers")
-            .orderBy("timestamp")
+
+        answersRef.orderBy("timestamp")
             .get()
             .addOnSuccessListener { result ->
-                val answers = result.documents.mapNotNull { doc ->
-                    GuideAnswer(
-                        doc.getString("answerId") ?: doc.id,
-                        doc.getString("answerText") ?: "",
-                        doc.getString("username") ?: "Anonymous",
-                        doc.getLong("timestamp") ?: System.currentTimeMillis(),
-                        doc.getLong("upvotes")?.toInt() ?: 0,
-                        doc.getLong("downvotes")?.toInt() ?: 0,
-                        doc.getString("currentUserVote") ?: ""
-                    )
+
+                if (result.isEmpty) {
+                    onDone(emptyList())
+                    return@addOnSuccessListener
                 }
 
-                onDone(answers)
+                val answers = mutableListOf<GuideAnswer>()
+                var loadedCount = 0
+                val totalCount = result.documents.size
+
+                for (doc in result.documents) {
+                    val answerId = doc.getString("answerId") ?: doc.id
+
+                    if (userId == null) {
+                        answers.add(
+                            GuideAnswer(
+                                answerId,
+                                doc.getString("answerText") ?: "",
+                                doc.getString("username") ?: "Anonymous",
+                                doc.getLong("timestamp") ?: System.currentTimeMillis(),
+                                doc.getLong("upvotes")?.toInt() ?: 0,
+                                doc.getLong("downvotes")?.toInt() ?: 0,
+                                ""
+                            )
+                        )
+
+                        loadedCount++
+                        if (loadedCount == totalCount) {
+                            onDone(answers)
+                        }
+                    } else {
+                        answersRef.document(answerId)
+                            .collection("votes")
+                            .document(userId)
+                            .get()
+                            .addOnSuccessListener { voteDoc ->
+
+                                val currentUserVote = voteDoc.getString("vote") ?: ""
+
+                                answers.add(
+                                    GuideAnswer(
+                                        answerId,
+                                        doc.getString("answerText") ?: "",
+                                        doc.getString("username") ?: "Anonymous",
+                                        doc.getLong("timestamp") ?: System.currentTimeMillis(),
+                                        doc.getLong("upvotes")?.toInt() ?: 0,
+                                        doc.getLong("downvotes")?.toInt() ?: 0,
+                                        currentUserVote
+                                    )
+                                )
+
+                                loadedCount++
+                                if (loadedCount == totalCount) {
+                                    onDone(answers.sortedBy { it.timestamp })
+                                }
+                            }
+                            .addOnFailureListener {
+                                loadedCount++
+                                if (loadedCount == totalCount) {
+                                    onDone(answers.sortedBy { it.timestamp })
+                                }
+                            }
+                    }
+                }
             }
             .addOnFailureListener {
                 onDone(emptyList())
@@ -362,6 +417,11 @@ object GuideRepository {
         newVote: String,
         onDone: (Boolean) -> Unit
     ) {
+        val userId = FirestoreAuthManager.currentUserId ?: run {
+            onDone(false)
+            return
+        }
+
         val answerRef = db.collection("guides")
             .document(guideId)
             .collection("questions")
@@ -369,51 +429,79 @@ object GuideRepository {
             .collection("answers")
             .document(answer.answerId)
 
-        val oldVote = answer.currentUserVote
+        val voteRef = answerRef
+            .collection("votes")
+            .document(userId)
 
-        var upChange = 0
-        var downChange = 0
-        var finalVote = newVote
+        db.runTransaction { transaction ->
 
-        if (oldVote == newVote) {
-            finalVote = ""
+            val answerSnapshot = transaction.get(answerRef)
+            val voteSnapshot = transaction.get(voteRef)
 
-            if (newVote == "up") {
-                upChange = -1
+            val oldVote = voteSnapshot.getString("vote") ?: ""
+
+            var upChange = 0
+            var downChange = 0
+            var finalVote = newVote
+
+            if (oldVote == newVote) {
+                finalVote = ""
+
+                if (newVote == "up") {
+                    upChange = -1
+                } else {
+                    downChange = -1
+                }
             } else {
-                downChange = -1
-            }
-        } else {
-            if (oldVote == "up") {
-                upChange -= 1
+                if (oldVote == "up") {
+                    upChange -= 1
+                }
+
+                if (oldVote == "down") {
+                    downChange -= 1
+                }
+
+                if (newVote == "up") {
+                    upChange += 1
+                }
+
+                if (newVote == "down") {
+                    downChange += 1
+                }
             }
 
-            if (oldVote == "down") {
-                downChange -= 1
-            }
+            val currentUpvotes = answerSnapshot.getLong("upvotes") ?: 0
+            val currentDownvotes = answerSnapshot.getLong("downvotes") ?: 0
 
-            if (newVote == "up") {
-                upChange += 1
-            }
+            transaction.update(
+                answerRef,
+                mapOf(
+                    "upvotes" to currentUpvotes + upChange,
+                    "downvotes" to currentDownvotes + downChange
+                )
+            )
 
-            if (newVote == "down") {
-                downChange += 1
+            if (finalVote.isBlank()) {
+                transaction.delete(voteRef)
+            } else {
+                transaction.set(
+                    voteRef,
+                    mapOf(
+                        "userId" to userId,
+                        "vote" to finalVote,
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    )
+                )
             }
         }
-
-        answerRef.update(
-            mapOf(
-                "upvotes" to FieldValue.increment(upChange.toLong()),
-                "downvotes" to FieldValue.increment(downChange.toLong()),
-                "currentUserVote" to finalVote
-            )
-        )
             .addOnSuccessListener {
                 updateTopAnswer(guideId, questionId) {
                     onDone(true)
                 }
             }
-            .addOnFailureListener { onDone(false) }
+            .addOnFailureListener {
+                onDone(false)
+            }
     }
     private fun updateTopAnswer(
         guideId: String,
