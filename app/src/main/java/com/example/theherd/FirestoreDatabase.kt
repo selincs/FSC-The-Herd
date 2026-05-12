@@ -16,5 +16,6 @@ object FirestoreDatabase {
     // Collections (Tables)
     val users = db.collection("users")
     val topics = db.collection("topics")
+    val guides = db.collection("guides")
 
 }

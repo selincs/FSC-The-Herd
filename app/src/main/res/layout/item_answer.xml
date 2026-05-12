@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- Answer text side -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvAnswerUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Student Name"
+                android:textColor="#2E7D32"
+                android:textStyle="bold"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvAnswerContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Answer content goes here..."
+                android:textColor="#333333"
+                android:textSize="16sp"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Vote side (horizontal) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Upvote -->
+            <ImageButton
+                android:id="@+id/btnUpVote"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/outline_arrow_upward_24"
+                app:tint="#555555" />
+
+            <TextView
+                android:id="@+id/tvUpCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:layout_marginEnd="8dp"
+                android:textStyle="bold" />
+
+            <!-- Downvote -->
+            <ImageButton
+                android:id="@+id/btnDownVote"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/outline_arrow_downward_24"
+                app:tint="#555555" />
+
+            <TextView
+                android:id="@+id/tvDownCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -75,6 +75,9 @@
             android:name=".GuideMainPageActivity"
             android:exported="false"/>
         <activity
+            android:name=".AnswerActivity"
+            android:exported="false" />
+        <activity
             android:name=".GuideTemplateActivity"
             android:exported="false"/>
         <activity

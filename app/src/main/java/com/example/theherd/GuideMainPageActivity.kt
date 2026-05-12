@@ -1,123 +1,96 @@
 package com.example.theherd
 
 import Model.Guide
-import Model.GuideRepository
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.theherd.databinding.ActivityGuideMainBinding
-import com.example.theherd.GuidesAdapter
-
 
 class GuideMainPageActivity : BaseActivity() {
 
     private lateinit var binding: ActivityGuideMainBinding
+    private lateinit var categoryName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGuideMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         setupNavigation()
 
-        setupRecyclerView()
+        categoryName = intent.getStringExtra("CATEGORY_NAME") ?: "Navigation"
 
-        val incomingCategory = intent.getStringExtra("CATEGORY_NAME")
+        loadGuides()
+    }
 
-        if(incomingCategory != null) {
-            when (incomingCategory) {
-                "Navigation", "Travel" -> {
-                    println("User is looking for: $incomingCategory -> Routing to Campus Services")
-                }
-                "Academic", "Financial Aid" -> {
-                    println("User is looking for: $incomingCategory -> Routing to Academic Services")
-                }
-                "Housing", "Clubs", "Health & Wellness" -> {
-                    println("User is looking for: $incomingCategory -> Routing to Housing Services")
-                }
-                "Miscellaneous" -> {
-                    println("User is looking for: $incomingCategory -> Routing to Miscellaneous Services")
-                }
-
-            }
-
+    private fun loadGuides() {
+        GuideRepository.getGuidesFromFirestore { guides ->
+            setupRecyclerView(guides)
         }
     }
 
+    private fun setupRecyclerView(allGuides: List<Guide>) {
+        val displayedGuides = allGuides.filter {
+            it.category == categoryName
+        }
 
-private fun setupRecyclerView() {
-    val allGuides = Model.GuideRepository.getAllGuides()
-    val incomingCategory = intent.getStringExtra("CATEGORY_NAME")
+        val campusGuides = displayedGuides.filter {
+            it.category == "Navigation" || it.category == "Travel"
+        }
 
-    val displayedGuides = if (incomingCategory != null) {
-        allGuides.filter { it.category == incomingCategory }
-    } else {
-        allGuides
-    }
+        val academicGuides = displayedGuides.filter {
+            it.category == "Academic" || it.category == "Financial Aid"
+        }
 
+        val studentLifeGuides = displayedGuides.filter {
+            it.category == "Housing" ||
+                    it.category == "Clubs" ||
+                    it.category == "Health & Wellness"
+        }
 
-    val campusGuides = displayedGuides.filter { it.category == "Navigation" || it.category == "Travel" }
-    val academicGuides = displayedGuides.filter { it.category == "Academic" || it.category == "Financial Aid" }
-    val studentLifeGuides = displayedGuides.filter { it.category == "Housing" || it.category == "Clubs" || it.category == "Health & Wellness" }
-    val otherGuides = displayedGuides.filter { it.category == "Miscellaneous" || it.category == "Other (specify below)" }
+        val otherGuides = displayedGuides.filter {
+            it.category == "Miscellaneous" ||
+                    it.category == "Other (specify below)"
+        }
 
-    val campusAdapter = GuidesAdapter()
-    val academicAdapter = GuidesAdapter()
-    val studentLifeAdapter = GuidesAdapter()
-    val otherAdapter = GuidesAdapter()
+        val campusAdapter = GuidesAdapter()
+        val academicAdapter = GuidesAdapter()
+        val studentLifeAdapter = GuidesAdapter()
+        val otherAdapter = GuidesAdapter()
 
-    binding.rvCampusServices.adapter = campusAdapter
-    binding.rvAcademicServices.adapter = academicAdapter
-    binding.rvStudentLife.adapter = studentLifeAdapter
-    binding.rvOther.adapter = otherAdapter
+        binding.rvCampusServices.adapter = campusAdapter
+        binding.rvAcademicServices.adapter = academicAdapter
+        binding.rvStudentLife.adapter = studentLifeAdapter
+        binding.rvOther.adapter = otherAdapter
 
-    binding.rvCampusServices.layoutManager = GridLayoutManager(this, 2)
-    binding.rvAcademicServices.layoutManager = GridLayoutManager(this, 2)
-    binding.rvStudentLife.layoutManager = GridLayoutManager(this, 2)
-    binding.rvOther.layoutManager = GridLayoutManager(this, 2)
+        binding.rvCampusServices.layoutManager = GridLayoutManager(this, 2)
+        binding.rvAcademicServices.layoutManager = GridLayoutManager(this, 2)
+        binding.rvStudentLife.layoutManager = GridLayoutManager(this, 2)
+        binding.rvOther.layoutManager = GridLayoutManager(this, 2)
 
-    campusAdapter.submitList(campusGuides)
-    academicAdapter.submitList(academicGuides)
-    studentLifeAdapter.submitList(studentLifeGuides)
-    otherAdapter.submitList(otherGuides)
+        campusAdapter.submitList(campusGuides)
+        academicAdapter.submitList(academicGuides)
+        studentLifeAdapter.submitList(studentLifeGuides)
+        otherAdapter.submitList(otherGuides)
 
-    if (campusGuides.isEmpty()) {
-        binding.tvCampusHeader.visibility = android.view.View.GONE
-        binding.rvCampusServices.visibility = android.view.View.GONE
-    } else {
-        binding.tvCampusHeader.visibility = android.view.View.VISIBLE
-        binding.rvCampusServices.visibility = android.view.View.VISIBLE
-    }
+        binding.tvCampusHeader.visibility =
+            if (campusGuides.isEmpty()) View.GONE else View.VISIBLE
+        binding.rvCampusServices.visibility =
+            if (campusGuides.isEmpty()) View.GONE else View.VISIBLE
 
-    if (academicGuides.isEmpty()) {
-        binding.tvAcademicHeader.visibility = android.view.View.GONE
-        binding.rvAcademicServices.visibility = android.view.View.GONE
-    } else {
-        binding.tvAcademicHeader.visibility = android.view.View.VISIBLE
-        binding.rvAcademicServices.visibility = android.view.View.VISIBLE
-    }
+        binding.tvAcademicHeader.visibility =
+            if (academicGuides.isEmpty()) View.GONE else View.VISIBLE
+        binding.rvAcademicServices.visibility =
+            if (academicGuides.isEmpty()) View.GONE else View.VISIBLE
 
-    if (studentLifeGuides.isEmpty()) {
-        binding.tvStudentLifeHeader.visibility = android.view.View.GONE
-        binding.rvStudentLife.visibility = android.view.View.GONE
-    } else {
-        binding.tvStudentLifeHeader.visibility = android.view.View.VISIBLE
-        binding.rvStudentLife.visibility = android.view.View.VISIBLE
-    }
+        binding.tvStudentLifeHeader.visibility =
+            if (studentLifeGuides.isEmpty()) View.GONE else View.VISIBLE
+        binding.rvStudentLife.visibility =
+            if (studentLifeGuides.isEmpty()) View.GONE else View.VISIBLE
 
-    if (otherGuides.isEmpty()) {
-        binding.tvOtherHeader.visibility = android.view.View.GONE
-        binding.rvOther.visibility = android.view.View.GONE
-    } else {
-        binding.tvOtherHeader.visibility = android.view.View.VISIBLE
-        binding.rvOther.visibility = android.view.View.VISIBLE
-    }
-}
-    private fun showSuggestDialog() {
-        val builder = AlertDialog.Builder(this)
-        val dialogView = layoutInflater.inflate(R.layout.suggest_guide_dialogue, null)
-        builder.setView(dialogView).show()
+        binding.tvOtherHeader.visibility =
+            if (otherGuides.isEmpty()) View.GONE else View.VISIBLE
+        binding.rvOther.visibility =
+            if (otherGuides.isEmpty()) View.GONE else View.VISIBLE
     }
 }
