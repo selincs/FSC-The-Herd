@@ -414,13 +414,17 @@ object GuideRepository {
         guideId: String,
         questionId: String,
         answer: GuideAnswer,
-        newVote: String,
+        voteType: String, // "up" or "down"
         onDone: (Boolean) -> Unit
     ) {
-        val userId = FirestoreAuthManager.currentUserId ?: run {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user == null) {
             onDone(false)
             return
         }
+
+        val uid = user.uid
+        val db = FirebaseFirestore.getInstance()
 
         val answerRef = db.collection("guides")
             .document(guideId)
@@ -429,79 +433,45 @@ object GuideRepository {
             .collection("answers")
             .document(answer.answerId)
 
-        val voteRef = answerRef
-            .collection("votes")
-            .document(userId)
+        val voteRef = answerRef.collection("votes").document(uid)
 
         db.runTransaction { transaction ->
+            val voteSnap = transaction.get(voteRef)
+            val oldVote = voteSnap.getString("voteType")
 
-            val answerSnapshot = transaction.get(answerRef)
-            val voteSnapshot = transaction.get(voteRef)
+            if (oldVote == voteType) {
+                // same button clicked again = remove vote
+                transaction.delete(voteRef)
 
-            val oldVote = voteSnapshot.getString("vote") ?: ""
-
-            var upChange = 0
-            var downChange = 0
-            var finalVote = newVote
-
-            if (oldVote == newVote) {
-                finalVote = ""
-
-                if (newVote == "up") {
-                    upChange = -1
+                if (voteType == "up") {
+                    transaction.update(answerRef, "upvotes", FieldValue.increment(-1))
                 } else {
-                    downChange = -1
+                    transaction.update(answerRef, "downvotes", FieldValue.increment(-1))
                 }
+
             } else {
+                // switching vote or first vote
+                transaction.set(voteRef, mapOf("voteType" to voteType))
+
                 if (oldVote == "up") {
-                    upChange -= 1
+                    transaction.update(answerRef, "upvotes", FieldValue.increment(-1))
                 }
 
                 if (oldVote == "down") {
-                    downChange -= 1
+                    transaction.update(answerRef, "downvotes", FieldValue.increment(-1))
                 }
 
-                if (newVote == "up") {
-                    upChange += 1
-                }
-
-                if (newVote == "down") {
-                    downChange += 1
+                if (voteType == "up") {
+                    transaction.update(answerRef, "upvotes", FieldValue.increment(1))
+                } else {
+                    transaction.update(answerRef, "downvotes", FieldValue.increment(1))
                 }
             }
-
-            val currentUpvotes = answerSnapshot.getLong("upvotes") ?: 0
-            val currentDownvotes = answerSnapshot.getLong("downvotes") ?: 0
-
-            transaction.update(
-                answerRef,
-                mapOf(
-                    "upvotes" to currentUpvotes + upChange,
-                    "downvotes" to currentDownvotes + downChange
-                )
-            )
-
-            if (finalVote.isBlank()) {
-                transaction.delete(voteRef)
-            } else {
-                transaction.set(
-                    voteRef,
-                    mapOf(
-                        "userId" to userId,
-                        "vote" to finalVote,
-                        "updatedAt" to FieldValue.serverTimestamp()
-                    )
-                )
-            }
+        }.addOnSuccessListener {
+            onDone(true)
+        }.addOnFailureListener {
+            onDone(false)
         }
-            .addOnSuccessListener {
-                updateTopAnswer(guideId, questionId) {
-                    onDone(true)
-                }
-            }
-            .addOnFailureListener {
-                onDone(false)
-            }
     }
     private fun updateTopAnswer(
         guideId: String,
