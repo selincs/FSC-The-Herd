@@ -317,7 +317,9 @@ object GuideRepository {
 
         answerRef.set(answerData)
             .addOnSuccessListener {
-                onDone(true)
+                updateTopAnswer(guideId, questionId) {
+                    onDone(true)
+                }
             }
             .addOnFailureListener {
                 onDone(false)
@@ -377,7 +379,7 @@ object GuideRepository {
                             .get()
                             .addOnSuccessListener { voteDoc ->
 
-                                val currentUserVote = voteDoc.getString("vote") ?: ""
+                                val currentUserVote = voteDoc.getString("voteType") ?: ""
 
                                 answers.add(
                                     GuideAnswer(
@@ -468,7 +470,9 @@ object GuideRepository {
                 }
             }
         }.addOnSuccessListener {
-            onDone(true)
+            updateTopAnswer(guideId, questionId) {
+                onDone(true)
+            }
         }.addOnFailureListener {
             onDone(false)
         }
