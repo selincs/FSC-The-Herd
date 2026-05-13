@@ -347,19 +347,6 @@ class ProfileActivity : BaseActivity() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val uid = user.uid
         val db = FirebaseFirestore.getInstance()
-        val avatarName = "default"
-
-        val avatarResId = when (avatarName) {
-            "default" -> R.drawable.avatar_1
-            "avatar_1" -> R.drawable.avatar_2
-            "avatar_2" -> R.drawable.avatar_3
-            "avatar_3" -> R.drawable.avatar_4
-            "avatar_4" -> R.drawable.avatar_5
-            else -> R.drawable.avatar_1
-        }
-
-
-        findViewById<ImageView>(R.id.profileImage).setImageResource(avatarResId)
 
         db.collection("users")
             .document(uid)
@@ -367,6 +354,26 @@ class ProfileActivity : BaseActivity() {
             .addOnSuccessListener { document ->
 
                 if (!document.exists()) return@addOnSuccessListener
+
+                val avatarName =
+                    document.getString("avatar") ?: "avatar_1"
+
+                val avatarResId = when (avatarName) {
+
+                    "avatar_1" -> R.drawable.avatar_1
+
+                    "avatar_2" -> R.drawable.avatar_2
+
+                    "avatar_3" -> R.drawable.avatar_3
+
+                    "avatar_4" -> R.drawable.avatar_4
+
+                    "avatar_5" -> R.drawable.avatar_5
+
+                    else -> R.drawable.avatar_1
+                }
+
+                findViewById<ImageView>(R.id.profileImage).setImageResource(avatarResId)
 
                 findViewById<EditText>(R.id.firstNameInput)
                     .setText(document.getString("firstName") ?: "")

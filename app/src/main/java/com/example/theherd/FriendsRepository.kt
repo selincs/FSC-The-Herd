@@ -543,7 +543,10 @@ object FriendsRepository {
             else -> "firstName"
         }
 
-        val normalizedQuery = query.lowercase().trim()
+        //TODO: Firestore User documents require normalized lower case fields for this to work properly.
+        // Commenting out the lowercase() version until this is implemented, though lowercase is the best implementation overall
+//        val normalizedQuery = query.lowercase().trim()
+        val normalizedQuery = query.trim()
 
         db.collection("users")
             .whereEqualTo(field, normalizedQuery)
