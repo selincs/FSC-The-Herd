@@ -20,163 +20,162 @@
 1. **Sign Up**  
    Sign up for The Herd with valid FSC credentials.
 
-   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/5bf38c23-12e4-46fd-994b-c227b6e4508d" />
+   <img width="160" alt="Sign Up" src="https://github.com/user-attachments/assets/5bf38c23-12e4-46fd-994b-c227b6e4508d" />
 
 ---
 
 2. **Log In**  
    Log in to your newly created account.
 
-   <img width="230" height="512" alt="log in" src="https://github.com/user-attachments/assets/d65a2a85-366f-4ecc-a542-e26d5b474c26" />
+   <img width="160" alt="Log In" src="https://github.com/user-attachments/assets/d65a2a85-366f-4ecc-a542-e26d5b474c26" />
 
 ---
 
 3. **Customize Your Profile Page**  
    Select an avatar, add your major and graduation date, and create new status updates.
 
-   <img width="230" height="512" alt="profile1" src="https://github.com/user-attachments/assets/08dde91f-dcd9-4621-a408-280e48713392" />
+   <img width="160" alt="Profile 1" src="https://github.com/user-attachments/assets/08dde91f-dcd9-4621-a408-280e48713392" />
 
-   <img width="230" height="512" alt="profile2" src="https://github.com/user-attachments/assets/aed6548f-3d9a-48a9-82e3-fee10c19dca9" />
+   <img width="160" alt="Profile 2" src="https://github.com/user-attachments/assets/aed6548f-3d9a-48a9-82e3-fee10c19dca9" />
 
 ---
 
 4. **Shared Communities**  
    See the Topics & Communities you share with your Friends.
 
-   <img width="230" height="512" alt="Screenshot_20260518_201522" src="https://github.com/user-attachments/assets/582584ce-798d-4337-bc79-c1c6af02da98" />
+   <img width="160" alt="Shared Communities" src="https://github.com/user-attachments/assets/582584ce-798d-4337-bc79-c1c6af02da98" />
 
 ---
 
 5. **Status Posts**  
    Create status posts to update your friends.
 
-   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/638fb0eb-2566-4255-894d-089a63ba9d81" />
+   <img width="160" alt="Status Post 1" src="https://github.com/user-attachments/assets/638fb0eb-2566-4255-894d-089a63ba9d81" />
 
-   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/264f67c0-d3ef-4750-8607-62a6a88a0466" />
+   <img width="160" alt="Status Post 2" src="https://github.com/user-attachments/assets/264f67c0-d3ef-4750-8607-62a6a88a0466" />
 
 ---
 
 6. **Friends List**  
    View and manage all of your friends in The Herd.
 
-   <img width="230" height="512" alt="Screenshot_20260518_201249" src="https://github.com/user-attachments/assets/610f53d0-fb74-4633-a7c9-9c1096e9f9ee" />
+   <img width="160" alt="Friends List" src="https://github.com/user-attachments/assets/610f53d0-fb74-4633-a7c9-9c1096e9f9ee" />
 
 ---
 
 7. **Messaging**  
    Send direct messages between friends.
 
-   <img width="230" height="512" alt="Screenshot_20260518_201639" src="https://github.com/user-attachments/assets/e51165c3-f691-496c-8b1c-d3207b6c1c63" />
+   <img width="160" alt="Messaging" src="https://github.com/user-attachments/assets/e51165c3-f691-496c-8b1c-d3207b6c1c63" />
 
 ---
 
 8. **Friend Requests**  
    Send outgoing requests to potential friends and manage your incoming friend requests.
 
-   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/6576ef69-618c-465a-a73a-4cd32e43b401" />
+   <img width="160" alt="Friend Requests" src="https://github.com/user-attachments/assets/6576ef69-618c-465a-a73a-4cd32e43b401" />
 
 ---
 
 9. **Blocking**  
    Block users you no longer wish to interact with via their profile.
 
-   <img width="230" height="512" alt="Screenshot_20260518_201417" src="https://github.com/user-attachments/assets/aa0c89d4-f3bd-45a4-abd8-2aa611f24665" />
+   <img width="160" alt="Blocking" src="https://github.com/user-attachments/assets/aa0c89d4-f3bd-45a4-abd8-2aa611f24665" />
 
 ---
 
 10. **Events Calendar**  
     View an event’s existing events by date.
 
-   <img width="230" height="512" alt="Screenshot_20260518_201726" src="https://github.com/user-attachments/assets/f4d120b7-41fd-4fdd-86bc-cc4171b28353" />
+   <img width="160" alt="Events Calendar" src="https://github.com/user-attachments/assets/f4d120b7-41fd-4fdd-86bc-cc4171b28353" />
 
 ---
 
 11. **Event Creation**  
     Create & host your own events within a particular Topic.
 
-   <img width="230" height="512" alt="Screenshot_20260518_201748" src="https://github.com/user-attachments/assets/934100eb-8ed8-4576-bbfe-5117594b8f02" />
+   <img width="160" alt="Event Creation" src="https://github.com/user-attachments/assets/934100eb-8ed8-4576-bbfe-5117594b8f02" />
 
 ---
 
 12. **Event RSVPs**  
     RSVP to events you are interested in attending.
 
-   <img width="411" height="452" alt="unnamed" src="https://github.com/user-attachments/assets/516f5338-f8bf-41b2-b226-0beb80600bd5" />
+   <img width="160" alt="Event RSVPs" src="https://github.com/user-attachments/assets/516f5338-f8bf-41b2-b226-0beb80600bd5" />
 
 ---
 
 13. **Event Sharing**  
     Send invites with event details to your friends.
 
-   <img width="405" height="470" alt="unnamed" src="https://github.com/user-attachments/assets/0b620241-136f-4bc3-ac88-2b94c439f49c" />
+   <img width="160" alt="Event Sharing" src="https://github.com/user-attachments/assets/0b620241-136f-4bc3-ac88-2b94c439f49c" />
 
 ---
 
 14. **Guides Archive**  
     View a collection of student-created guides.
 
-   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/f59be3ee-4311-4bc7-9515-b6b97a27a056" />
+   <img width="160" alt="Guides Archive 1" src="https://github.com/user-attachments/assets/f59be3ee-4311-4bc7-9515-b6b97a27a056" />
 
-   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/a5558ec1-ac52-4e9c-8db8-14d097b04d33" />
+   <img width="160" alt="Guides Archive 2" src="https://github.com/user-attachments/assets/a5558ec1-ac52-4e9c-8db8-14d097b04d33" />
 
 ---
 
 15. **Guides Q&A**  
     Ask questions or answer other students’ questions. The community can collectively vote on the most helpful answers with upvotes and downvotes.
 
-    <img width="230" height="512" alt="Screenshot_20260518_204013" src="https://github.com/user-attachments/assets/6e541016-0a98-4733-b24c-4968094b3ccd" />
+   <img width="160" alt="Guides Q&A" src="https://github.com/user-attachments/assets/6e541016-0a98-4733-b24c-4968094b3ccd" />
 
 ---
 
 16. **Topic Creation**  
     Can't find a Topic matching your interests? Make your own.
 
-   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/5bd2bc52-29f0-4e74-8043-5cfc1bc360aa" />
+   <img width="160" alt="Topic Creation" src="https://github.com/user-attachments/assets/5bd2bc52-29f0-4e74-8043-5cfc1bc360aa" />
 
 ---
 
 17. **Topic Membership**  
     Join Topics you resonate with and engage with other students.
 
-   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/92050bcf-2c42-4e8c-bd44-b90c90ff7be6" />
+   <img width="160" alt="Topic Membership" src="https://github.com/user-attachments/assets/92050bcf-2c42-4e8c-bd44-b90c90ff7be6" />
 
 ---
 
 18. **Searching & Filtering**  
     Quickly filter between Topics you have joined or search for one by keyword.
 
-    <img width="230" height="512" alt="Screenshot_20260518_204239" src="https://github.com/user-attachments/assets/d2f8ceba-f8ed-4d20-9db7-24d88c952dcb" />
+   <img width="160" alt="Searching & Filtering" src="https://github.com/user-attachments/assets/d2f8ceba-f8ed-4d20-9db7-24d88c952dcb" />
 
 ---
 
 19. **Community Board Posts**  
     Post within a Community Board to make your thoughts and opinions heard.
 
-   <img width="230" height="512" alt="Screenshot_20260518_202253" src="https://github.com/user-attachments/assets/6a77abee-954d-4cc8-a591-a2ecb00768dc" />
+   <img width="160" alt="Community Board Posts" src="https://github.com/user-attachments/assets/6a77abee-954d-4cc8-a591-a2ecb00768dc" />
 
 ---
 
 20. **Community Board Comments & Likes**  
     Comment on posts and like comments you agree with.
 
-   <img width="230" height="512" alt="Screenshot_20260518_202231" src="https://github.com/user-attachments/assets/39e2788b-b36f-4d36-9994-4cf2007ade56" />
+   <img width="160" alt="Community Board Comments" src="https://github.com/user-attachments/assets/39e2788b-b36f-4d36-9994-4cf2007ade56" />
 
 ---
 
 21. **Commitment Streaks**  
     Create goals and track your progress toward your commitments.
 
-   <img width="350" height="473" alt="unnamed" src="https://github.com/user-attachments/assets/d5e185f1-90f5-4aae-bbf7-8dc2b8294105" />
+   <img width="160" alt="Commitment Streaks 1" src="https://github.com/user-attachments/assets/d5e185f1-90f5-4aae-bbf7-8dc2b8294105" />
 
-   <img width="385" height="291" alt="unnamed" src="https://github.com/user-attachments/assets/a2d824a6-f7bf-4587-8f77-2aa3a303709b" />
+   <img width="160" alt="Commitment Streaks 2" src="https://github.com/user-attachments/assets/a2d824a6-f7bf-4587-8f77-2aa3a303709b" />
 
 ---
 
 22. **Mentorship Enrollment**  
     Enroll as a volunteer mentor or as a mentee seeking guidance.
 
-   <img width="427" height="693" alt="unnamed" src="https://github.com/user-attachments/assets/078c7387-3974-447e-8a3b-5aa80269fcde" />
-
+   <img width="160" alt="Mentorship Enrollment" src="https://github.com/user-attachments/assets/078c7387-3974-447e-8a3b-5aa80269fcde" />
 
 ## Technologies Utilized
 - Android Studio
