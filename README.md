@@ -25,14 +25,13 @@
    <img width="230" height="512" alt="log in" src="https://github.com/user-attachments/assets/d65a2a85-366f-4ecc-a542-e26d5b474c26" />
 
 1. Customize your Profile page
-   - Select an avatar, add your major and graduation date, and create new status posts!
+   - Select an avatar, add your major and graduation date, and create new status updates!
    <img width="230" height="512" alt="profile1" src="https://github.com/user-attachments/assets/08dde91f-dcd9-4621-a408-280e48713392" />
    <img width="230" height="512" alt="profile2" src="https://github.com/user-attachments/assets/aed6548f-3d9a-48a9-82e3-fee10c19dca9" />
    
 1. Shared Communities
    - See the Topics & Communities you share with your Friends!
    
-  
 1. Status Posts
    - Create status posts to update your friends
 
@@ -43,7 +42,9 @@
    - Send direct messages between friends
    
 1. Friend Requests
-  - Send outgoing requests to potential friends and manage your incoming friend requests
+- Send outgoing requests to potential friends and manage your incoming friend requests
+<img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/6576ef69-618c-465a-a73a-4cd32e43b401" />
+
    
 1. Blocking
    - Block user's you no longer wish to interact with via their profile
@@ -56,22 +57,32 @@
    
 1. Event RSVPs
    - RSVP to events you are interested in attending
+   <img width="411" height="452" alt="unnamed" src="https://github.com/user-attachments/assets/516f5338-f8bf-41b2-b226-0beb80600bd5" />
+
    
 1. Event Sharing
    - And send invites with event details to your friends!
+   <img width="405" height="470" alt="unnamed" src="https://github.com/user-attachments/assets/0b620241-136f-4bc3-ac88-2b94c439f49c" />
+
    
 1. Guides Archive
    - See the Guides Archive to view a collection of guides
-   
+   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/f59be3ee-4311-4bc7-9515-b6b97a27a056" />
+   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/a5558ec1-ac52-4e9c-8db8-14d097b04d33" />
+   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/106ba1e4-81b5-48fa-b312-54293c43ee08" />
+
+
 1. Guides Q&A
    - Ask questions or answer other student's questions. The community can collectively vote on the most helpful answers with upvotes and downvotes, which will display the best answer on the guide's main page.
     
 1. Topic Creation
    - Can't find a Topic that matches your hobbies or interest? Make your own!
-   
+   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/5bd2bc52-29f0-4e74-8043-5cfc1bc360aa" />
+
 1. Topic Membership
    - Join Topics you resonate with and engage in the features within with other students
-   
+   <img width="230" height="512" alt="unnamed" src="https://github.com/user-attachments/assets/92050bcf-2c42-4e8c-bd44-b90c90ff7be6" />
+
 1. Searching & Filtering - Topics & Community Boards
    - Quickly filter between all of the topics you have joined, or search for a specific one by keyword!
    
@@ -83,10 +94,14 @@
    
 1. Commitment Streaks
    - Create a goal you'd like to commit to, and come here to track your progress towards your new commitment.
+   <img width="350" height="473" alt="unnamed" src="https://github.com/user-attachments/assets/d5e185f1-90f5-4aae-bbf7-8dc2b8294105" />
+   <img width="385" height="291" alt="unnamed" src="https://github.com/user-attachments/assets/a2d824a6-f7bf-4587-8f77-2aa3a303709b" />
+
    
 1. Mentorship Enrollment
    - Enroll in the Mentorship program as a volunteer mentor to other students, or as a mentee seeking guidance.
-   
+   <img width="427" height="693" alt="unnamed" src="https://github.com/user-attachments/assets/078c7387-3974-447e-8a3b-5aa80269fcde" />
+ 
 
 
 ## Technologies Utilized
