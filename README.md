@@ -89,7 +89,7 @@ Block users you no longer wish to interact with via their profile.
 ---
 
 ### 10. Events Calendar
-View an event’s existing events by date.
+View a Topic’s existing events by date.
 
 <img width="160" alt="Events Calendar" src="https://github.com/user-attachments/assets/f4d120b7-41fd-4fdd-86bc-cc4171b28353" />
 
